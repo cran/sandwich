@@ -1,5 +1,6 @@
 vcovHC <- function(x, order.by = NULL, data = list(),
-  type = c("HC2", "const", "HC", "HC1", "HC3"))
+  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
+  omega = NULL)
 {
   if(is.matrix(x$x))
     X <- x$x
@@ -21,30 +22,28 @@ vcovHC <- function(x, order.by = NULL, data = list(),
   }
   X <- X[index, , drop = FALSE]
   res <- res[index]
-    
-  Q1 <- summary(x)$cov.unscaled
-  sigma2 <- var(res)*(n-1)/(n-k)
+  
+  x.sum <- summary(x)  
+  Q1 <- x.sum$cov.unscaled
+  sigma2 <- x.sum$sigma^2
+  diaghat <- hat(X)
   type <- match.arg(type)
+  if(type == "HC") type <- "HC0"
 
-  if( type == "const") {
-    V <- sigma2 * Q1
-  } else {
-    if(type == "HC2")
-    {
-      diaghat <- 1 - diag(X %*% Q1 %*% t(X))
-      res <- res/sqrt(diaghat)
-    }
-    if(type == "HC3")
-    {
-      diaghat <- 1 - diag(X %*% Q1 %*% t(X))
-      res <- res/diaghat
-      Xu <- as.vector(t(X) %*% res)
-    }
-    VX <- res * X
-    if(type %in% c("HC", "HC1", "HC2")) { V <- crossprod(crossprod(t(VX), Q1)) }
-    if(type == "HC1") {V <- V * (n/(n-k))}
-    if(type == "HC3") {V <- Q1 %*% (crossprod(VX) - (outer(Xu,Xu) /n)) %*% Q1 * (n-1)/n}
+  V <- NULL
+  if(is.null(omega)) {
+    switch(type,
+      "const" = { omega <- function(residuals, diaghat, df) rep(1, length(residuals)) * sum(residuals^2)/df
+                  V <- sigma2 * Q1 },
+      "HC0" = { omega <- function(residuals, diaghat, df) residuals^2 },
+      "HC1" = { omega <- function(residuals, diaghat, df) residuals^2 * length(residuals)/df },
+      "HC2" = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat) },
+      "HC3" = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^2 },
+      "HC4" = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^pmin(4, length(residuals) * diaghat/as.integer(round(sum(diaghat), digits = 0))) })
+  }
+  if(is.null(V)) {
+    VX <- sqrt(omega(res, diaghat, x$df.residual)) * X
+    V <- crossprod(crossprod(t(VX), Q1))
   }
   return(V)
 }
-
