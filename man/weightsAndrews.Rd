@@ -12,15 +12,16 @@
 \usage{
 kernHAC(x, order.by = NULL, prewhite = 1, bw = NULL,
   kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
-  approx = c("AR(1)", "ARMA(1,1)"), diagnostics = FALSE, sandwich = TRUE, data = list(), \dots)
+  approx = c("AR(1)", "ARMA(1,1)"), diagnostics = FALSE, sandwich = TRUE,
+  ar.method = "ols", tol = 1e-7, data = list(), \dots)
 
 weightsAndrews(x, order.by = NULL, bw = NULL,
   kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
-  prewhite = 1, data = list(), \dots)
+  prewhite = 1, ar.method = "ols", tol = 1e-7, data = list(), \dots)
 
 bwAndrews(x, order.by = NULL, kernel = c("Quadratic Spectral", "Truncated",
   "Bartlett", "Parzen", "Tukey-Hanning"), approx = c("AR(1)", "ARMA(1,1)"),
-  weights = NULL, prewhite = 1, data = list())
+  weights = NULL, prewhite = 1, ar.method = "ols", data = list())
 }
 
 \arguments{
@@ -46,6 +47,10 @@ bwAndrews(x, order.by = NULL, kernel = c("Quadratic Spectral", "Truncated",
    See \code{\link{vcovHAC}} for details.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?
     If set to \code{FALSE} only the middle matrix is returned.}
+ \item{ar.method}{character. The \code{method} argument passed to
+   \code{\link{ar}} for prewhitening (only, not for bandwidth selection).}
+ \item{tol}{numeric. Weights that exceed \code{tol} are used for computing
+   the covariance matrix, all other weights are treated as 0.}
  \item{data}{an optional data frame containing the variables in the \code{order.by} 
     model. By default the variables are taken from the environment which
     the function is called from.}

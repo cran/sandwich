@@ -8,7 +8,7 @@
 }
 \usage{
 vcovHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
-  diagnostics = FALSE, sandwich = TRUE, data = list())
+  diagnostics = FALSE, sandwich = TRUE, ar.method = "ols", data = list())
 }
 \arguments{
  \item{x}{a fitted model object of class \code{"lm"} or \code{"glm"}.}
@@ -29,6 +29,8 @@ vcovHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
    See below for details.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?
     If set to \code{FALSE} only the middle matrix is returned.}
+ \item{ar.method}{character. The \code{method} argument passed to
+   \code{\link{ar}} for prewhitening.}
  \item{data}{an optional data frame containing the variables in the \code{order.by} 
     model. By default the variables are taken from the environment which
     \code{vcovHAC} is called from.}

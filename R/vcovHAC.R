@@ -1,6 +1,6 @@
 vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
   weights = weightsAndrews, diagnostics = FALSE, sandwich = TRUE,
-  data = list())
+  ar.method = "ols", data = list())
 {
   prewhite <- as.integer(prewhite)
 
@@ -23,7 +23,7 @@ vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
   umat <- umat[index, , drop = FALSE]
 
   if(prewhite > 0) {
-    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = "ols")
+    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method)
     if(k > 1) D <- solve(diag(ncol(umat)) - apply(var.fit$ar, 2:3, sum))
       else D <- as.matrix(1/(1 - sum(var.fit$ar)))
     umat <- as.matrix(na.omit(var.fit$resid))
@@ -31,7 +31,7 @@ vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
   }
 
   if(is.function(weights))
-    weights <- weights(x, order.by = order.by, prewhite = prewhite, data = data)
+    weights <- weights(x, order.by = order.by, prewhite = prewhite, ar.method = ar.method, data = data)
 
   if(length(weights) > n) {
     warning("more weights than observations, only first n used")
@@ -75,22 +75,22 @@ vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
 
 weightsAndrews <- function(x, order.by = NULL, bw = NULL,
   kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
-  prewhite = 1, data = list(), ...)
+  prewhite = 1, ar.method = "ols", tol = 1e-7, data = list(), ...)
 {
   kernel <- match.arg(kernel)
   if(is.null(bw))
     bw <- bwAndrews(x, order.by = order.by, kernel = kernel,
-      prewhite = prewhite, data = data, ...)
+      prewhite = prewhite, data = data, ar.method = ar.method, ...)
   n <- length(residuals(x)) - as.integer(prewhite)
   
   weights <- kweights(0:(n-1)/bw, kernel = kernel)
-  weights <- weights[1:max(which(abs(weights) > 1e-7))]
+  weights <- weights[1:max(which(abs(weights) > tol))]
   return(weights)
 }
 
 bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Truncated",
   "Bartlett", "Parzen", "Tukey-Hanning"), approx = c("AR(1)", "ARMA(1,1)"),
-  weights = NULL, prewhite = 1, data = list())
+  weights = NULL, prewhite = 1, ar.method = "ols", data = list())
 {
   kernel <- match.arg(kernel)
   approx <- match.arg(approx)
@@ -102,12 +102,17 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
 
   if(!is.null(order.by))
   {
-    z <- model.matrix(order.by, data = data)
-    z <- as.vector(z[,ncol(z)])
+    if(inherits(order.by, "formula")) {
+      z <- model.matrix(order.by, data = data)
+      z <- as.vector(z[,ncol(z)])
+    } else {
+      z <- order.by
+    }
     index <- order(z)
   } else {
     index <- 1:n
   }
+
   umat <- umat[index, , drop = FALSE]
 
   ## compute weights (try to set the intercept weight to 0)
@@ -130,7 +135,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
 
   if(prewhite > 0) {
     umat <- as.matrix(na.omit(ar(umat, order.max = prewhite,
-      demean = FALSE, aic = FALSE, method = "ols")$resid))
+      demean = FALSE, aic = FALSE, method = ar.method)$resid))
     n <- n - prewhite ##??
   }
 
@@ -187,8 +192,12 @@ weightsLumley <- function(x, order.by = NULL, C = NULL,
 
   if(!is.null(order.by))
   {
-    z <- model.matrix(order.by, data = data)
-    z <- as.vector(z[,ncol(z)])
+    if(inherits(order.by, "formula")) {
+      z <- model.matrix(order.by, data = data)
+      z <- as.vector(z[,ncol(z)])
+    } else {
+      z <- order.by
+    }
     index <- order(z)
   } else {
     index <- 1:n
@@ -217,21 +226,22 @@ weightsLumley <- function(x, order.by = NULL, C = NULL,
 
 kernHAC <- function(x, order.by = NULL, prewhite = 1, bw = NULL,
   kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
-  approx = c("AR(1)", "ARMA(1,1)"), diagnostics = FALSE, sandwich = TRUE, data = list(), ...)
+  approx = c("AR(1)", "ARMA(1,1)"), diagnostics = FALSE, sandwich = TRUE,
+  ar.method = "ols", tol = 1e-7, data = list(), ...)
 {
-  myweights <- function(x, order.by = NULL, prewhite = FALSE, data = list())
+  myweights <- function(x, order.by = NULL, prewhite = FALSE, ar.method = "ols", data = list())
     weightsAndrews(x, order.by = order.by, prewhite = prewhite, bw = bw,
-                   approx = approx, data = data, ...)
+                   kernel = kernel, approx = approx, ar.method = ar.method, tol = 1e-7, data = data, ...)
   vcovHAC(x, order.by = order.by, prewhite = prewhite,
     weights = myweights, diagnostics = diagnostics, sandwich = sandwich,
-    data = data)
+    ar.method = ar.method, data = data)
 }
 
 weave <- function(x, order.by = NULL, prewhite = FALSE, C = NULL,
   method = c("truncate", "smooth"), acf = isoacf, diagnostics = FALSE, 
   sandwich = TRUE, data = list(), ...)
 {
-  myweights <- function(x, order.by = NULL, prewhite = FALSE, data = list())
+  myweights <- function(x, order.by = NULL, prewhite = FALSE, data = list(), ...)
     weightsLumley(x, order.by = order.by, prewhite = prewhite, C = C,
                    method = method, acf = acf, data = data)
   vcovHAC(x, order.by = order.by, prewhite = prewhite,

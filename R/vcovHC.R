@@ -14,8 +14,12 @@ vcovHC <- function(x, order.by = NULL, data = list(),
 
   if(!is.null(order.by))
   {
-    z <- model.matrix(order.by, data = data)
-    z <- as.vector(z[,ncol(z)])
+    if(inherits(order.by, "formula")) {
+      z <- model.matrix(order.by, data = data)
+      z <- as.vector(z[,ncol(z)])
+    } else {
+      z <- order.by
+    }
     index <- order(z)
   } else {
     index <- 1:n
