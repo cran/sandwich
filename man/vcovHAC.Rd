@@ -8,7 +8,8 @@
 }
 \usage{
 vcovHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
-  diagnostics = FALSE, sandwich = TRUE, ar.method = "ols", data = list())
+  adjust = TRUE, diagnostics = FALSE, sandwich = TRUE, ar.method = "ols",
+  data = list())
 }
 \arguments{
  \item{x}{a fitted model object of class \code{"lm"} or \code{"glm"}.}
@@ -23,10 +24,13 @@ vcovHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
     method \code{"ols"} and \code{demean = FALSE}.}
  \item{weights}{Either a vector of weights for the autocovariances or a
     function to compute these weights based on \code{x}, \code{order.by},
-    \code{prewhite} and \code{data}. If \code{weights} is a function
-    it has to take these arguments. See also details.}
+    \code{prewhite}, \code{ar.method} and \code{data}. If \code{weights}
+    is a function it has to take these arguments. See also details.}
+ \item{adjust}{logical. Should a finite sample adjustment be made?
+    This amounts to multiplication with $n/(n-k)$ where $n$ is the
+    number of observations and $k$ the number of estimated parameters.}
  \item{diagnostics}{logical. Should additional model diagnostics be returned?
-   See below for details.}
+    See below for details.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?
     If set to \code{FALSE} only the middle matrix is returned.}
  \item{ar.method}{character. The \code{method} argument passed to

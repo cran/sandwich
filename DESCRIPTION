@@ -1,11 +1,12 @@
 Package: sandwich
-Version: 0.1-3
-Date: 2004-07-19
+Version: 0.9-0
+Date: 2004-11-02
 Title: Robust Covariance Matrix Estimators
 Author: Thomas Lumley, Achim Zeileis
 Maintainer: Achim Zeileis <Achim.Zeileis@wu-wien.ac.at>
-Description: Model-robust standard error estimators for time series
-	     and longitudinal data.
+Description: Model-robust standard error estimators for cross-sectional,
+             time series and longitudinal data.
 Depends: zoo, R (>= 1.5.0)
+Suggests: lmtest, strucchange
 License: GPL version 2
-Packaged: Mon Jul 19 23:28:55 2004; zeileis
+Packaged: Tue Nov  2 17:45:51 2004; zeileis

@@ -1,6 +1,8 @@
+## vcovHAC() is the general workhorse for HAC estimation
+
 vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
-  weights = weightsAndrews, diagnostics = FALSE, sandwich = TRUE,
-  ar.method = "ols", data = list())
+  weights = weightsAndrews, adjust = TRUE, diagnostics = FALSE,
+  sandwich = TRUE, ar.method = "ols", data = list())
 {
   prewhite <- as.integer(prewhite)
 
@@ -51,8 +53,9 @@ vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
   }
 
   utu <- utu + t(utu)
+
   ## Andrews: multiply with df n/(n-k)
-  utu <- n.orig/(n.orig-k) * utu
+  if(adjust) utu <- n.orig/(n.orig-k) * utu
   
   if(prewhite > 0) {
     utu <- crossprod(t(D), utu) %*% t(D)
@@ -73,14 +76,23 @@ vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
   return(rval)
 }
 
-weightsAndrews <- function(x, order.by = NULL, bw = NULL,
+
+
+## weightsAndrews() and bwAndrews() implement the HAC estimation
+## procedure described in Andrews (1991) and Andrews & Monahan (1992)
+## kernHAC() is the convenience interface.
+## (Note, that bwNeweyWest() can also be used with weightsAndrews())
+
+weightsAndrews <- function(x, order.by = NULL, bw = bwAndrews,
   kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
-  prewhite = 1, ar.method = "ols", tol = 1e-7, data = list(), ...)
+  prewhite = 1, ar.method = "ols", tol = 1e-7, data = list(), verbose = FALSE, ...)
 {
   kernel <- match.arg(kernel)
-  if(is.null(bw))
-    bw <- bwAndrews(x, order.by = order.by, kernel = kernel,
+  if(is.function(bw))
+    bw <- bw(x, order.by = order.by, kernel = kernel,
       prewhite = prewhite, data = data, ar.method = ar.method, ...)
+  if(verbose) cat(paste("\nBandwidth chosen:", bw, "\n"))
+      
   n <- length(residuals(x)) - as.integer(prewhite)
   
   weights <- kweights(0:(n-1)/bw, kernel = kernel)
@@ -90,7 +102,7 @@ weightsAndrews <- function(x, order.by = NULL, bw = NULL,
 
 bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Truncated",
   "Bartlett", "Parzen", "Tukey-Hanning"), approx = c("AR(1)", "ARMA(1,1)"),
-  weights = NULL, prewhite = 1, ar.method = "ols", data = list())
+  weights = NULL, prewhite = 1, ar.method = "ols", data = list(), ...)
 {
   kernel <- match.arg(kernel)
   approx <- match.arg(approx)
@@ -116,8 +128,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   umat <- umat[index, , drop = FALSE]
 
   ## compute weights (try to set the intercept weight to 0)
-  ## ignore at the moment: use 1 instead
-  weights <- 1
+  #### could be ignored by using: weights = 1
   
   if(is.null(weights)) {
     weights <- rep(1, k)
@@ -174,7 +185,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   }
 
   rval <- switch(kernel,
-    "Truncated"          = {stop("no automatic bandwidth selection available for `Truncated' kernel, use weightsLumley() instead")},
+    "Truncated"          = {0.6611 * (n * alpha2)^(1/5)},
     "Bartlett"           = {1.1447 * (n * alpha1)^(1/3)},
     "Parzen"             = {2.6614 * (n * alpha2)^(1/5)},
     "Tukey-Hanning"      = {1.7462 * (n * alpha2)^(1/5)},
@@ -182,6 +193,26 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
 
   return(rval)  
 }
+
+kernHAC <- function(x, order.by = NULL, prewhite = 1, bw = bwAndrews,
+  kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
+  approx = c("AR(1)", "ARMA(1,1)"), adjust = TRUE, diagnostics = FALSE, sandwich = TRUE,
+  ar.method = "ols", tol = 1e-7, data = list(), verbose = FALSE, ...)
+{
+  myweights <- function(x, order.by = NULL, prewhite = FALSE, ar.method = "ols", data = list())
+    weightsAndrews(x, order.by = order.by, prewhite = prewhite, bw = bw,
+                   kernel = kernel, approx = approx, ar.method = ar.method, tol = tol,
+		   data = data, verbose = verbose, ...)
+  vcovHAC(x, order.by = order.by, prewhite = prewhite,
+    weights = myweights, adjust = adjust, diagnostics = diagnostics,
+    sandwich = sandwich, ar.method = ar.method, data = data)
+}
+
+
+
+## weightsLumley() implements the WEAVE estimators from 
+## Lumley & Heagerty (1999)
+## weave() is a convenience interface
 
 weightsLumley <- function(x, order.by = NULL, C = NULL,
   method = c("truncate", "smooth"), acf = isoacf, data = list(), ...)
@@ -224,27 +255,123 @@ weightsLumley <- function(x, order.by = NULL, C = NULL,
 
 
 
-kernHAC <- function(x, order.by = NULL, prewhite = 1, bw = NULL,
-  kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
-  approx = c("AR(1)", "ARMA(1,1)"), diagnostics = FALSE, sandwich = TRUE,
-  ar.method = "ols", tol = 1e-7, data = list(), ...)
-{
-  myweights <- function(x, order.by = NULL, prewhite = FALSE, ar.method = "ols", data = list())
-    weightsAndrews(x, order.by = order.by, prewhite = prewhite, bw = bw,
-                   kernel = kernel, approx = approx, ar.method = ar.method, tol = 1e-7, data = data, ...)
-  vcovHAC(x, order.by = order.by, prewhite = prewhite,
-    weights = myweights, diagnostics = diagnostics, sandwich = sandwich,
-    ar.method = ar.method, data = data)
-}
-
 weave <- function(x, order.by = NULL, prewhite = FALSE, C = NULL,
-  method = c("truncate", "smooth"), acf = isoacf, diagnostics = FALSE, 
-  sandwich = TRUE, data = list(), ...)
+  method = c("truncate", "smooth"), acf = isoacf, adjust = FALSE,
+  diagnostics = FALSE, sandwich = TRUE, data = list(), ...)
 {
   myweights <- function(x, order.by = NULL, prewhite = FALSE, data = list(), ...)
     weightsLumley(x, order.by = order.by, prewhite = prewhite, C = C,
                    method = method, acf = acf, data = data)
   vcovHAC(x, order.by = order.by, prewhite = prewhite,
-    weights = myweights, diagnostics = diagnostics, sandwich = sandwich,
-    data = data)
+    weights = myweights, adjust = adjust, diagnostics = diagnostics,
+    sandwich = sandwich, data = data)
 }
+
+
+## bwNeweyWest() implements the procedure from Newey & West (1994)
+## It works for Bartlett/Parzen/QS kernels and can thus be passed
+## to weightsAndrews() and kernHAC() respectively.
+## A convenience interface NeweyWest() to only the Bartlett kernel
+## is also available.
+
+bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
+  "Quadratic Spectral", "Truncated", "Tukey-Hanning"), weights = NULL, prewhite = 1,
+  ar.method = "ols", data = list(), ...)
+{
+  kernel <- match.arg(kernel)
+  if(kernel %in% c("Truncated", "Tukey-Hanning"))
+    stop(paste("Automatic bandwidth selection only available for ", 
+      dQuote("Bartlett"), ", ", dQuote("Parzen"), " and ", dQuote("Quadratic Spectral"),
+      " kernel. Use ", sQuote("bwAndrews"), " instead.", sep = ""))
+  prewhite <- as.integer(prewhite)
+
+  umat <- estfun(x)[,, drop = FALSE]
+  n <- nrow(umat)
+  k <- ncol(umat)
+
+  if(!is.null(order.by))
+  {
+    if(inherits(order.by, "formula")) {
+      z <- model.matrix(order.by, data = data)
+      z <- as.vector(z[,ncol(z)])
+    } else {
+      z <- order.by
+    }
+    index <- order(z)
+  } else {
+    index <- 1:n
+  }
+
+  umat <- umat[index, , drop = FALSE]
+
+  ## compute weights (try to set the intercept weight to 0)
+  #### could be ignored by using: weights = 1
+  
+  if(is.null(weights)) {
+    weights <- rep(1, k)
+    unames <- colnames(umat)
+    if(!is.null(unames) && "(Intercept)" %in% unames)
+      weights[which(unames == "(Intercept)")] <- 0
+    else {
+      res <- as.vector(residuals(x, "working"))
+      weights[which(colSums((umat - res)^2) < 1e-16)] <- 0      
+    }
+  } else {
+    weights <- rep(weights, length.out = k)
+  }
+  if(length(weights) < 2) weights <- 1
+
+  ## select lag truncation according to Table II C. from Newey & West (1994)
+  mrate <- switch(kernel, 
+    "Bartlett"           = 2/9,
+    "Parzen"             = 4/25,
+    "Quadratic Spectral" = 2/25)
+  m <- floor(ifelse(prewhite > 0, 3, 4) * (n/100)^mrate)
+
+  if(prewhite > 0) {
+    umat <- as.matrix(na.omit(ar(umat, order.max = prewhite,
+      demean = FALSE, aic = FALSE, method = ar.method)$resid))
+    n <- n - prewhite
+  }
+
+  ## compute weighted variances
+  hw <- rowSums(t(t(umat) * weights))
+  sigmaj <- function(j) sum(hw[1:(n-j)] * hw[(j+1):n])/n
+  sigma <- sapply(0:m, sigmaj)
+  s0 <- sigma[1] + 2*sum(sigma[-1])
+  s1 <- 2 * sum(1:m * sigma[-1])
+  s2 <- 2 * sum((1:m)^2 * sigma[-1])
+  
+  ## use parameters as in Table I B.
+  ## choose 1/(2*q + 1)
+  qrate <- 1/(2 * ifelse(kernel == "Bartlett", 1, 2) + 1)
+  ## compute gamma
+  rval <- switch(kernel,
+    "Bartlett"           = { 1.1447 * ((s1/s0)^2)^qrate },
+    "Parzen"             = { 2.6614 * ((s2/s0)^2)^qrate },
+    "Quadratic Spectral" = { 1.3221 * ((s2/s0)^2)^qrate })
+  ## compute bandwidth
+  rval <- rval * (n + prewhite)^qrate
+
+  ## rval is not truncated. This is done in NeweyWest(),
+  ## but bwNeweyWest() can also used without truncation.
+  
+  return(rval)  
+}
+
+NeweyWest <- function(x, lag = NULL,
+  order.by = NULL, prewhite = TRUE, adjust = FALSE, 
+  diagnostics = FALSE, sandwich = TRUE, ar.method = "ols", data = list(),
+  verbose = FALSE)
+{
+  if(is.null(lag)) lag <- floor(bwNeweyWest(x, 
+    order.by = order.by, prewhite = prewhite,
+    ar.method = ar.method, data = data))
+  if(verbose) cat(paste("\nLag truncation parameter chosen:", lag, "\n"))
+  
+  myweights <- seq(1, 0, by = -(1/(lag + 1)))
+  vcovHAC(x, order.by = order.by, prewhite = prewhite,
+    weights = myweights, adjust = adjust, diagnostics = diagnostics,
+    sandwich = sandwich, ar.method = ar.method, data = data)
+}
+

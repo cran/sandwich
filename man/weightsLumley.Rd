@@ -10,8 +10,8 @@
 
 \usage{
 weave(x, order.by = NULL, prewhite = FALSE, C = NULL,
-  method = c("truncate", "smooth"), acf = isoacf, diagnostics = FALSE, 
-  sandwich = TRUE, data = list(), \dots)
+  method = c("truncate", "smooth"), acf = isoacf, adjust = FALSE,
+  diagnostics = FALSE, sandwich = TRUE, data = list(), \dots)
 
 weightsLumley(x, order.by = NULL, C = NULL,
   method = c("truncate", "smooth"), acf = isoacf, data = list(), \dots)
@@ -33,6 +33,9 @@ weightsLumley(x, order.by = NULL, C = NULL,
  \item{method}{a character specifying the method used, see details.}
  \item{acf}{a function that computes the autocorrelation function of 
     a vector, by default \code{\link{isoacf}} is used.}
+ \item{adjust}{logical. Should a finite sample adjustment be made?
+    This amounts to multiplication with $n/(n-k)$ where $n$ is the
+    number of observations and $k$ the number of estimated parameters.}
  \item{diagnostics}{logical. Should additional model diagnostics be returned?
    See \code{\link{vcovHAC}} for details.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?

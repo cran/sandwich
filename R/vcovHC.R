@@ -1,6 +1,6 @@
-vcovHC <- function(x, order.by = NULL, data = list(),
+vcovHC <- function(x, 
   type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
-  omega = NULL)
+  omega = NULL, ...)
 {
   if(is.matrix(x$x))
     X <- x$x
@@ -11,21 +11,6 @@ vcovHC <- function(x, order.by = NULL, data = list(),
   res <- residuals(x)
   n <- nrow(X)
   k <- ncol(X)
-
-  if(!is.null(order.by))
-  {
-    if(inherits(order.by, "formula")) {
-      z <- model.matrix(order.by, data = data)
-      z <- as.vector(z[,ncol(z)])
-    } else {
-      z <- order.by
-    }
-    index <- order(z)
-  } else {
-    index <- 1:n
-  }
-  X <- X[index, , drop = FALSE]
-  res <- res[index]
   
   x.sum <- summary(x)  
   Q1 <- x.sum$cov.unscaled
@@ -46,7 +31,8 @@ vcovHC <- function(x, order.by = NULL, data = list(),
       "HC4" = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^pmin(4, length(residuals) * diaghat/as.integer(round(sum(diaghat), digits = 0))) })
   }
   if(is.null(V)) {
-    VX <- sqrt(omega(res, diaghat, x$df.residual)) * X
+    if(is.function(omega)) omega <- omega(res, diaghat, x$df.residual)
+    VX <- sqrt(omega) * X
     V <- crossprod(crossprod(t(VX), Q1))
   }
   return(V)
