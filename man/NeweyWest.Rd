@@ -93,6 +93,10 @@ which is typically just the covariance matrix.
   Automatic Lag Selection in Covariance Matrix Estimation.
   \emph{Review of Economic Studies}, \bold{61},
   631--653.
+
+  Zeileis A (2004),
+  Econometric Computing with HC and HAC Covariance Matrix Estimators.
+  \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
 }
 
 \seealso{\code{\link{vcovHAC}}, \code{\link{weightsAndrews}},

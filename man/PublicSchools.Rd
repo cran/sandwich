@@ -18,7 +18,7 @@ A data frame containing 51 observations of 2 variables.
 
 \references{
 Cribari-Neto F. (2004), Asymptotic Inference Under Heteroskedasticity
-  of Unknown Form, emph{Computational Statistics \& Data Analysis},
+  of Unknown Form, \emph{Computational Statistics \& Data Analysis},
   \bold{45}, 215-233.
 
 Greene W.H. (1993), \emph{Econometric Analysis}, 2nd edition.

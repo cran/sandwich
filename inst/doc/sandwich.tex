@@ -38,19 +38,13 @@ can be integrated into applications.
 
 \begin{document}
 
-\SweaveOpts{engine=R,eps=FALSE}
+
 %\VignetteIndexEntry{Econometric Computing with HC and HAC Covariance Matrix Estimators}
 %\VignetteDepends{sandwich,zoo,lmtest,strucchange}
 %\VignetteKeywords{covariance matrix estimator, heteroskedasticity, autocorrelation, estimating functions, econometric computing, R}
 %\VignettePackage{sandwich}
 
 
-<<preliminaries,echo=FALSE,results=hide>>=
-library(zoo)
-library(sandwich)
-library(strucchange)
-library(lmtest)
-@
 
 \section{Introduction} \label{sec:intro}
 
@@ -369,29 +363,7 @@ function \code{bwNeweyWest}, see also below.
 \setkeys{Gin}{width=.7\textwidth} 
 \begin{figure}[tbh]
 \begin{center}
-<<hac-kweights,fig=TRUE,height=5,width=7,echo=FALSE>>=
-curve(kweights(x, kernel = "Quadratic", normalize = TRUE),
-      from = 0, to = 3.2, xlab = "x", ylab = "K(x)")
-curve(kweights(x, kernel = "Bartlett", normalize = TRUE),
-      from = 0, to = 3.2, col = 2, add = TRUE)
-curve(kweights(x, kernel = "Parzen", normalize = TRUE),
-      from = 0, to = 3.2, col = 3, add = TRUE)
-curve(kweights(x, kernel = "Tukey", normalize = TRUE),
-      from = 0, to = 3.2, col = 4, add = TRUE)
-lines(c(0, 0.5), c(1, 1), col = 6)
-lines(c(0.5, 0.5), c(1, 0), lty = 3, col = 6)
-lines(c(0.5, 3.2), c(0, 0), col = 6)
-curve(kweights(x, kernel = "Quadratic", normalize = TRUE),
-      from = 0, to = 3.2, col = 1, add = TRUE)
-
-text(0.5, 0.98, "Truncated", pos = 4)
-text(0.8, kweights(0.8, "Bartlett", normalize = TRUE), "Bartlett", pos = 4)
-text(1.35, kweights(1.4, "Quadratic", normalize = TRUE), "Quadratic Spectral", pos = 2)
-text(1.15, 0.29, "Parzen", pos = 4)
-arrows(1.17, 0.29, 1, kweights(1, "Parzen", normalize = TRUE), length = 0.1)
-text(1.3, 0.2, "Tukey-Hanning", pos = 4)
-arrows(1.32, 0.2, 1.1, kweights(1.1, "Tukey", normalize = TRUE), length = 0.1)
-@
+\includegraphics{sandwich-hac-kweights}
 \caption{\label{fig:kweights} Kernel functions for kernel-based HAC estimation}
 \end{center}
 \end{figure}
@@ -513,10 +485,12 @@ those which produce the figures in the text, are provided (without output) in th
 appendix along with the versions of \proglang{R} and the packages used.
 Before we start with the examples, the \pkg{sandwich} and \pkg{lmtest} package
 have to be loaded:
-<<loadlibs1>>=
-library(sandwich)
-library(lmtest)
-@
+\begin{Schunk}
+\begin{Sinput}
+> library(sandwich)
+> library(lmtest)
+\end{Sinput}
+\end{Schunk}
 
 \subsection{Testing coefficients in cross-sectional data}
 
@@ -528,20 +502,24 @@ data for the 51 US states
 is given in Table 14.1 in \cite{hac:Greene:1993} and available in
 \pkg{sandwich} in the data frame \code{PublicSchools} which can be
 loaded by:
-<<hc-data>>=
-data(PublicSchools)
-ps <- na.omit(PublicSchools)
-ps$Income <- ps$Income * 0.0001
-@
+\begin{Schunk}
+\begin{Sinput}
+> data(PublicSchools)
+> ps <- na.omit(PublicSchools)
+> ps$Income <- ps$Income * 1e-04
+\end{Sinput}
+\end{Schunk}
 where the second line omits a missing value (\code{NA}) in Wisconsin
 and assigns the result to a new data frame \code{ps} and
 the third line transforms the income to be in USD $10,000$.
 The quadratic regression can now easily be fit using the function
 \code{lm} which fits linear regression models specified by
 a symbolic formula via OLS.
-<<hc-model>>=
-fm.ps <- lm(Expenditure ~ Income + I(Income^2), data = ps)
-@
+\begin{Schunk}
+\begin{Sinput}
+> fm.ps <- lm(Expenditure ~ Income + I(Income^2), data = ps)
+\end{Sinput}
+\end{Schunk}
 The fitted \code{"lm"} object \code{fm.ps} now contains the regression of
 the variable \code{Expenditure} on the variable \code{Income}
 and its sqared value, both variables are taken from the data frame \code{ps}.
@@ -550,18 +528,40 @@ needed, i.e., whether the coefficient of \verb/I(Income^2)/ is significantly
 different from zero. The partial quasi-$t$~tests (or $z$~tests) for all
 coefficients can be computed using the function \code{coeftest}. \cite{hac:Greene:1993}
 assesses the significance using the HC0 estimator of \cite{hac:White:1980}.
-<<hc-test1>>=
-coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC0"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC0"))
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients of "lm" object 'fm.ps':
+
+            Estimate Std. Error z value Pr(>|z|)  
+(Intercept)   832.91     460.89  1.8072  0.07073 .
+Income      -1834.20    1243.04 -1.4756  0.14006  
+I(Income^2)  1587.04     829.99  1.9121  0.05586 .
+---
+Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+\end{Soutput}
+\end{Schunk}
 The \code{vcov} argument specifies the covariance matrix as a matrix
 (as opposed to a function) which is returned by \code{vcovHC(fm.ps, type = "HC0")}.
 As \code{df} is set to infinity (\code{Inf}) a normal approximation is used
 for computing the $p$ values which seem to suggest that the quadratic term
 might be weakly significant. In his analysis, \cite{hac:Cribari-Neto:2004} uses his HC4 estimator
 (among others) giving the following result:
-<<hc-test2>>=
-coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
-@
+\begin{Schunk}
+\begin{Sinput}
+> coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients of "lm" object 'fm.ps':
+
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept)   832.91    3008.01  0.2769   0.7819
+Income      -1834.20    8183.19 -0.2241   0.8226
+I(Income^2)  1587.04    5488.93  0.2891   0.7725
+\end{Soutput}
+\end{Schunk}
 The quadratic term is clearly non-significant. The reason for this result is
 depicted in Figure~\ref{fig:hc} which shows the data along with the fitted linear
 and quadratic model---the latter being obviously heavily influenced by a single outlier: 
@@ -571,16 +571,7 @@ the HC0 estimator is due to the correction for high leverage points.
 \setkeys{Gin}{width=.6\textwidth} 
 \begin{figure}[tbh]
 \begin{center}
-<<hc-plot,fig=TRUE,height=5,width=6,echo=FALSE>>=
-plot(Expenditure ~ Income, data = ps,
-  xlab = "per capita income",
-  ylab = "per capita spending on public schools")
-inc <- seq(0.5, 1.2, by = 0.001)
-lines(inc, predict(fm.ps, data.frame(Income = inc)), col = 4, lty = 2)
-fm.ps2 <- lm(Expenditure ~ Income, data = ps)
-abline(fm.ps2, col = 4)
-text(ps[2,2], ps[2,1], rownames(ps)[2], pos = 2)
-@
+\includegraphics{sandwich-hc-plot}
 \caption{\label{fig:hc} Expenditure on public schools and income with fitted models}
 \end{center}
 \end{figure}
@@ -596,26 +587,55 @@ to formulate a model that explains real investment by real GNP and real
 interest. The corresponding transformed variables \code{RealInv}, \code{RealGNP}
 and \code{RealInt} are stored in the data frame \code{Investment} in
 \pkg{sandwich} which can be loaded by:
-<<hac-data>>=
-data(Investment)
-@
+\begin{Schunk}
+\begin{Sinput}
+> data(Investment)
+\end{Sinput}
+\end{Schunk}
 Subsequently, the fitted linear regression model is computed by:
-<<hac-model>>=
-fm.inv <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
-@
+\begin{Schunk}
+\begin{Sinput}
+> fm.inv <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
+\end{Sinput}
+\end{Schunk}
 and the significance of the coefficients can again be assessed
 by partial $z$ tests using \code{coeftest}. \cite{hac:Greene:1993}
 uses the estimator of \cite{hac:Newey+West:1987} without prewhitening and
 with lag $L = 4$ for this purpose which is here passed as a matrix (as opposed to a function)
 to \code{coeftest}.
-<<hac-test1>>=
-coeftest(fm.inv, df = Inf, vcov = NeweyWest(fm.inv, lag = 4, prewhite = FALSE))
-@
+\begin{Schunk}
+\begin{Sinput}
+> coeftest(fm.inv, df = Inf, vcov = NeweyWest(fm.inv, lag = 4, 
++     prewhite = FALSE))
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients of "lm" object 'fm.inv':
+
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -12.533601  18.958298 -0.6611   0.5085    
+RealGNP       0.169136   0.016751 10.0972   <2e-16 ***
+RealInt      -1.001438   3.342375 -0.2996   0.7645    
+---
+Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+\end{Soutput}
+\end{Schunk}
 If alternatively the automatic bandwidth selection procedure of \cite{hac:Newey+West:1994}
 with prewhitening should be used, this can be passed as a function to \code{coeftest}.
-<<hac-test2>>=
-coeftest(fm.inv, df = Inf, vcov = NeweyWest)
-@
+\begin{Schunk}
+\begin{Sinput}
+> coeftest(fm.inv, df = Inf, vcov = NeweyWest)
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients of "lm" object 'fm.inv':
+
+              Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) -12.533601  24.374177 -0.5142    0.6071    
+RealGNP       0.169136   0.023586  7.1709 7.449e-13 ***
+RealInt      -1.001438   3.639935 -0.2751    0.7832    
+---
+Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+\end{Soutput}
+\end{Schunk}
 For illustration purposes, we show how a new function implementing a particular
 HAC estimator can be easily set up using the tools provided by \pkg{sandwich}.
 This is particularly helpful if the same estimator is to be applied several times
@@ -623,11 +643,23 @@ in the course of an analysis. Suppose, we want to use a Parzen kernel with VAR(2
 prewhitening, no finite sample adjustment and automatic bandwidth selection
 according to \cite{hac:Newey+West:1994}. First, we set
 up the function \code{parzenHAC} and then pass this function to \code{coeftest}. 
-<<hac-test3>>=
-parzenHAC <- function(x, ...) kernHAC(x, kernel = "Parzen", prewhite = 2,
-  adjust = FALSE, bw = bwNeweyWest, ...)
-coeftest(fm.inv, df = Inf, vcov = parzenHAC)
-@
+\begin{Schunk}
+\begin{Sinput}
+> parzenHAC <- function(x, ...) kernHAC(x, kernel = "Parzen", prewhite = 2, 
++     adjust = FALSE, bw = bwNeweyWest, ...)
+> coeftest(fm.inv, df = Inf, vcov = parzenHAC)
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients of "lm" object 'fm.inv':
+
+              Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) -12.533601  24.663944 -0.5082    0.6113    
+RealGNP       0.169136   0.020835  8.1181 4.737e-16 ***
+RealInt      -1.001438   3.947469 -0.2537    0.7997    
+---
+Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+\end{Soutput}
+\end{Schunk}
 The three estimators leads to slightly different standard errors, but all
 tests agree that real GNP has a highly significant influence while
 the real interest rate has not. The data along with the fitted regression
@@ -636,16 +668,7 @@ are depicted in Figure~\ref{fig:hac}.
 \setkeys{Gin}{width=.6\textwidth} 
 \begin{figure}[tbh]
 \begin{center}
-<<hac-plot,fig=TRUE,height=5,width=6,echo=FALSE,results=hide>>=
-if(require(scatterplot3d)) {
-  s3d <- scatterplot3d(Investment[,c(5,7,6)],
-    type = "b", angle = 65, scale.y = 1, pch = 16)
-  s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
-} else {
-  plot(Investment[, "RealInv"], type = "b", pch = 19, ylab = "Real investment")
-  lines(ts(fitted(fm.inv), start = 1964), col = 4)
-}
-@
+\includegraphics{sandwich-hac-plot}
 \caption{\label{fig:hac} Investment equation data with fitted model}
 \end{center}
 \end{figure}
@@ -685,14 +708,18 @@ fitting and assessing fluctuation processes including OLS-based CUSUM processes
 \citep[see][for more details]{hac:Zeileis:2004}.
 
 After loading the package and the data,
-<<loadlibs2>>=
-library(strucchange)
-data(RealInt)
-@
+\begin{Schunk}
+\begin{Sinput}
+> library(strucchange)
+> data(RealInt)
+\end{Sinput}
+\end{Schunk}
 the command
-<<sc-ocus>>=
-ocus <- gefp(RealInt ~ 1, fit = lm, vcov = kernHAC)
-@
+\begin{Schunk}
+\begin{Sinput}
+> ocus <- gefp(RealInt ~ 1, fit = lm, vcov = kernHAC)
+\end{Sinput}
+\end{Schunk}
 fits the OLS-based CUSUM process for a regression on the mean (\verb/RealInt ~ 1/),
 using the function \code{lm} and estimating the variance using the function
 \code{kernHAC}. The fitted OLS-based CUSUM process can then be visualized together
@@ -701,17 +728,36 @@ a similar plot as in the left panel of Figure~\ref{fig:sc} (see the appendix for
 As the process crosses its boundary, there is a significant change in the mean, while
 the clear peak in the process conveys that there is at least one strong break in the
 early 1980s. A formal significance test can also be carried out by \code{sctest(ocus)}
-which leads to a highly significant $p$ value of \Sexpr{round(sctest(ocus)$p.value, digits = 4)}.
+which leads to a highly significant $p$ value of 0.0082.
 Similarly, the same quadratic spectral kernel HAC estimator could also be used for
 computing and visualizing the sup$F$ test of \cite{hac:Andrews:1993}, the code is provided 
 in the appendix.
 
 Finally, the breakpoints in this model along with their confidence intervals
 can be computed by:
-<<sc-bp>>=
-bp <- breakpoints(RealInt ~ 1)
-confint(bp, vcov = kernHAC)
-@
+\begin{Schunk}
+\begin{Sinput}
+> bp <- breakpoints(RealInt ~ 1)
+> confint(bp, vcov = kernHAC)
+\end{Sinput}
+\begin{Soutput}
+	 Confidence intervals for breakpoints
+	 of optimal 3-segment partition: 
+
+Call:
+confint.breakpointsfull(object = bp, vcov = kernHAC)
+
+Breakpoints at observation number:
+  2.5 % breakpoints 97.5 %
+1    37          47     48
+2    77          79     81
+
+Corresponding to breakdates:
+  2.5 %   breakpoints 97.5 % 
+1 1970(1) 1972(3)     1972(4)
+2 1980(1) 1980(3)     1981(1)
+\end{Soutput}
+\end{Schunk}
 The dating algorithm \code{breakpoints} implements the procedure described in
 \cite{hac:Bai+Perron:2003} and estimates the timing of the structural changes
 by OLS. Therefore, in this step no covariance matrix estimate is required, but for
@@ -729,13 +775,7 @@ intervals is depicted in the right panel of Figure~\ref{fig:sc}.
 \setkeys{Gin}{width=\textwidth} 
 \begin{figure}[tbh]
 \begin{center}
-<<sc-plot,fig=TRUE,height=4,width=10,echo=FALSE>>=
-par(mfrow = c(1, 2))
-plot(ocus, aggregate = FALSE, main = "")
-plot(RealInt, ylab = "Real interest rate")
-lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
-lines(confint(bp, vcov = kernHAC))
-@
+\includegraphics{sandwich-sc-plot}
 \caption{\label{fig:sc} OLS-based CUSUM test (left) and fitted model (right) for real interest data}
 \end{center}
 \end{figure}
@@ -775,57 +815,67 @@ in the development of \pkg{sandwich}.
 
 %% for "plain pretty" printing
 \DefineVerbatimEnvironment{Sinput}{Verbatim}{}
-<<echo=FALSE>>=
-options(prompt = "  ")
-@
 
 \section[R code]{\proglang{R} code}
 
 The packages \pkg{sandwich}, \pkg{lmtest} and \pkg{strucchange} are
 required for the applications in this paper. Furthermore, the packages
 depend on \pkg{zoo}. For the computations in this paper \proglang{R}
-\Sexpr{paste(R.Version()[6:7], collapse = ".")} and \pkg{sandwich}
-\Sexpr{gsub("-", "--", packageDescription("sandwich")$Version)},
-\pkg{lmtest} \Sexpr{gsub("-", "--", packageDescription("lmtest")$Version)},
-\pkg{strucchange} \Sexpr{gsub("-", "--", packageDescription("strucchange")$Version)}
-and \pkg{zoo} \Sexpr{gsub("-", "--", packageDescription("zoo")$Version)}
+2.0.1 and \pkg{sandwich}
+1.0--0,
+\pkg{lmtest} 0.9--11,
+\pkg{strucchange} 1.2--8
+and \pkg{zoo} 0.9--1
 have been used. \proglang{R} itself and all packages used are available from
 CRAN at \url{http://CRAN.R-project.org/}.
 
 To make the packages available for the examples the following commands are 
 necessary:
-<<eval=FALSE>>=
-<<loadlibs1>>
-library(strucchange)
-@
+\begin{Schunk}
+\begin{Sinput}
+  library(sandwich)
+  library(lmtest)
+  library(strucchange)
+\end{Sinput}
+\end{Schunk}
 
 \subsection{Testing coefficients in cross-sectional data}
 
 Load public schools data,
 omit \code{NA} in Wisconsin and scale income:
-<<eval=FALSE>>=
-<<hc-data>>
-@
+\begin{Schunk}
+\begin{Sinput}
+  data(PublicSchools)
+  ps <- na.omit(PublicSchools)
+  ps$Income <- ps$Income * 1e-04
+\end{Sinput}
+\end{Schunk}
 
 Fit quadratic regression model:
-<<eval=FALSE>>=
-<<hc-model>>
-@
+\begin{Schunk}
+\begin{Sinput}
+  fm.ps <- lm(Expenditure ~ Income + I(Income^2), data = ps)
+\end{Sinput}
+\end{Schunk}
 
 Compare standard errors:
-<<eval=FALSE>>=
-sqrt(diag(vcov(fm.ps)))
-sqrt(diag(vcovHC(fm.ps, type = "const")))
-sqrt(diag(vcovHC(fm.ps, type = "HC0")))
-sqrt(diag(vcovHC(fm.ps, type = "HC3")))
-sqrt(diag(vcovHC(fm.ps, type = "HC4")))
-@
+\begin{Schunk}
+\begin{Sinput}
+  sqrt(diag(vcov(fm.ps)))
+  sqrt(diag(vcovHC(fm.ps, type = "const")))
+  sqrt(diag(vcovHC(fm.ps, type = "HC0")))
+  sqrt(diag(vcovHC(fm.ps, type = "HC3")))
+  sqrt(diag(vcovHC(fm.ps, type = "HC4")))
+\end{Sinput}
+\end{Schunk}
 
 Test coefficient of quadratic term:
-<<eval=FALSE>>=
-<<hc-test1>>
-<<hc-test2>>
-@
+\begin{Schunk}
+\begin{Sinput}
+  coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC0"))
+  coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
+\end{Sinput}
+\end{Schunk}
 
 Visualization: %%non-dynamic for pretty printing
 \begin{Schunk}
@@ -844,14 +894,18 @@ Visualization: %%non-dynamic for pretty printing
 \subsection{Testing coefficients in time-series data}
 
 Load investment equation data:
-<<eval=FALSE>>=
-<<hac-data>>
-@
+\begin{Schunk}
+\begin{Sinput}
+  data(Investment)
+\end{Sinput}
+\end{Schunk}
 
 Fit regression model:
-<<eval=FALSE>>=
-<<hac-model>>
-@
+\begin{Schunk}
+\begin{Sinput}
+  fm.inv <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
+\end{Sinput}
+\end{Schunk}
 
 Test coefficients using Newey-West HAC estimator with user-defined and data-driven bandwidth
 and with Parzen kernel:
@@ -868,10 +922,12 @@ and with Parzen kernel:
 \end{Schunk}
 
 Time-series visualization:
-<<eval=FALSE>>=
-plot(Investment[, "RealInv"], type = "b", pch = 19, ylab = "Real investment")
-lines(ts(fitted(fm.inv), start = 1964), col = 4)
-@
+\begin{Schunk}
+\begin{Sinput}
+  plot(Investment[, "RealInv"], type = "b", pch = 19, ylab = "Real investment")
+  lines(ts(fitted(fm.inv), start = 1964), col = 4)
+\end{Sinput}
+\end{Schunk}
 
 3-dimensional visualization: %%non-dynamic for pretty printing
 \begin{Schunk}
@@ -886,37 +942,48 @@ lines(ts(fitted(fm.inv), start = 1964), col = 4)
 \subsection[Testing and dating structural changes in the presence of heteroskedasticity and autocorrelation]{Testing and dating structural changes in the presence of\\ heteroskedasticity and autocorrelation}
 
 Load real interest series:
-<<eval=FALSE>>=
-data(RealInt)
-@
+\begin{Schunk}
+\begin{Sinput}
+  data(RealInt)
+\end{Sinput}
+\end{Schunk}
 
 OLS-based CUSUM test with quadratic spectral kernel HAC estimate:
-<<eval=FALSE>>=
-<<sc-ocus>>
-plot(ocus, aggregate = FALSE)
-sctest(ocus)
-@
+\begin{Schunk}
+\begin{Sinput}
+  ocus <- gefp(RealInt ~ 1, fit = lm, vcov = kernHAC)
+  plot(ocus, aggregate = FALSE)
+  sctest(ocus)
+\end{Sinput}
+\end{Schunk}
 
 sup$F$ test with quadratic spectral kernel HAC estimate:
-<<eval=FALSE>>=
-fs <- Fstats(RealInt ~ 1, vcov = kernHAC)
-plot(fs)
-sctest(fs)
-@
+\begin{Schunk}
+\begin{Sinput}
+  fs <- Fstats(RealInt ~ 1, vcov = kernHAC)
+  plot(fs)
+  sctest(fs)
+\end{Sinput}
+\end{Schunk}
 
 Breakpoint estimation and confidence intervals
 with quadratic spectral kernel HAC estimate:
-<<eval=FALSE>>=
-<<sc-bp>>
-plot(bp)
-@
+\begin{Schunk}
+\begin{Sinput}
+  bp <- breakpoints(RealInt ~ 1)
+  confint(bp, vcov = kernHAC)
+  plot(bp)
+\end{Sinput}
+\end{Schunk}
 
 Visualization:
-<<eval=FALSE>>=
-plot(RealInt, ylab = "Real interest rate")
-lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
-lines(confint(bp, vcov = kernHAC))
-@
+\begin{Schunk}
+\begin{Sinput}
+  plot(RealInt, ylab = "Real interest rate")
+  lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
+  lines(confint(bp, vcov = kernHAC))
+\end{Sinput}
+\end{Schunk}
 
 \subsection{Integrating covariance matrix estimators in other functions}
 

@@ -52,17 +52,20 @@ vcovHC(x,
 
 Cribari-Neto F. (2004), Asymptotic inference under heteroskedasticity
 of unknown form. \emph{Computational Statistics \& Data Analysis}
-\bold{45}, 215-233.
+\bold{45}, 215--233.
 
 MacKinnon J. G., White H. (1985),
 Some heteroskedasticity-consistent
 covariance matrix estimators with improved finite sample properties.
-\emph{Journal of Econometrics} \bold{29}, 305-325.
+\emph{Journal of Econometrics} \bold{29}, 305--325.
 
 White H. (1980), A heteroskedasticity-consistent covariance matrix and
 a direct test for heteroskedasticity. \emph{Econometrica} \bold{48},
-817-838.
+817--838.
 
+Zeileis A (2004),
+Econometric Computing with HC and HAC Covariance Matrix Estimators.
+\emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
 }
 
 \seealso{\code{\link{lm}}, \code{\link[car]{hccm}},

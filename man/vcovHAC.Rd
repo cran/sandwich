@@ -90,6 +90,10 @@ with
   A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.
   \emph{Econometrica}, \bold{55},
   703--708.
+
+  Zeileis A (2004),
+  Econometric Computing with HC and HAC Covariance Matrix Estimators.
+  \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
 }
 
 \seealso{\code{\link{weightsLumley}}, \code{\link{weightsAndrews}},
