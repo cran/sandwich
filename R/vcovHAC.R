@@ -335,7 +335,7 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
   }
 
   ## compute weighted variances
-  hw <- rowSums(t(t(umat) * weights))
+  hw <- umat %*% weights
   sigmaj <- function(j) sum(hw[1:(n-j)] * hw[(j+1):n])/n
   sigma <- sapply(0:m, sigmaj)
   s0 <- sigma[1] + 2*sum(sigma[-1])
@@ -354,7 +354,7 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
   rval <- rval * (n + prewhite)^qrate
 
   ## rval is not truncated. This is done in NeweyWest(),
-  ## but bwNeweyWest() can also used without truncation.
+  ## but bwNeweyWest() can also be used without truncation.
   
   return(rval)  
 }
