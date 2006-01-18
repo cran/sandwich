@@ -1,5 +1,6 @@
 \name{vcovHAC}
 \alias{vcovHAC}
+\alias{meatHAC}
 \title{Heteroskedasticity and Autocorrelation Consistent (HAC) Covariance Matrix Estimation}
 \description{
  Heteroskedasticity and autocorrelation consistent (HAC) estimation
@@ -9,7 +10,10 @@
 \usage{
 vcovHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
   adjust = TRUE, diagnostics = FALSE, sandwich = TRUE, ar.method = "ols",
-  data = list())
+  data = list(), \dots)
+
+meatHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
+  adjust = TRUE, diagnostics = FALSE, ar.method = "ols", data = list())
 }
 \arguments{
  \item{x}{a fitted model object of class \code{"lm"} or \code{"glm"}.}
@@ -32,17 +36,23 @@ vcovHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
  \item{diagnostics}{logical. Should additional model diagnostics be returned?
     See below for details.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?
-    If set to \code{FALSE} only the middle matrix is returned.}
+    If set to \code{FALSE} only the meat matrix is returned.}
  \item{ar.method}{character. The \code{method} argument passed to
    \code{\link{ar}} for prewhitening.}
  \item{data}{an optional data frame containing the variables in the \code{order.by} 
     model. By default the variables are taken from the environment which
     \code{vcovHAC} is called from.}
+ \item{\dots}{arguments passed to \code{\link{sandwich}}.}
 }
 
-\details{
-This function constructs weighted information sandwich variance estimators
-for (generalized) linear models fitted to time series data. These are basically
+\details{The function \code{meatHAC} is the real work horse for estimating
+the meat of HAC sandwich estimators -- \code{vcovHAC} is a wrapper calling
+\code{\link{sandwich}} and \code{\link{bread}}. See Zeileis (2006) for
+more implementation details. The theoretical background, exemplified
+for the linear regression model, is described in Zeileis (2004).
+
+Both functions construct weighted information sandwich variance estimators
+for parametric models fitted to time series data. These are basically
 constructed from weighted sums of autocovariances of the estimation functions
 (as extracted by \code{\link{estfun}}). The crucial step is the specification
 of weights: the user can either supply \code{vcovHAC} with some vector of 
@@ -94,6 +104,10 @@ with
   Zeileis A (2004),
   Econometric Computing with HC and HAC Covariance Matrix Estimators.
   \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+
+  Zeileis A (2006),
+  Object-oriented Computation of Sandwich Estimators.
+  Package vignette.
 }
 
 \seealso{\code{\link{weightsLumley}}, \code{\link{weightsAndrews}},

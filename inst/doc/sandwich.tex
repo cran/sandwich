@@ -540,7 +540,7 @@ z test of coefficients of "lm" object 'fm.ps':
 Income      -1834.20    1243.04 -1.4756  0.14006  
 I(Income^2)  1587.04     829.99  1.9121  0.05586 .
 ---
-Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 \end{Soutput}
 \end{Schunk}
 The \code{vcov} argument specifies the covariance matrix as a matrix
@@ -616,7 +616,7 @@ z test of coefficients of "lm" object 'fm.inv':
 RealGNP       0.169136   0.016751 10.0972   <2e-16 ***
 RealInt      -1.001438   3.342375 -0.2996   0.7645    
 ---
-Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 \end{Soutput}
 \end{Schunk}
 If alternatively the automatic bandwidth selection procedure of \cite{hac:Newey+West:1994}
@@ -633,7 +633,7 @@ z test of coefficients of "lm" object 'fm.inv':
 RealGNP       0.169136   0.023586  7.1709 7.449e-13 ***
 RealInt      -1.001438   3.639935 -0.2751    0.7832    
 ---
-Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 \end{Soutput}
 \end{Schunk}
 For illustration purposes, we show how a new function implementing a particular
@@ -657,7 +657,7 @@ z test of coefficients of "lm" object 'fm.inv':
 RealGNP       0.169136   0.020835  8.1181 4.737e-16 ***
 RealInt      -1.001438   3.947469 -0.2537    0.7997    
 ---
-Signif. codes:  0 `***' 0.001 `**' 0.01 `*' 0.05 `.' 0.1 ` ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
 \end{Soutput}
 \end{Schunk}
 The three estimators leads to slightly different standard errors, but all
@@ -745,7 +745,7 @@ can be computed by:
 	 of optimal 3-segment partition: 
 
 Call:
-confint.breakpointsfull(object = bp, vcov = kernHAC)
+confint.breakpointsfull(object = bp, vcov. = kernHAC)
 
 Breakpoints at observation number:
   2.5 % breakpoints 97.5 %
@@ -821,11 +821,11 @@ in the development of \pkg{sandwich}.
 The packages \pkg{sandwich}, \pkg{lmtest} and \pkg{strucchange} are
 required for the applications in this paper. Furthermore, the packages
 depend on \pkg{zoo}. For the computations in this paper \proglang{R}
-2.0.1 and \pkg{sandwich}
-1.0--0,
-\pkg{lmtest} 0.9--11,
-\pkg{strucchange} 1.2--8
-and \pkg{zoo} 0.9--1
+2.2.1 and \pkg{sandwich}
+1.1--0,
+\pkg{lmtest} 0.9--14,
+\pkg{strucchange} 1.2--12
+and \pkg{zoo} 1.0--4
 have been used. \proglang{R} itself and all packages used are available from
 CRAN at \url{http://CRAN.R-project.org/}.
 

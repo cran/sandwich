@@ -3,23 +3,34 @@
 \alias{estfun.lm}
 \alias{estfun.glm}
 \alias{estfun.rlm}
-\title{Extract Estimating Functions}
+\alias{estfun.survreg}
+\alias{estfun.coxph}
+\alias{estfun.nls}
+\title{Extract Empirical Estimating Functions}
 \description{
- Generic function for extracting the estimating functions
- of a fitted model with methods for (generalized) linear models.
+ Generic function for extracting the empirical estimating functions
+ of a fitted model.
 }
 \usage{
 estfun(x, \dots)
 }
 \arguments{
- \item{x}{a fitted model object of class \code{"lm"}, \code{"glm"}
-   or \code{"rlm"}.}
- \item{\dots}{currently not used.}
+ \item{x}{a fitted model object.}
+ \item{\dots}{arguments passed to methods.}
 }
 
-\value{A matrix containing the estimating functions.}
+\value{A matrix containing the empirical estimating functions.
+Typically, this should be an \eqn{n \times k}{n x k} matrix corresponding
+to \eqn{n} observations and \eqn{k} parameters. The columns should be named
+as in \code{\link{coef}} or \code{\link{terms}}, respectively.}
 
-\seealso{\code{\link{lm}}, \code{\link{glm}}, \code{\link[MASS]{rlm}}}
+\seealso{\code{\link{lm}}, \code{\link{glm}}}
+
+\references{
+  Zeileis A (2006),
+  Object-oriented Computation of Sandwich Estimators.
+  Package vignette.
+}
 
 \examples{
 x <- sin(1:10)

@@ -1,8 +1,27 @@
 ## vcovHAC() is the general workhorse for HAC estimation
+## although the essential part is now moved to meatHAC()
+## interfacing the sandwich() function
 
 vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
   weights = weightsAndrews, adjust = TRUE, diagnostics = FALSE,
-  sandwich = TRUE, ar.method = "ols", data = list())
+  sandwich = TRUE, ar.method = "ols", data = list(), ...)
+{
+  rval <- meatHAC(x, order.by = order.by, prewhite = prewhite,
+                  weights = weights, adjust = adjust, diagnostics = diagnostics,
+		  ar.method = ar.method, data = data)
+				  
+  if(sandwich) {
+    diagn <- attr(rval, "diagnostics")
+    rval <- sandwich(x, meat = rval, ...)
+    attr(rval, "diagnostics") <- diagn
+  }
+
+  return(rval)
+}
+
+meatHAC <- function(x, order.by = NULL, prewhite = FALSE,
+  weights = weightsAndrews, adjust = TRUE, diagnostics = FALSE,
+  ar.method = "ols", data = list())
 {
   prewhite <- as.integer(prewhite)
 
@@ -61,21 +80,16 @@ vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
     utu <- crossprod(t(D), utu) %*% t(D)
   }
   
-  
   wsum <- 2*wsum
   w2sum <- 2*w2sum
   bc <- n^2/(n^2 - wsum)
   df <- n^2/w2sum
 
-  if(sandwich) {
-    modelv <- summary(x)$cov.unscaled
-    rval <- modelv %*% utu %*% modelv
-  } else rval <- utu/n.orig
+  rval <- utu/n.orig
 
   if(diagnostics)  attr(rval, "diagnostics") <- list(bias.correction = bc, df = df)
   return(rval)
 }
-
 
 
 ## weightsAndrews() and bwAndrews() implement the HAC estimation
@@ -93,7 +107,7 @@ weightsAndrews <- function(x, order.by = NULL, bw = bwAndrews,
       prewhite = prewhite, data = data, ar.method = ar.method, ...)
   if(verbose) cat(paste("\nBandwidth chosen:", bw, "\n"))
       
-  n <- length(residuals(x)) - as.integer(prewhite)
+  n <- NROW(estfun(x)) - as.integer(prewhite)
   
   weights <- kweights(0:(n-1)/bw, kernel = kernel)
   weights <- weights[1:max(which(abs(weights) > tol))]
@@ -136,8 +150,8 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
     if(!is.null(unames) && "(Intercept)" %in% unames)
       weights[which(unames == "(Intercept)")] <- 0
     else {
-      res <- as.vector(residuals(x, "working"))
-      weights[which(colSums((umat - res)^2) < 1e-16)] <- 0      
+      res <- as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE))
+      weights[which(colSums((umat - res)^2) < 1e-16)] <- 0
     }
   } else {
     weights <- rep(weights, length.out = k)
@@ -215,10 +229,10 @@ kernHAC <- function(x, order.by = NULL, prewhite = 1, bw = bwAndrews,
 ## weave() is a convenience interface
 
 weightsLumley <- function(x, order.by = NULL, C = NULL,
-  method = c("truncate", "smooth"), acf = isoacf, data = list(), ...)
+  method = c("truncate", "smooth"), acf = isoacf, tol = 1e-7, data = list(), ...)
 {
   method <- match.arg(method)
-  res <- residuals(x, "response")
+  res <- residuals(x, "response") #FIXME# available for which models?
   n <- length(res)
 
   if(!is.null(order.by))
@@ -247,7 +261,7 @@ weightsLumley <- function(x, order.by = NULL, C = NULL,
     if(is.null(C)) C <- 1
     weights <- C * n * rhohat^2
     weights <- ifelse(weights > 1, 1, weights)
-    weights <- weights[1:max(which(abs(weights) > 1e-7))]
+    weights <- weights[1:max(which(abs(weights) > tol))]
   })
   
   return(weights)
@@ -257,11 +271,11 @@ weightsLumley <- function(x, order.by = NULL, C = NULL,
 
 weave <- function(x, order.by = NULL, prewhite = FALSE, C = NULL,
   method = c("truncate", "smooth"), acf = isoacf, adjust = FALSE,
-  diagnostics = FALSE, sandwich = TRUE, data = list(), ...)
+  diagnostics = FALSE, sandwich = TRUE, tol = 1e-7, data = list(), ...)
 {
   myweights <- function(x, order.by = NULL, prewhite = FALSE, data = list(), ...)
     weightsLumley(x, order.by = order.by, prewhite = prewhite, C = C,
-                   method = method, acf = acf, data = data)
+                   method = method, acf = acf, tol = tol, data = data)
   vcovHAC(x, order.by = order.by, prewhite = prewhite,
     weights = myweights, adjust = adjust, diagnostics = diagnostics,
     sandwich = sandwich, data = data)
@@ -313,7 +327,7 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
     if(!is.null(unames) && "(Intercept)" %in% unames)
       weights[which(unames == "(Intercept)")] <- 0
     else {
-      res <- as.vector(residuals(x, "working"))
+      res <- as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE))
       weights[which(colSums((umat - res)^2) < 1e-16)] <- 0      
     }
   } else {

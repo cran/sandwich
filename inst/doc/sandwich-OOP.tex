@@ -1,0 +1,305 @@
+\documentclass{Z}
+%% need no \usepackage{Sweave}
+
+%% Symbols
+\newcommand{\darrow}{\stackrel{\mbox{\tiny \textnormal{d}}}{\longrightarrow}}
+
+\author{Achim Zeileis\\Wirtschaftsuniversit\"at Wien}
+\Plainauthor{Achim Zeileis}
+
+\title{Object-oriented Computation of Sandwich Estimators}
+
+\Keywords{covariance matrix estimators, estimating functions, object orientation, \proglang{R}}
+\Plainkeywords{covariance matrix estimators, estimating functions, object orientation, R}
+
+\Abstract{
+Conceptual and computational tools for calculating various types of sandwich
+estimators in different kinds of parametric regression models are discussed.
+
+The theory underlying the package is based on parameter estimates which are computed
+from estimating functions and for which a central limit theorem holds. The covariance
+matrix is then of a sandwich type: a slice of meat between two slices of bread, pictorially
+speaking.
+
+The implementation suggested in the \pkg{sandwich} package aims at providing 
+computational translations for these conceptual tools. This is achieved by defining
+generic functions for extracting the bread and the empirical estimating functions
+from fitted models and by supplying functions that compute various types of 
+meat fillings from these.
+
+In particular, this should enable computations of sandwich estimators models fitted
+not only by \code{lm()}, but also  \code{glm()}, \code{survreg()}, and maybe
+\code{gam()}, \code{betareg()}, etc.
+}
+
+\begin{document}
+
+
+%\VignetteIndexEntry{Object-oriented Computation of Sandwich Estimators}
+%\VignetteDepends{sandwich,zoo}
+%\VignetteKeywords{covariance matrix estimators, estimating functions, object orientation, R}
+%\VignettePackage{sandwich}
+
+
+\section{Model frame}
+
+To fix notations, let us assume we have data in a regression setup, i.e., 
+$(y_i, x_i)$ for $i = 1, \dots, n$, that follow some distribution that is 
+controlled by a $k$-dimensional parameter vector $\theta$. In many situations,
+an estimating function $\psi(\cdot)$ is available for this type of models
+such that $\E[\psi(y, x, \theta)] = 0$. Then, under certain weak regularity
+conditions, %% \citep[see e.g.,][]{Z:White:1994},
+$\theta$ can be estimated using an M-estimator $\hat \theta$ implicitely defined as
+  \begin{equation} \label{eq:estfun}
+    \sum_{i = 1}^n \psi(y_i, x_i, \hat \theta) \quad = \quad 0.
+  \end{equation}
+This includes in particular maximum likelihood (ML) and ordinary least
+squares (OLS) estimation, where the estimating function $\psi(\cdot)$ is
+the derivative of an objective function $\Psi(\cdot)$:
+  \begin{equation} \label{eq:score}
+    \psi(y, x, \theta) \quad = \quad \frac{\partial \Psi(y, x, \theta)}{\partial \theta}.
+  \end{equation}
+
+Inference about $\theta$ is then typically performed relying on a central
+limit theorem (CLT) of type
+  \begin{equation} \label{eq:clt}
+    \sqrt{n} \, (\hat \theta - \theta) \quad \darrow \quad N(0, S(\theta)),
+  \end{equation}
+where $\darrow$ denotes convergence in distribution. For the covariance matrix
+$S(\theta)$, a sandwich formula can be given
+\begin{eqnarray} \label{eq:sandwich}
+  S(\theta) & = & B(\theta) \, M(\theta) \, B(\theta) \\  \label{eq:bread}
+  B(\theta) & = & \left( \E[ - \psi'(y, x, \theta) ] \right)^{-1} \\  \label{eq:meat}
+  M(\theta) & = & \VAR[ \psi(y, x, \theta) ]
+\end{eqnarray}
+i.e., the ``meat'' of the sandwich $M(\theta)$ is the variance of the estimating
+function and the ``bread'' is the inverse of the expectation of its first derivative $\psi'$
+(again with respect to $\theta$). (Note that we use the more evocative names $S$,
+$B$ and $M$ instead of the more conventional notation $V(\theta) = A(\theta)^{-1} B(\theta)
+A(\theta)^{-1}$.)
+
+In correctly specified models, estimated by ML, this sandwich expression for
+$S(\theta)$ can be simplified because both $M(\theta) = B(\theta)^{-1}$ correspond
+to the Fisher information matrix. Hence, the variance $S(\theta)$ in the CLT from Equation~\ref{eq:clt}
+is typically estimated by an empirical version of $B(\theta)$.
+However, covariance matrix estimates that
+are in some sense robust against misspecification can usually be obtained by 
+plugging estimates for both $B(\theta)$ and $M(\theta)$ into the 
+sandwich formula for $S(\theta)$ from Equation~\ref{eq:sandwich}.
+
+Many of the models of interest to us, provide some more structure: the objective function
+$\Psi(y, x, \theta)$ depends on $x$ and $\theta$ in a special way, namely it does only
+depend on the univariate linear predictor $\eta = x^\top \theta$. Then, the estimating function is of type
+\[
+  \psi(y, x, \theta)
+    \quad = \quad \frac{\partial \Psi}{\partial \eta} \cdot \frac{\partial \eta}{\partial \theta}
+    \quad = \quad \frac{\partial \Psi}{\partial \eta} \cdot x.
+\]
+The partial derivative $r(y, \eta) = \partial \Psi(y, \eta) / \partial \eta$ is in some models
+also called ``working residual'' correpsonding to the usual residuals in linear regression models.
+In such models based on linear predictors, the meat of the sandwich can also be written as
+\begin{equation} \label{eq:meatHC}
+  M(\theta) \quad = \quad x \, \VAR[ r(y, x^\top \theta) ] \, x^\top.
+\end{equation}
+
+
+
+\section{Covariance matrix estimators}
+
+To make use of the theory outlined in the previous section, the model has to be fitted
+(i.e., the parameters have to be estimated as in Equation~\ref{eq:estfun}) and subsequently
+inference can be performed relying on the CLT from Equation~\ref{eq:clt} and employing different
+types of sandwich estimators for $S(\theta)$.
+
+In \proglang{R}, there are already many model fitting functions which compute estimates $\hat \theta$
+for a multitude of regression models that can be seen as special cases of the framework
+outlined above. These typically have a \code{coef()} method which extracts the parameter 
+estimates $\hat \theta$ and an estimate for the covariance matrix is available via a
+\code{vcov()} method. Inference relying on this covariance matrix is typically provided
+in the \code{summary()} method (partial $t$ or $z$ tests) and \code{anova()} method
+($F$ or $\chi^2$ tests for nested models). The covariance estimate returned by \code{vcov()}
+usually relies on the assumption of correctly specified models estimated via ML and hence
+is simply an empirical version of $B(\theta)$ that is then divided by $n$. The simplest
+estimator is
+\begin{equation} \label{eq:Bhat}
+  \hat B \quad = \quad \left( \frac{1}{n} \sum_{i = 1}^n - \psi'(y_i, x_i, \hat \theta) \right)^{-1}.
+\end{equation}
+
+Re-using these tools, the \pkg{sandwich} package aims at providing other (more robust)
+sandwich estimators in this general setup. Therefore, we propose the following tools. 
+
+
+\subsubsection*{The bread}
+
+Estimating the bread $B(\theta)$ is usually relatively easy and hence often 
+not dealt with in publications about sandwich estimators. As the simple estimator
+from Equation~\ref{eq:Bhat} is typically already provided in fitted model objects,
+it suffices to simply provide a generic function \code{bread()} which has a method
+for each class of fitted models. For ``\code{lm}'' and ``\code{glm}'' all the necessary
+information can be conveniently obtained from the \code{summary()} method:
+\begin{Schunk}
+\begin{Sinput}
+bread.lm <- function(x, ...)
+{
+  sx <- summary(x)
+  sx$cov.unscaled * as.vector(sum(sx$df[1:2]))
+}
+\end{Sinput}
+\end{Schunk}
+Similarly simple functions are provided for ``\code{survreg}'', ``\code{coxph} and
+``\code{gam}'' objects.
+
+
+\subsubsection*{The meat}
+
+While the bread $B(\theta)$ is almost always estimated by $\hat B$ from Equation~\ref{eq:Bhat},
+various different types of estimators are available for the meat $M(\theta)$, most of which
+are based on the empirical values of estimating functions. Hence, a natural idea
+for object-oriented implementation of such estimators is the following: provide various 
+functions that compute different estimators for the meat based only on an
+\code{estfun()} extractor function that extracts the empirical estimating function
+from a fitted model object. The \code{estfun()} method should return
+an $n \times k$ matrix with
+ \[ \left( \begin{array}{c} \psi(y_1, x_1, \hat \theta) \\ \vdots \\ \psi(y_n, x_n, \hat \theta)
+    \end{array} \right). \]
+Based on this the function \code{meat()} can simply compute crossproducts for deriving a simple
+estimator of $M(\theta)$. This corresponds to the Eicker-Huber-White HC estimator
+%% \citep{hac:Eicker:1963,hac:Huber:1967,hac:White:1980}
+and is sometimes also called
+outer product of gradients estimator. A simplified version of the \proglang{R} code is
+\begin{Schunk}
+\begin{Sinput}
+meat <- function(x)
+{
+  psi <- estfun(x)
+  crossprod(psi)/NROW(psi)
+}
+\end{Sinput}
+\end{Schunk}
+
+More elaborate estimators are also available: \code{meatHAC()} computes an estimate based on the
+weighted (empirical) autocorrelations of the (empirical) estimating function. An extremely simplified
+version of \code{meatHAC()} is
+\begin{Schunk}
+\begin{Sinput}
+meatHAC <- function(x, weights)
+{
+  psi <- estfun(x)
+  n <- NROW(psi)
+
+  rval <- 0.5 * crossprod(psi) * weights[1]
+  for(i in 2:length(weights))
+    rval <- rval + weights[i] * crossprod(psi[1:(n-i+1),], psi[i:n,])
+  
+  (rval + t(rval))/n
+}
+\end{Sinput}
+\end{Schunk}
+
+Finally, we would like to provide HC estimators via \code{meatHC()}
+for which we need a bit more infrastructure. Relying on Equation~\ref{eq:meatHC}
+we want to estimate $M(\theta)$ by a matrix of type $1/n \, X^\top \Omega X$ where $X$
+is the regressor matrix and $\Omega$ is a diagonal matrix estimating the variance of $r(y, \eta)$.
+Various forms for this diagonal matrix $\Omega$ have been suggested, they all depend on
+the vector of the observed $(r(y_1, x_1^\top \hat \theta), \dots, r(y_n, x_n^\top \hat \theta))^\top$,
+the hat values and the degrees of freedom. Instead of basing this on a seperate generic
+for this type of residuals, it is also possible to recover it from the estimating function.
+As $\psi(y_i, x_i, \hat \theta) = r(y_i, x_i^\top \hat \theta) \cdot x_i$, we can simply 
+divide the empirical estimating function by $x_i$ and obtain the residual.
+%% Even simpler, if the model includes an intercept, the residuals are in the first column of the estimating
+%% function matrix.
+Consequently, we only need a way to extract the regressor matrix from
+the fitted model (via the \code{model.matrix()} method), the hat values (via the \code{hatvalues()} method)
+and the residual degrees of freedom (via the \code{df.residual()} method).
+A condensed version of \code{meatHC()} can then be given as
+\begin{Schunk}
+\begin{Sinput}
+meatHC <- function(x, omega)
+{
+  X <- if(is.matrix(x$x)) x$x else model.matrix(x)
+  n <- NROW(X)
+  
+  diaghat <- hatvalues(x)
+  df <- df.residual(x)
+  if(is.null(df)) df <- n - NCOL(X)
+  
+  res <- rowMeans(estfun(x)/X, na.rm = TRUE)
+  
+  if(is.function(omega)) omega <- omega(res, diaghat, df)
+  rval <- sqrt(omega) * X
+  
+  crossprod(rval)/n
+}
+\end{Sinput}
+\end{Schunk}
+
+%% %Z% GAM sandwiches
+%% This works out of the box with ``\code{lm}'' and ``\code{glm}'', for ``\code{gam}'' objects
+%% we only need a new \code{hatvalues()} method which is trivial to provide:
+%% \begin{Schunk}
+%% \begin{Sinput}
+%% hatvalues.gam <- function(model, ...) model$hat
+%% \end{Sinput}
+%% \end{Schunk}
+
+
+\subsubsection*{The sandwich}
+
+Computing the sandwich is easy given the previous building blocks. Currently, the 
+function \code{sandwich()} computes an estimate for $1/n \, S(\theta)$ via
+\begin{Schunk}
+\begin{Sinput}
+sandwich <- function(x, bread. = bread, meat. = meat, ...)
+{
+  if(is.function(bread.)) bread. <- bread.(x)
+  if(is.function(meat.)) meat. <- meat.(x, ...)
+  1/NROW(estfun(x)) * (bread. %*% meat. %*% bread.)
+}
+\end{Sinput}
+\end{Schunk}
+and \code{meat.} could also be set to \code{meatHAC} or \code{meatHC}. 
+
+Therefore, all that a
+use\proglang{R}/develope\proglang{R} would have to do to make a new class of models, 
+``\code{foo}'' say, fit for this framework is: 
+provide an \code{estfun()} method \code{estfun.}\emph{foo}\code{()}
+and a \code{bread()} method \code{bread.}\emph{foo}\code{()}. See also Figure~\ref{fig:sandwich}.
+
+Only for HC estimators (other than HC0 and HC1 which are available via \code{meat()}),
+it has to be assured in addtion that 
+\begin{itemize}
+  \item the model only depends on a linear predictor (this cannot be easily
+        checked by the software, but has to be done by the user),
+  \item the model matrix $X$ is available (via a \code{model.matrix.}\emph{foo}\code{()} method),
+  \item a \code{hatvalues.}\emph{foo}\code{()} method exists (for HC2--HC4), and
+  \item a \code{df.residual.}\emph{foo}\code{()} method exists (or the default $n-k$ are correct).
+\end{itemize}
+
+\setkeys{Gin}{width=.85\textwidth} 
+\begin{figure}[tbh]
+\begin{center}
+\includegraphics{sandwich-OOP-sandwich}
+\caption{\label{fig:sandwich} Structure of sandwich estimators}
+\end{center}
+\end{figure}
+
+%% Applications and illustrations
+%%  - linear model in Zeileis (2004)
+%%  - generalized linear model
+%%  - survreg: tobit regression for data("Fair", package = "Ecdat")
+%%  - betareg -> send code to CN and dBS
+%%  - maybe gam()?
+
+%% \section{Open questions}
+%% 
+%% \subsubsection*{Appropriateness of HC estimators}
+%% 
+%% I am aware of only very few applications of HC estimators to regression 
+%% models other than the linear regression model. Is there any theoretical
+%% or applied work that treats HC estimators in a general setup as done
+%% here? Are there arguments why HC estimators as used here might not 
+%% be useful in other types of regression models?
+
+%% \bibliography{hac}
+
+\end{document}

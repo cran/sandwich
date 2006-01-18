@@ -1,14 +1,17 @@
 \name{vcovHC}
 \alias{vcovHC}
+\alias{meatHC}
 \title{Heteroskedasticity-Consistent Covariance Matrix Estimation}
 \description{
  Heteroskedasticity-consistent estimation of the covariance matrix of the
- coefficient estimates in a linear regression model.
+ coefficient estimates in regression models.
 }
 \usage{
 vcovHC(x,
   type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
-  omega = NULL, \dots)
+  omega = NULL, sandwich = TRUE, \dots)
+
+meatHC(x, type = , omega = NULL)
 }
 \arguments{
  \item{x}{a fitted model object of class \code{"lm"}.}
@@ -19,9 +22,18 @@ vcovHC(x,
      (the residuals of the linear model), \code{diaghat} (the diagonal 
      of the corresponding hat matrix) and \code{df} (the residual degrees of
      freedom). For details see below.}
- \item{\dots}{currently not used.}
+ \item{sandwich}{logical. Should the sandwich estimator be computed?
+    If set to \code{FALSE} only the meat matrix is returned.}
+ \item{\dots}{arguments passed to \code{\link{sandwich}}.}
 }
-\details{When \code{type = "const"} constant variances are assumed and
+
+\details{The function \code{meatHC} is the real work horse for estimating
+  the meat of HC sandwich estimators -- \code{vcovHC} is a wrapper calling
+  \code{\link{sandwich}} and \code{\link{bread}}. See Zeileis (2006) for
+  more implementation details. The theoretical background, exemplified
+  for the linear regression model, is described below and in Zeileis (2004).
+
+  When \code{type = "const"} constant variances are assumed and
   and \code{vcovHC} gives the usual estimate of the covariance matrix of
   the coefficient estimates:
 
@@ -44,18 +56,27 @@ vcovHC(x,
   estimating it, the \code{type} argument can be used to specify the 
   HC0 to HC4 estimators. If \code{omega} is used, \code{type} is ignored.
   
-  For details see the references.
+  Long \& Ervin (2000) conduct a simulation study of HC estimators in
+  the linear regression model, recommending to use HC3 which is thus the
+  default in \code{vcovHC}. Cribari-Neto (2004) suggests the HC4 type
+  estimator which is tailored to take into account the effect of leverage
+  points in the design matrix. For more details see the references.
 }
-\value{A matrix containing the covariance matrix estimate.
-}
-\references{
 
+\value{
+  A matrix containing the covariance matrix estimate.
+}
+
+\references{
 Cribari-Neto F. (2004), Asymptotic inference under heteroskedasticity
 of unknown form. \emph{Computational Statistics \& Data Analysis}
 \bold{45}, 215--233.
 
-MacKinnon J. G., White H. (1985),
-Some heteroskedasticity-consistent
+Long J. S., Ervin L. H. (2000), Using Heteroscedasticity Consistent Standard
+Errors in the Linear Regression Model. \emph{The American Statistician},
+\bold{54}, 217--224.
+
+MacKinnon J. G., White H. (1985), Some heteroskedasticity-consistent
 covariance matrix estimators with improved finite sample properties.
 \emph{Journal of Econometrics} \bold{29}, 305--325.
 
@@ -63,9 +84,11 @@ White H. (1980), A heteroskedasticity-consistent covariance matrix and
 a direct test for heteroskedasticity. \emph{Econometrica} \bold{48},
 817--838.
 
-Zeileis A (2004),
-Econometric Computing with HC and HAC Covariance Matrix Estimators.
-\emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+Zeileis A (2004), Econometric Computing with HC and HAC Covariance Matrix
+Estimators. \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+
+Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
+Package vignette.
 }
 
 \seealso{\code{\link{lm}}, \code{\link[car]{hccm}},

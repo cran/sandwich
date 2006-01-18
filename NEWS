@@ -1,0 +1,21 @@
+Changes in Version 1.1-0
+
+  o sandwich is made object-oriented, so that various types
+    of sandwich estimators can be computed not only for "lm"
+    models, but also "glm", "survreg", etc.
+    To achieve object orientation this various changes have
+    been made: a sandwich() function is provided which needs
+    a bread and a meat matrix. For the bread, a generic bread()
+    function is provided, for the meat, there are meat(),
+    meatHC() and meatHAC(). All rely on the existence of a
+    estfun() method.
+    
+  o vcovHC() and vcovHAC() have been restructured to use
+    sandwich() together with meatHC() and meatHAC(), respectively.
+    
+  o A new vignette "sandwich-OOP" has been added, explaining
+    the new object-orientation features.
+    
+  o Various methods to bread() and estfun() have been added,
+    particularly for "survreg" and "coxph".
+    

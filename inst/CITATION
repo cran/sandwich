@@ -8,11 +8,11 @@ citEntry(entry="Article",
 	 volume       = "11",
 	 number       = "10",
 	 pages        = "1--17",
-         url          = "http://jstatsoft.org/v11/i10/",
+         url          = "http://www.jstatsoft.org/v11/i10/",
          
          textVersion = 
          paste("Achim Zeileis (2004).", 
                "Econometric Computing with HC and HAC Covariance Matrix Estimators.",
                "Journal of Statistical Software 11(10), 1-17.",
-	       "URL http://jstatsoft.org/v11/i10/")
+	       "URL http://www.jstatsoft.org/v11/i10/")
 )

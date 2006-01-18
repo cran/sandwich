@@ -11,10 +11,10 @@
 \usage{
 weave(x, order.by = NULL, prewhite = FALSE, C = NULL,
   method = c("truncate", "smooth"), acf = isoacf, adjust = FALSE,
-  diagnostics = FALSE, sandwich = TRUE, data = list(), \dots)
+  diagnostics = FALSE, sandwich = TRUE, tol = 1e-7, data = list(), \dots)
 
 weightsLumley(x, order.by = NULL, C = NULL,
-  method = c("truncate", "smooth"), acf = isoacf, data = list(), \dots)
+  method = c("truncate", "smooth"), acf = isoacf, tol = 1e-7, data = list(), \dots)
 }
 
 \arguments{
@@ -40,6 +40,8 @@ weightsLumley(x, order.by = NULL, C = NULL,
    See \code{\link{vcovHAC}} for details.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?
     If set to \code{FALSE} only the middle matrix is returned.}
+ \item{tol}{numeric. Weights that exceed \code{tol} are used for computing
+   the covariance matrix, all other weights are treated as 0.}
  \item{data}{an optional data frame containing the variables in the \code{order.by} 
     model. By default the variables are taken from the environment which
     the function is called from.}
@@ -52,7 +54,7 @@ weightsLumley(x, order.by = NULL, C = NULL,
 is called.
 
 Both weighting methods are based on some estimate of the autocorrelation
-function \deqn{\rho}{r} (as computed by \code{acf}) of the residuals of
+function \eqn{\rho}{r} (as computed by \code{acf}) of the residuals of
 the model \code{x}. The weights for the \code{"truncate"} method are 
 
 \deqn{I\{n \rho^2 > C\}}{I{n * r ** 2 > C}}
