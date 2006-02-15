@@ -1,3 +1,9 @@
+Changes in Version 1.1-1
+
+  o estfun() methods now use directly the model.matrix() method
+    instead of the terms() and model.frame() methods.
+
+
 Changes in Version 1.1-0
 
   o sandwich is made object-oriented, so that various types

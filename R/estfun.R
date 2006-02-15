@@ -5,12 +5,7 @@ estfun <- function(x, ...)
 
 estfun.lm <- function(x, ...)
 {
-  if (is.matrix(x$x))
-    xmat <- x$x
-  else {
-    mf <- model.frame(x)
-    xmat <- model.matrix(terms(x), mf)    
-  }
+  xmat <- if(is.matrix(x$x)) x$x else model.matrix(x)
   wts <- if(!is.null(x$weights)) x$weights else 1
   res <- residuals(x)
   rval <- as.vector(res) * wts * xmat
@@ -23,12 +18,7 @@ estfun.lm <- function(x, ...)
 
 estfun.glm <- function(x, ...)
 {
-  if (is.matrix(x$x))
-    xmat <- x$x
-  else {
-    mf <- model.frame(x)
-    xmat <- model.matrix(terms(x), mf)    
-  }
+  xmat <- if(is.matrix(x$x)) x$x else model.matrix(x)
   rval <- as.vector(residuals(x, "working")) * x$weights * xmat
   attr(rval, "assign") <- NULL
   attr(rval, "contrasts") <- NULL
@@ -40,15 +30,8 @@ estfun.glm <- function(x, ...)
 
 estfun.rlm <- function(x, ...)
 {
-  if (is.matrix(x$x)) 
-      xmat <- x$x
-  else {
-      mf <- model.frame(x)
-      xmat <- model.matrix(terms(x), mf)
-  }
-  if (!is.null(x$weights)) 
-      wts <- x$weights
-  else wts <- 1
+  xmat <- if(is.matrix(x$x)) x$x else model.matrix(x)
+  wts <- if(!is.null(x$weights)) x$weights else 1
   res <- residuals(x)
   psi <- function(z) x$psi(z) * z
   rval <- as.vector(psi(res/x$s)) * wts * xmat
@@ -70,12 +53,7 @@ estfun.coxph <- function(x, ...)
 estfun.survreg <- function(x, ...)
 {
   stopifnot(require("survival"))
-  if (is.matrix(x$x))
-    xmat <- x$x
-  else {
-    mf <- model.frame(x)
-    xmat <- model.matrix(terms(x), mf)    
-  }
+  xmat <- if(is.matrix(x$x)) x$x else model.matrix(x)
   wts <- if(!is.null(x$weights)) x$weights else 1
   res <- residuals(x, type = "matrix")
   rval <- as.vector(res[,"dg"]) * wts * xmat
