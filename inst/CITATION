@@ -16,3 +16,19 @@ citEntry(entry="Article",
                "Journal of Statistical Software 11(10), 1-17.",
 	       "URL http://www.jstatsoft.org/v11/i10/")
 )
+
+citEntry(entry        = "TechReport",
+         title        = "Object-oriented Computation of Sandwich Estimators",
+         author       = "Achim Zeileis", 
+         institution  = "Department of Statistics and Mathematics, Wirtschaftsuniversität Wien, Research Report Series",
+         year         = "2006",
+	 number       = "37",
+	 url          = "http://epub.wu-wien.ac.at/",
+         
+         textVersion = 
+         paste("Achim Zeileis (2006).", 
+               "Object-oriented Computation of Sandwich Estimators.",
+               "Department of Statistics and Mathematics, Wirtschaftsuniversität Wien, Research Report Series, Report 37",
+	       "URL http://epub.wu-wien.ac.at/"),
+         header = "If sandwich is applied to models other than lm() also cite:"
+)

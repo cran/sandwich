@@ -30,7 +30,9 @@ the scaled cross products of the empirical estimating functions.}
 \references{
   Zeileis A (2006),
   Object-oriented Computation of Sandwich Estimators.
-  Package vignette.
+  \emph{Report 37}, Department of Statistics and Mathematics, 
+   \enc{Wirtschaftsuniversität}{Wirtschaftsuniversitaet} Wien, Research Report Series.
+   \url{http://epub.wu-wien.ac.at/}
 }
 
 \examples{

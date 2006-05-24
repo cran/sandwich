@@ -150,8 +150,9 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
     if(!is.null(unames) && "(Intercept)" %in% unames)
       weights[which(unames == "(Intercept)")] <- 0
     else {
-      res <- as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE))
-      weights[which(colSums((umat - res)^2) < 1e-16)] <- 0
+      res <- try(as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE)), silent = TRUE)
+      if(inherits(res, "try-error")) res <- try(residuals(x), silent = TRUE)
+      if(!inherits(res, "try-error")) weights[which(colSums((umat - res)^2) < 1e-16)] <- 0
     }
   } else {
     weights <- rep(weights, length.out = k)
@@ -327,8 +328,9 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
     if(!is.null(unames) && "(Intercept)" %in% unames)
       weights[which(unames == "(Intercept)")] <- 0
     else {
-      res <- as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE))
-      weights[which(colSums((umat - res)^2) < 1e-16)] <- 0      
+      res <- try(as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE)))
+      if(inherits(res, "try-error")) res <- try(residuals(x), silent = TRUE)
+      if(!inherits(res, "try-error")) weights[which(colSums((umat - res)^2) < 1e-16)] <- 0      
     }
   } else {
     weights <- rep(weights, length.out = k)

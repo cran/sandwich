@@ -533,7 +533,7 @@ assesses the significance using the HC0 estimator of \cite{hac:White:1980}.
 > coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC0"))
 \end{Sinput}
 \begin{Soutput}
-z test of coefficients of "lm" object 'fm.ps':
+z test of coefficients:
 
             Estimate Std. Error z value Pr(>|z|)  
 (Intercept)   832.91     460.89  1.8072  0.07073 .
@@ -554,7 +554,7 @@ might be weakly significant. In his analysis, \cite{hac:Cribari-Neto:2004} uses 
 > coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
 \end{Sinput}
 \begin{Soutput}
-z test of coefficients of "lm" object 'fm.ps':
+z test of coefficients:
 
             Estimate Std. Error z value Pr(>|z|)
 (Intercept)   832.91    3008.01  0.2769   0.7819
@@ -609,7 +609,7 @@ to \code{coeftest}.
 +     prewhite = FALSE))
 \end{Sinput}
 \begin{Soutput}
-z test of coefficients of "lm" object 'fm.inv':
+z test of coefficients:
 
               Estimate Std. Error z value Pr(>|z|)    
 (Intercept) -12.533601  18.958298 -0.6611   0.5085    
@@ -626,7 +626,7 @@ with prewhitening should be used, this can be passed as a function to \code{coef
 > coeftest(fm.inv, df = Inf, vcov = NeweyWest)
 \end{Sinput}
 \begin{Soutput}
-z test of coefficients of "lm" object 'fm.inv':
+z test of coefficients:
 
               Estimate Std. Error z value  Pr(>|z|)    
 (Intercept) -12.533601  24.374177 -0.5142    0.6071    
@@ -650,7 +650,7 @@ up the function \code{parzenHAC} and then pass this function to \code{coeftest}.
 > coeftest(fm.inv, df = Inf, vcov = parzenHAC)
 \end{Sinput}
 \begin{Soutput}
-z test of coefficients of "lm" object 'fm.inv':
+z test of coefficients:
 
               Estimate Std. Error z value  Pr(>|z|)    
 (Intercept) -12.533601  24.663944 -0.5082    0.6113    
@@ -821,11 +821,11 @@ in the development of \pkg{sandwich}.
 The packages \pkg{sandwich}, \pkg{lmtest} and \pkg{strucchange} are
 required for the applications in this paper. Furthermore, the packages
 depend on \pkg{zoo}. For the computations in this paper \proglang{R}
-2.2.1 and \pkg{sandwich}
-1.1--1,
+2.3.0 and \pkg{sandwich}
+1.9--0,
 \pkg{lmtest} 0.9--14,
 \pkg{strucchange} 1.2--12
-and \pkg{zoo} 1.0--5
+and \pkg{zoo} 1.0--7
 have been used. \proglang{R} itself and all packages used are available from
 CRAN at \url{http://CRAN.R-project.org/}.
 

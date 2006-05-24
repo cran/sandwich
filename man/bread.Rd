@@ -19,7 +19,7 @@ bread(x, \dots)
 }
 
 \value{A matrix containing an estimator for the expectation of the negative
-derivative of the estimating functions.
+derivative of the estimating functions, usually the Hessian.
 Typically, this should be an \eqn{k \times k}{k x k} matrix corresponding
 to \eqn{k} parameters. The rows and columns should be named
 as in \code{\link{coef}} or \code{\link{terms}}, respectively.}
@@ -29,7 +29,9 @@ as in \code{\link{coef}} or \code{\link{terms}}, respectively.}
 \references{
   Zeileis A (2006),
   Object-oriented Computation of Sandwich Estimators.
-  Package vignette.
+  \emph{Report 37}, Department of Statistics and Mathematics, 
+   \enc{Wirtschaftsuniversität}{Wirtschaftsuniversitaet} Wien, Research Report Series.
+   \url{http://epub.wu-wien.ac.at/}
 }
 
 \examples{

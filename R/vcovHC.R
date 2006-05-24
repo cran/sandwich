@@ -12,16 +12,15 @@ meatHC <- function(x,
   omega = NULL)
 {
   ## extract X
-  X <- if(is.matrix(x$x)) x$x else model.matrix(x)
+  X <- model.matrix(x)
   attr(X, "assign") <- NULL
   n <- NROW(X)
 
   ## get hat values and residual degrees of freedom
   diaghat <- try(hatvalues(x), silent = TRUE)
-  df <- try(df.residual(x), silent = TRUE)
-  if(is.null(df) || inherits(df, "try-error")) df <- n - NCOL(X)
+  df <- n - NCOL(X)
   
-  ## might work, but "intercept" is also claimed for "coxph"
+  ## the following might work, but "intercept" is also claimed for "coxph"
   ## res <- if(attr(terms(x), "intercept") > 0) estfun(x)[,1] else rowMeans(estfun(x)/X, na.rm = TRUE)
   ## hence better rely on
   res <- rowMeans(estfun(x)/X, na.rm = TRUE)

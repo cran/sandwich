@@ -1,3 +1,12 @@
+Changes in Version 1.9-0
+
+  o The vignette "sandwich-OOP" has been revised, extended and
+    released as a technical report.
+    
+  o Several estfun() methods and some of the meat functions have
+    been enhanced and made more consistent.
+
+
 Changes in Version 1.1-1
 
   o estfun() methods now use directly the model.matrix() method
