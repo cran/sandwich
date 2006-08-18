@@ -1,9 +1,19 @@
+Changes in Version 2.0-0
+
+  o A paper based on the "sandwich-OOP" vignette was accepted
+    for publication in volume 16(9) of Journal of Statistical
+    Software at
+      http://www.jstatsoft.org/
+  
+  o A NAMESPACE was added for the package.
+  
+
 Changes in Version 1.9-0
 
   o The vignette "sandwich-OOP" has been revised, extended and
     released as a technical report.
     
-  o Several estfun() methods and some of the meat functions have
+  o Several estfun() methods and some of the meat() functions have
     been enhanced and made more consistent.
 
 

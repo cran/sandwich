@@ -14,21 +14,23 @@ citEntry(entry="Article",
          paste("Achim Zeileis (2004).", 
                "Econometric Computing with HC and HAC Covariance Matrix Estimators.",
                "Journal of Statistical Software 11(10), 1-17.",
-	       "URL http://www.jstatsoft.org/v11/i10/")
+	       "URL http://www.jstatsoft.org/v11/i10/.")
 )
 
-citEntry(entry        = "TechReport",
+citEntry(entry        = "Article",
          title        = "Object-oriented Computation of Sandwich Estimators",
          author       = "Achim Zeileis", 
-         institution  = "Department of Statistics and Mathematics, Wirtschaftsuniversität Wien, Research Report Series",
+         journal      = "Journal of Statistical Software",
          year         = "2006",
-	 number       = "37",
-	 url          = "http://epub.wu-wien.ac.at/",
+	 volume       = "16",
+	 number       = "9",
+	 pages        = "1--16",
+         url          = "http://www.jstatsoft.org/v16/i09/.",
          
          textVersion = 
          paste("Achim Zeileis (2006).", 
                "Object-oriented Computation of Sandwich Estimators.",
-               "Department of Statistics and Mathematics, Wirtschaftsuniversität Wien, Research Report Series, Report 37",
-	       "URL http://epub.wu-wien.ac.at/"),
+               "Journal of Statistical Software 16(9), 1-16.",
+	       "URL http://www.jstatsoft.org/v16/i09/"),
          header = "If sandwich is applied to models other than lm() also cite:"
 )

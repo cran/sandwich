@@ -83,33 +83,29 @@ with
 \references{
   Andrews DWK (1991),
   Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation.
-  \emph{Econometrica}, \bold{59},
-  817--858.
+  \emph{Econometrica}, \bold{59}, 817--858.
 
   Andrews DWK & Monahan JC (1992),
   An Improved Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimatior.
-  \emph{Econometrica}, \bold{60},
-  953--966.
+  \emph{Econometrica}, \bold{60}, 953--966.
 
   Lumley A & Heagerty P (1999),
   Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.
-  \emph{Journal of the Royal Statistical Society B}, \bold{61},
-  459--477.
+  \emph{Journal of the Royal Statistical Society B}, \bold{61}, 459--477.
 
   Newey WK & West KD (1987),
   A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.
-  \emph{Econometrica}, \bold{55},
-  703--708.
+  \emph{Econometrica}, \bold{55}, 703--708.
 
   Zeileis A (2004),
   Econometric Computing with HC and HAC Covariance Matrix Estimators.
   \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+  URL \url{http://http://www.jstatsoft.org/v11/i10/}.  
 
   Zeileis A (2006),
   Object-oriented Computation of Sandwich Estimators.
-  \emph{Report 37}, Department of Statistics and Mathematics, 
-   \enc{Wirtschaftsuniversität}{Wirtschaftsuniversitaet} Wien, Research Report Series.
-   \url{http://epub.wu-wien.ac.at/}
+  \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
+  URL \url{http://http://www.jstatsoft.org/v16/i09/}.
 }
 
 \seealso{\code{\link{weightsLumley}}, \code{\link{weightsAndrews}},

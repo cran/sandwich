@@ -86,12 +86,11 @@ a direct test for heteroskedasticity. \emph{Econometrica} \bold{48},
 
 Zeileis A (2004), Econometric Computing with HC and HAC Covariance Matrix
 Estimators. \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+URL \url{http://http://www.jstatsoft.org/v11/i10/}.
 
-  Zeileis A (2006),
-  Object-oriented Computation of Sandwich Estimators.
-  \emph{Report 37}, Department of Statistics and Mathematics, 
-   \enc{Wirtschaftsuniversität}{Wirtschaftsuniversitaet} Wien, Research Report Series.
-   \url{http://epub.wu-wien.ac.at/}
+Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
+\emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
+URL \url{http://http://www.jstatsoft.org/v16/i09/}.
 }
 
 \seealso{\code{\link{lm}}, \code{\link[car]{hccm}},

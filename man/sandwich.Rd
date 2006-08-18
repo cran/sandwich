@@ -35,11 +35,9 @@ to \eqn{k} parameters.}
 \seealso{\code{\link{bread}}, \code{\link{meat}}, \code{\link{meatHC}}, \code{\link{meatHAC}}}
 
 \references{
-  Zeileis A (2006),
-  Object-oriented Computation of Sandwich Estimators.
-  \emph{Report 37}, Department of Statistics and Mathematics, 
-   \enc{Wirtschaftsuniversität}{Wirtschaftsuniversitaet} Wien, Research Report Series.
-   \url{http://epub.wu-wien.ac.at/}
+  Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
+  \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
+  URL \url{http://http://www.jstatsoft.org/v16/i09/}.
 }
 
 \examples{

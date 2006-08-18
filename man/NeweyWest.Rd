@@ -81,22 +81,20 @@ which is typically just the covariance matrix.
 \references{
   Andrews DWK (1991),
   Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation.
-  \emph{Econometrica}, \bold{59},
-  817--858.
+  \emph{Econometrica}, \bold{59}, 817--858.
 
   Newey WK & West KD (1987),
   A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.
-  \emph{Econometrica}, \bold{55},
-  703--708.
+  \emph{Econometrica}, \bold{55}, 703--708.
 
   Newey WK & West KD (1994),
   Automatic Lag Selection in Covariance Matrix Estimation.
-  \emph{Review of Economic Studies}, \bold{61},
-  631--653.
+  \emph{Review of Economic Studies}, \bold{61}, 631--653.
 
   Zeileis A (2004),
   Econometric Computing with HC and HAC Covariance Matrix Estimators.
   \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+  URL \url{http://www.jstatsoft.org/v11/i10/}.
 }
 
 \seealso{\code{\link{vcovHAC}}, \code{\link{weightsAndrews}},

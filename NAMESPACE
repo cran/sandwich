@@ -1,0 +1,46 @@
+import("stats")
+
+export(
+## core ingredients
+  "sandwich",
+  "bread",
+  "meat",
+
+## HC estimators  
+  "vcovHC",
+  "meatHC",
+
+## HAC estimators  
+  "vcovHAC",
+  "meatHAC",
+  "kernHAC",
+  "NeweyWest",
+  "weave",
+
+## weights/bandwidths for HAC estimators  
+  "weightsLumley",
+  "weightsAndrews",
+  "bwAndrews",
+  "bwNeweyWest",
+
+## new estfun generic      
+  "estfun",
+
+## auxiliary functions
+  "kweights",
+  "isoacf",
+  "pava.blocks")
+
+## methods for extracting bread matrix
+  S3method("bread", "lm")
+  S3method("bread", "survreg")
+  S3method("bread", "gam")
+  S3method("bread", "coxph")
+
+## methods for empirical estimating functions
+  S3method("estfun", "lm")
+  S3method("estfun", "glm")
+  S3method("estfun", "rlm")
+  S3method("estfun", "coxph")
+  S3method("estfun", "survreg")
+  S3method("estfun", "nls")

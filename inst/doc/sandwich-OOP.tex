@@ -13,6 +13,11 @@
 \Plainkeywords{covariance matrix estimators, estimating functions, object orientation, R}
 
 \Abstract{
+This introduction to the object-orientation features of the
+\proglang{R} package \pkg{sandwich} is a (slightly)
+modified version of \cite{hac:Zeileis:2006}, published in the
+\emph{Journal of Statistical Software}.
+
 Sandwich covariance matrix estimators are a popular tool in applied regression
 modeling for performing inference that is robust to certain types of model misspecification.
 Suitable implementations are available in the \proglang{R} system for statistical
@@ -30,7 +35,7 @@ types of sandwich estimators can be computed.
 
 
 %\VignetteIndexEntry{Object-oriented Computation of Sandwich Estimators}
-%\VignetteDepends{sandwich,zoo}
+%\VignetteDepends{sandwich,zoo,Ecdat,survival,MASS,lmtest}
 %\VignetteKeywords{covariance matrix estimators, estimating functions, object orientation, R}
 %\VignettePackage{sandwich}
 
@@ -60,11 +65,11 @@ functions for fitted model objects. The most important of these is a method for
 extracting the empirical estimating functions---based on this a wide variety of 
 meat fillings for sandwiches is provided.
 
-The paper is organized is follows: Section~\ref{sec:model} discusses the model frame
+The paper is organized as follows: Section~\ref{sec:model} discusses the model frame
 and reviews some of the underlying theory. Section~\ref{sec:R} presents some existing
 \proglang{R} infrastructure which can be re-used for the computation of sandwich 
 covariance matrices in Section~\ref{sec:vcov}. Section~\ref{sec:illustrations} gives
-a brief illustration of the computational tools before Section~\ref{sec:summary}
+a brief illustration of the computational tools before Section~\ref{sec:disc}
 concludes the paper.
 
 
@@ -82,15 +87,21 @@ $\theta$ can be estimated using an M-estimator $\hat \theta$ implicitely defined
   \begin{equation} \label{eq:estfun}
     \sum_{i = 1}^n \psi(y_i, x_i, \hat \theta) \quad = \quad 0.
   \end{equation}
-This includes in particular maximum likelihood (ML) and ordinary and nonlinear least
-squares (OLS and NLS) estimation, where the estimating function $\psi(\cdot)$ is
+This includes cases where the estimating function $\psi(\cdot)$ is
 the derivative of an objective function $\Psi(\cdot)$:
   \begin{equation} \label{eq:score}
     \psi(y, x, \theta) \quad = \quad \frac{\partial \Psi(y, x, \theta)}{\partial \theta}.
   \end{equation}
 }
+Examples for estimation techniques included in this framework are maximum likelihood (ML)
+and ordinary and nonlinear least squares (OLS and NLS) estimation, where the estimator
+is usually written in terms of the objective function as
+$\hat \theta = \mbox{argmin}_\theta \sum_i \Psi(y_i, x_i, \theta)$.
+Other techniques---often expressed in terms of the estimating function rather than
+the objective function---include quasi ML, robust M-estimation and generalized estimating
+equations (GEE). 
 
-Inference about $\theta$ is then typically performed relying on a central
+Inference about $\theta$ is typically performed relying on a central
 limit theorem (CLT) of type
   \begin{equation} \label{eq:clt}
     \sqrt{n} \, (\hat \theta - \theta) \quad \darrow \quad N(0, S(\theta)),
@@ -152,8 +163,8 @@ and summary methods providing inference based on the CLT from Equation~\ref{eq:c
 the estimated parameter vector $\hat \theta$ and some estimate of the covariance matrix $S(\theta)$,
 there are usually a \code{coef()} and a \code{vcov()} method, respectively. Based on these estimates,
 inference can typically be performed by the \code{summary()} and \code{anova()} methods.
-By convention, the \code{summary()} method performs partial $t$ or $z$ tests and the
-\code{anova()} method performs $F$ or $\chi^2$ tests for nested models. The covariance estimate
+By convention, the \code{summary()} method performs partial $t$ or $z$~tests and the
+\code{anova()} method performs $F$ or $\chi^2$~tests for nested models. The covariance estimate
 used in these tests (and returned by \code{vcov()}) usually relies on the assumption of correctly
 specified models and hence is simply an empirical version of the bread $B(\theta)$ only
 (divided by $n$).
@@ -400,16 +411,17 @@ sandwich <- function(obj, bread. = bread, meat. = meat, ...)
 }
 \end{Sinput}
 \end{Schunk}
-For computing other estimates, the argument \code{meat.} could also be set to
+For computing other estimates, the argument \code{meat.}~could also be set to
 \code{meatHAC} or \code{meatHC}. 
 
-Therefore, all that a use\proglang{R}/develope\proglang{R} would have to do to make a
+Therefore, all that an \proglang{R} user/developer would have to do to make a
 new class of fitted models, ``\code{foo}'' say, fit for this framework is: 
 provide an \code{estfun()} method \code{estfun.}\emph{foo}\code{()}
-and a \code{bread()} method \code{bread.}\emph{foo}\code{()}. See also Figure~\ref{fig:sandwich}.
+and a \code{bread()} method \code{bread.}\emph{foo}\code{()}.
+See also Figure~\ref{fig:sandwich}.
 
 Only for HC estimators (other than HC0 and HC1 which are available via \code{meat()}),
-it has to be assured in addtion that 
+it has to be assured in addition that 
 \begin{itemize}
   \item the model only depends on a linear predictor (this cannot be easily
         checked by the software, but has to be done by the user),
@@ -435,16 +447,158 @@ continue to be provided by \pkg{sandwich}.
 \end{center}
 \end{figure}
 
+
+
 \section{Illustrations} \label{sec:illustrations}
 
-%% Applications and illustrations
-%%  - linear model in Zeileis (2004)
-%%  - generalized linear model
-%%  - survreg: tobit regression for data("Fair", package = "Ecdat")
-%%  - betareg -> send code to CN and dBS
+This section briefly illustrates how the tools provided by \pkg{sandwich}
+can be applied to various models and re-used in other functions. Predominantly,
+sandwich estimators are used for inference, such as partial $t$ or $z$~tests
+of regression coefficients or restriction testing in nested regression 
+models. As pointed out in Section~\ref{sec:R}, the packages \pkg{lmtest}
+\citep{hac:Zeileis+Hothorn:2002} and \pkg{car} \citep{hac:Fox:2002} provide
+some functions for this type of inference.
 
-For briefly illustrating how the sandwich estimators discussed in the
-previous sections can easily be applied in practice, we consider an
+The model for which sandwich estimators are employed most often is surely
+the linear regression model. Part of the reason for this is (together
+with the ubiquity of linear regression) that in linear regression mean
+and variance can be specified independently from each other. Thus, the 
+model can be seen as a model for the conditional mean of the response
+with the variance left unspecified and captured only for inference by a robust
+sandwich estimator. \cite{hac:Zeileis:2004a} presents a collection of
+applications of sandwich estimators to linear regression, both for cross-section
+and time-series data. These examples are not affected by making
+\pkg{sandwich} object oriented, therefore, we do not present any examples
+for linear regression models here.
+
+To show that with the new object-oriented tools in \pkg{sandwich}, the
+functions can be applied as easily to other models we consider some models
+from microeconometrics: count data regression and probit and tobit models.
+In all examples, we compare the usual summary (coefficients, standard
+errors and partial $z$~tests) based on \code{vcov()} with the corresponding summary
+based on HC standard errors as provided by \code{sandwich()}. \code{coeftest()}
+from \pkg{lmtest} is always used for computing the summaries.
+
+
+\subsection{Count data regression}
+
+To illustrate the usage of sandwich estimators in count data regressions,
+we use artifical data simulated from a negative binomial model. The
+mean of the response \code{y} depends on a regressor \code{x} through
+a log link, the size parameter of the negative binomial distribution
+is 1, and the regressor is simply drawn from a standard normal distribution.
+After setting the random seed for reproducibility, we draw 250 observations
+from this model:
+
+\begin{Schunk}
+\begin{Sinput}
+> set.seed(123)
+> x <- rnorm(250)
+> y <- rnbinom(250, mu = exp(1 + x), size = 1)
+\end{Sinput}
+\end{Schunk}
+
+In the following, we will fit various count models to this data employing
+the overspecification \verb/y ~ x + I(x^2)/ and assessing the significance
+of \verb/I(x^2)/. First, we use \code{glm()} with \code{family = poisson}
+to fit a poisson regression as the simplest model for count data.
+Of course, this model is not correctly specified as \code{y} is from a 
+negative binomial distribution. Hence, we are not surprised that the 
+resulting test of \verb/I(x^2)/ is spuriously significant:
+
+\begin{Schunk}
+\begin{Sinput}
+> fm_pois <- glm(y ~ x + I(x^2), family = poisson)
+> coeftest(fm_pois)
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.063268   0.041357 25.7094  < 2e-16 ***
+x            0.996072   0.053534 18.6062  < 2e-16 ***
+I(x^2)      -0.049124   0.023146 -2.1223  0.03381 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+
+However, the specification of the conditional mean of \code{y} is correct
+in this model which is reflected by the coefficient estimates that are close to 
+their true value. Only the dispersion which is fixed at 1 in the \code{poisson}
+family is misspecified. In this situation, the problem can be alleviated 
+by employing sandwich standard errors in the partial $z$~tests, capturing
+the overdispersion in \code{y}.
+
+\begin{Schunk}
+\begin{Sinput}
+> coeftest(fm_pois, vcov = sandwich)
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.063268   0.083774 12.6922   <2e-16 ***
+x            0.996072   0.105215  9.4670   <2e-16 ***
+I(x^2)      -0.049124   0.036283 -1.3539   0.1758    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+
+Clearly, sandwich standard errors are not the only way of
+dealing with this situation. Other obvious candidates would be to use a
+quasi-poisson or, of course, a negative binomial model \citep{hac:McCullagh+Nelder:1989}.
+The former is available through the \code{quasipoisson} family for \code{glm()}
+that leads to the same coefficient estimates as \code{poisson} but additionally
+estimates the dispersion for inference. The associated model summary is very
+similar to that based on the sandwich standard errors, leading to qualitatively
+identical results.
+
+\begin{Schunk}
+\begin{Sinput}
+> fm_qpois <- glm(y ~ x + I(x^2), family = quasipoisson)
+> coeftest(fm_qpois)
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.063268   0.090434 11.7574   <2e-16 ***
+x            0.996072   0.117061  8.5090   <2e-16 ***
+I(x^2)      -0.049124   0.050612 -0.9706   0.3318    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+
+Negative binomial models can be fitted by \code{glm.nb()} from \pkg{MASS} 
+\citep{hac:Venables+Ripley:2002}.
+
+\begin{Schunk}
+\begin{Sinput}
+> fm_nbin <- glm.nb(y ~ x + I(x^2))
+> coeftest(fm_nbin)
+\end{Sinput}
+\begin{Soutput}
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.066057   0.089724 11.8816   <2e-16 ***
+x            0.999616   0.096127 10.3990   <2e-16 ***
+I(x^2)      -0.052652   0.065725 -0.8011   0.4231    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+\end{Soutput}
+\end{Schunk}
+
+Here, the estimated parameters are very similar to those from the poisson regression
+and the $z$~tests lead to the same conclusions as in the previous two examples.
+
+
+\subsection{Probit and tobit models}
+
+In this section, we consider an
 example from \citet[Section~22.3.6]{hac:Greene:2003} that reproduces
 the analysis of extramarital affairs by \citet{hac:Fair:1978}. The data,
 famously known as Fair's affairs, is available in the \pkg{Ecdat} package
@@ -468,9 +622,8 @@ and \code{glm()}, respectively:
 \end{Sinput}
 \end{Schunk}
 
-Using \code{coeftest()} from \pkg{lmtest} \citep{hac:Zeileis+Hothorn:2002},
-we can produce the usual summary based on the standard errors as computed by
-\code{vcov()} \citep[which reproduces the results in][]{hac:Greene:2003}
+Using \code{coeftest()}, we compare the usual summary based on the standard
+errors as computed by \code{vcov()} \citep[which reproduces the results in][]{hac:Greene:2003}
 and compare them to the HC standard errors provided by \code{sandwich()}.
 
 \begin{Schunk}
@@ -510,10 +663,10 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 \end{Soutput}
 \end{Schunk}
 
-In this case, the HC standard errors are only slightly different and yield
-qualitatively identical results. The picture is similar for the probit model
-which leads to the same interpretations, both for the standard and the HC 
-estimate.
+For the tobit model \code{fm_tobit}, the HC standard errors are only slightly
+different and yield qualitatively identical results. The picture is similar for
+the probit model \code{fm_probit} which leads to the same interpretations, both
+for the standard and the HC estimate.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -553,25 +706,54 @@ Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 See \cite{hac:Greene:2003} for a more detailed discussion of these and other
 regression models for Fair's affairs data.
 
-This brief illustration should merely show that for the use\proglang{R}, the
-estimators can be easily employed for inference. As discussed in Section~\ref{sec:R},
-further inference functions are available that accept covariance matrix estimators
-(or estimates) as arguments, e.g., in packages \pkg{lmtest} or \pkg{car}.
 
-\section{Summary} \label{sec:summary}
+\section{Discussion} \label{sec:disc}
 
 Object-oriented computational infrastructure in the \proglang{R} package \pkg{sandwich}
 for estimating sandwich covariance matrices in a wide class of parametric models is suggested.
-Re-using existing building blocks, all a develope\proglang{R} has to provide for adapting
+Re-using existing building blocks, all an \proglang{R} developer has to implement for adapting
 a new fitted model class to the sandwich estimators are methods for extracting a bread
 estimator and the empirical estimating functions (and possibly model matrix and hat values).
+
+Although the most important area of application of sandwich covariance matrices is inference,
+particularly restriction testing, the package \pkg{sandwich} does not contain any inference
+functions but rather aims at providing modular building blocks that can be re-used in or supplied to
+other computational tools. In this paper, we show how the \pkg{sandwich} functions can be
+plugged into some functions made available by other packages that implement tools for Wald tests.
+However, it should be pointed out that this is not the only strategy for employing sandwich
+covariances for restriction testing; recent research provides us with at least two other
+promising strategies: For cross-section data, \cite{hac:Godfrey:2006} shows that the finite sample
+performance of quasi $t$ or $z$~tests can be improved by computing HC estimators based on
+the residuals of the restricted model and assessing their significance based on their bootstrap
+distribution. For time-series data, \cite{hac:Kiefer+Vogelsang:2002} consider $t$-type statistics based on HAC
+estimators where the bandwidth is equal to the sample size, leading to a non-normal asymptotic
+distribution of the $t$ statistic. For both strategies, some tools from \pkg{sandwich} could be
+easily re-used but further infrastructure, in particular for the inference, is required.
+As this is beyond the scope of the \pkg{sandwich} package, we leave this for
+future developments in packages focused on inference in regression models.
+
+As the new tools in \pkg{sandwich} provide ``robust'' covariances for a wide class of
+parametric models, it is worth pointing out that this should \emph{not} encourage the
+user to employ them automatically for every model in every analysis. First, the use
+of sandwich estimators when the model is correctly specified leads to a loss of power.
+Second, if the model is not correctly specified, the sandwich estimators are only 
+useful if the parameters estimates are still consistent, i.e., if the misspecification
+does not result in bias. Whereas it is well understood what types of misspecification
+can be dealt with in linear regression models, the situation is less obvious for general
+regression models. Some further expository discussion of this issue for ML and quasi ML
+estimators can be found in \cite{hac:Freedman:2006} and \cite{hac:Koenker:2006}.
+
+
 
 \section*{Acknowledgements}
 
 The extensions of \pkg{sandwich}, in particular to microeconometric models,
 was motivated by the joint work with Christian Kleiber on \cite{hac:Kleiber+Zeileis:2006}.
-Furthermore, we would like to thank Henric Nilsson for helpful comments and discussions that
-lead to improvement and generalization of the functions in the package.
+We would also like to thank Henric Nilsson for helpful feedback and discussions that
+helped to improve and generalize the functions in the package. Furthermore,
+we gratefully acknowledge the valuable comments of the associate editor and two referees
+which led to an improvement of the paper.
+
 
 \bibliography{hac}
 

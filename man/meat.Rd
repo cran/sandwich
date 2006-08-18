@@ -13,8 +13,8 @@ meat(x, adjust = FALSE, \dots)
 \arguments{
  \item{x}{a fitted model object.}
  \item{adjust}{logical. Should a finite sample adjustment be made?
-    This amounts to multiplication with $n/(n-k)$ where $n$ is the
-    number of observations and $k$ the number of estimated parameters.}
+    This amounts to multiplication with \deqn{n/(n-k)} where \deqn{n} is the
+    number of observations and \deqn{k} the number of estimated parameters.}
  \item{\dots}{arguments passed to the \code{\link{estfun}} function.}
 }
 
@@ -28,11 +28,9 @@ the scaled cross products of the empirical estimating functions.}
 \seealso{\code{\link{sandwich}}, \code{\link{bread}}, \code{\link{estfun}}}
 
 \references{
-  Zeileis A (2006),
-  Object-oriented Computation of Sandwich Estimators.
-  \emph{Report 37}, Department of Statistics and Mathematics, 
-   \enc{Wirtschaftsuniversität}{Wirtschaftsuniversitaet} Wien, Research Report Series.
-   \url{http://epub.wu-wien.ac.at/}
+  Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
+  \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
+  URL \url{http://http://www.jstatsoft.org/v16/i09/}.
 }
 
 \examples{

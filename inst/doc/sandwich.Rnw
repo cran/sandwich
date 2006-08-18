@@ -46,10 +46,10 @@ can be integrated into applications.
 
 
 <<preliminaries,echo=FALSE,results=hide>>=
-library(zoo)
-library(sandwich)
-library(strucchange)
-library(lmtest)
+library("zoo")
+library("sandwich")
+library("strucchange")
+library("lmtest")
 @
 
 \section{Introduction} \label{sec:intro}
@@ -360,7 +360,7 @@ to \code{vcovHAC} is available for computing the estimator(s) of
 \end{equation}
 where $L$ is the maximum lag, all other weights are zero. This is implemented in the
 function \code{NeweyWest(lmobj, lag = NULL, \dots)} where \code{lag} specifies $L$ and 
-$\code{...}$ are (here, and in the following) further arguments passed to other
+\code{\dots} are (here, and in the following) further arguments passed to other
 functions, detailed information is always available in the reference manual.
 If \code{lag} is set to \code{NULL} (the default) the non-parametric bandwidth selection
 procedure of \cite{hac:Newey+West:1994} is used. This is also available in a stand-alone
@@ -514,8 +514,8 @@ appendix along with the versions of \proglang{R} and the packages used.
 Before we start with the examples, the \pkg{sandwich} and \pkg{lmtest} package
 have to be loaded:
 <<loadlibs1>>=
-library(sandwich)
-library(lmtest)
+library("sandwich")
+library("lmtest")
 @
 
 \subsection{Testing coefficients in cross-sectional data}
@@ -529,7 +529,7 @@ is given in Table 14.1 in \cite{hac:Greene:1993} and available in
 \pkg{sandwich} in the data frame \code{PublicSchools} which can be
 loaded by:
 <<hc-data>>=
-data(PublicSchools)
+data("PublicSchools")
 ps <- na.omit(PublicSchools)
 ps$Income <- ps$Income * 0.0001
 @
@@ -597,7 +597,7 @@ interest. The corresponding transformed variables \code{RealInv}, \code{RealGNP}
 and \code{RealInt} are stored in the data frame \code{Investment} in
 \pkg{sandwich} which can be loaded by:
 <<hac-data>>=
-data(Investment)
+data("Investment")
 @
 Subsequently, the fitted linear regression model is computed by:
 <<hac-model>>=
@@ -686,8 +686,8 @@ fitting and assessing fluctuation processes including OLS-based CUSUM processes
 
 After loading the package and the data,
 <<loadlibs2>>=
-library(strucchange)
-data(RealInt)
+library("strucchange")
+data("RealInt")
 @
 the command
 <<sc-ocus>>=
@@ -796,7 +796,7 @@ To make the packages available for the examples the following commands are
 necessary:
 <<eval=FALSE>>=
 <<loadlibs1>>
-library(strucchange)
+library("strucchange")
 @
 
 \subsection{Testing coefficients in cross-sectional data}
@@ -876,7 +876,7 @@ lines(ts(fitted(fm.inv), start = 1964), col = 4)
 3-dimensional visualization: %%non-dynamic for pretty printing
 \begin{Schunk}
 \begin{Sinput}
-  library(scatterplot3d)
+  library("scatterplot3d")
   s3d <- scatterplot3d(Investment[,c(5,7,6)],
     type = "b", angle = 65, scale.y = 1, pch = 16)
   s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
@@ -887,7 +887,7 @@ lines(ts(fitted(fm.inv), start = 1964), col = 4)
 
 Load real interest series:
 <<eval=FALSE>>=
-data(RealInt)
+data("RealInt")
 @
 
 OLS-based CUSUM test with quadratic spectral kernel HAC estimate:

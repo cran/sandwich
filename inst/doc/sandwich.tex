@@ -354,7 +354,7 @@ to \code{vcovHAC} is available for computing the estimator(s) of
 \end{equation}
 where $L$ is the maximum lag, all other weights are zero. This is implemented in the
 function \code{NeweyWest(lmobj, lag = NULL, \dots)} where \code{lag} specifies $L$ and 
-$\code{...}$ are (here, and in the following) further arguments passed to other
+\code{\dots} are (here, and in the following) further arguments passed to other
 functions, detailed information is always available in the reference manual.
 If \code{lag} is set to \code{NULL} (the default) the non-parametric bandwidth selection
 procedure of \cite{hac:Newey+West:1994} is used. This is also available in a stand-alone
@@ -487,8 +487,8 @@ Before we start with the examples, the \pkg{sandwich} and \pkg{lmtest} package
 have to be loaded:
 \begin{Schunk}
 \begin{Sinput}
-> library(sandwich)
-> library(lmtest)
+> library("sandwich")
+> library("lmtest")
 \end{Sinput}
 \end{Schunk}
 
@@ -504,7 +504,7 @@ is given in Table 14.1 in \cite{hac:Greene:1993} and available in
 loaded by:
 \begin{Schunk}
 \begin{Sinput}
-> data(PublicSchools)
+> data("PublicSchools")
 > ps <- na.omit(PublicSchools)
 > ps$Income <- ps$Income * 1e-04
 \end{Sinput}
@@ -589,7 +589,7 @@ and \code{RealInt} are stored in the data frame \code{Investment} in
 \pkg{sandwich} which can be loaded by:
 \begin{Schunk}
 \begin{Sinput}
-> data(Investment)
+> data("Investment")
 \end{Sinput}
 \end{Schunk}
 Subsequently, the fitted linear regression model is computed by:
@@ -710,8 +710,8 @@ fitting and assessing fluctuation processes including OLS-based CUSUM processes
 After loading the package and the data,
 \begin{Schunk}
 \begin{Sinput}
-> library(strucchange)
-> data(RealInt)
+> library("strucchange")
+> data("RealInt")
 \end{Sinput}
 \end{Schunk}
 the command
@@ -821,11 +821,11 @@ in the development of \pkg{sandwich}.
 The packages \pkg{sandwich}, \pkg{lmtest} and \pkg{strucchange} are
 required for the applications in this paper. Furthermore, the packages
 depend on \pkg{zoo}. For the computations in this paper \proglang{R}
-2.3.0 and \pkg{sandwich}
-1.9--0,
-\pkg{lmtest} 0.9--14,
-\pkg{strucchange} 1.2--12
-and \pkg{zoo} 1.0--7
+2.3.1 and \pkg{sandwich}
+2.0--0,
+\pkg{lmtest} 0.9--18,
+\pkg{strucchange} 1.3--0
+and \pkg{zoo} 1.2--0
 have been used. \proglang{R} itself and all packages used are available from
 CRAN at \url{http://CRAN.R-project.org/}.
 
@@ -833,9 +833,9 @@ To make the packages available for the examples the following commands are
 necessary:
 \begin{Schunk}
 \begin{Sinput}
-  library(sandwich)
-  library(lmtest)
-  library(strucchange)
+  library("sandwich")
+  library("lmtest")
+  library("strucchange")
 \end{Sinput}
 \end{Schunk}
 
@@ -845,7 +845,7 @@ Load public schools data,
 omit \code{NA} in Wisconsin and scale income:
 \begin{Schunk}
 \begin{Sinput}
-  data(PublicSchools)
+  data("PublicSchools")
   ps <- na.omit(PublicSchools)
   ps$Income <- ps$Income * 1e-04
 \end{Sinput}
@@ -896,7 +896,7 @@ Visualization: %%non-dynamic for pretty printing
 Load investment equation data:
 \begin{Schunk}
 \begin{Sinput}
-  data(Investment)
+  data("Investment")
 \end{Sinput}
 \end{Schunk}
 
@@ -932,7 +932,7 @@ Time-series visualization:
 3-dimensional visualization: %%non-dynamic for pretty printing
 \begin{Schunk}
 \begin{Sinput}
-  library(scatterplot3d)
+  library("scatterplot3d")
   s3d <- scatterplot3d(Investment[,c(5,7,6)],
     type = "b", angle = 65, scale.y = 1, pch = 16)
   s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
@@ -944,7 +944,7 @@ Time-series visualization:
 Load real interest series:
 \begin{Schunk}
 \begin{Sinput}
-  data(RealInt)
+  data("RealInt")
 \end{Sinput}
 \end{Schunk}
 
