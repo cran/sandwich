@@ -1,3 +1,9 @@
+Changes in Version 2.0-1
+
+  o Minor fix to bwAndrews() so that it can be easily used
+    in models for multivariate means.
+  
+
 Changes in Version 2.0-0
 
   o A paper based on the "sandwich-OOP" vignette was accepted

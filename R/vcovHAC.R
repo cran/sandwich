@@ -154,6 +154,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
       if(inherits(res, "try-error")) res <- try(residuals(x), silent = TRUE)
       if(!inherits(res, "try-error")) weights[which(colSums((umat - res)^2) < 1e-16)] <- 0
     }
+    if(isTRUE(all.equal(weights, rep(0, k)))) weights <- rep(1, k)
   } else {
     weights <- rep(weights, length.out = k)
   }

@@ -93,6 +93,7 @@ the derivative of an objective function $\Psi(\cdot)$:
     \psi(y, x, \theta) \quad = \quad \frac{\partial \Psi(y, x, \theta)}{\partial \theta}.
   \end{equation}
 }
+
 Examples for estimation techniques included in this framework are maximum likelihood (ML)
 and ordinary and nonlinear least squares (OLS and NLS) estimation, where the estimator
 is usually written in terms of the objective function as
@@ -618,7 +619,7 @@ and \code{glm()}, respectively:
 > fm_tobit <- survreg(Surv(nbaffairs, nbaffairs > 0, type = "left") ~ 
 +     age + ym + religious + occupation + rate, data = Fair, dist = "gaussian")
 > fm_probit <- glm(I(nbaffairs > 0) ~ age + ym + religious + occupation + 
-+     rate, data = Fair, family = binomial(link = probit))
++     rate, data = Fair, family = binomial(link = "probit"))
 \end{Sinput}
 \end{Schunk}
 
