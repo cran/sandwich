@@ -1,3 +1,14 @@
+Changes in Version 2.0-2
+
+  o Added new vcovOPG() function for computing the outer
+    product of gradients estimator (works for maximum
+    likelihood estfun() methods only).
+  
+  o Scaled estfun() and bread() method for "glm" objects
+    by dispersion estimate. Hence, this corresponds to
+    maximum likelihood and not deviance methods.
+  
+
 Changes in Version 2.0-1
 
   o Minor fix to bwAndrews() so that it can be easily used

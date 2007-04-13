@@ -37,7 +37,7 @@ to \eqn{k} parameters.}
 \references{
   Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
-  URL \url{http://http://www.jstatsoft.org/v16/i09/}.
+  URL \url{http://www.jstatsoft.org/v16/i09/}.
 }
 
 \examples{

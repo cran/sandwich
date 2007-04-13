@@ -17,6 +17,15 @@ bread.lm <- bread.nls <- function(x, ...)
   return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
 }
 
+bread.glm <- function(x, ...)
+{
+  sx <- summary(x)
+  wres <- as.vector(residuals(x, "working")) * weights(x, "working")
+  dispersion <- if(x$family$family %in% c("poisson", "binomial")) 1
+    else sum(wres^2)/sum(weights(x, "working"))
+  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])) * dispersion)
+}
+
 bread.survreg <- function(x, ...)
   length(x$linear.predictors) * x$var
 
@@ -40,6 +49,16 @@ meat <- function(x, adjust = FALSE, ...)
   k <- NCOL(psi)
   n <- NROW(psi)
   rval <- crossprod(as.matrix(psi))/n
+  if(adjust) rval <- n/(n-k) * rval
+  rownames(rval) <- colnames(rval) <- colnames(psi)
+  return(rval)
+}
+
+vcovOPG <- function(x, adjust = FALSE, ...) {
+  psi <- estfun(x, ...)
+  k <- NCOL(psi)
+  n <- NROW(psi)
+  rval <- chol2inv(qr.R(qr(psi)))
   if(adjust) rval <- n/(n-k) * rval
   rownames(rval) <- colnames(rval) <- colnames(psi)
   return(rval)

@@ -20,7 +20,10 @@ estfun.lm <- function(x, ...)
 estfun.glm <- function(x, ...)
 {
   xmat <- model.matrix(x)
-  rval <- as.vector(residuals(x, "working")) * weights(x, "working") * xmat
+  wres <- as.vector(residuals(x, "working")) * weights(x, "working")
+  dispersion <- if(x$family$family %in% c("poisson", "binomial")) 1
+    else sum(wres^2)/sum(weights(x, "working"))
+  rval <- wres * xmat / dispersion
   attr(rval, "assign") <- NULL
   attr(rval, "contrasts") <- NULL
   res <- residuals(x, type = "pearson")
