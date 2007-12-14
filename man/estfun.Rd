@@ -22,7 +22,13 @@ estfun(x, \dots)
 \value{A matrix containing the empirical estimating functions.
 Typically, this should be an \eqn{n \times k}{n x k} matrix corresponding
 to \eqn{n} observations and \eqn{k} parameters. The columns should be named
-as in \code{\link{coef}} or \code{\link{terms}}, respectively.}
+as in \code{\link{coef}} or \code{\link{terms}}, respectively.
+
+The estimating function (or score function) for a model is the derivative of the objective function
+with respect to the parameter vector. The empirical estimating functions is
+the evaluation of the estimating function at the observed data (\eqn{n} observations)
+and the estimated parameters (of dimension \eqn{k}).
+}
 
 \seealso{\code{\link{lm}}, \code{\link{glm}}}
 
@@ -33,10 +39,12 @@ as in \code{\link{coef}} or \code{\link{terms}}, respectively.}
 }
 
 \examples{
+## linear regression
 x <- sin(1:10)
 y <- rnorm(10)
 fm <- lm(y ~ x)
 
+## estimating function: (y - x'beta) * x
 estfun(fm)
 residuals(fm) * cbind(1, x)
 }

@@ -11,9 +11,9 @@ bread <- function(x, ...)
   UseMethod("bread")
 }
 
-bread.lm <- bread.nls <- function(x, ...)
+bread.lm <- function(x, ...)
 {
-  sx <- summary(x)
+  sx <- summary.lm(x)
   return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
 }
 
@@ -24,6 +24,12 @@ bread.glm <- function(x, ...)
   dispersion <- if(x$family$family %in% c("poisson", "binomial")) 1
     else sum(wres^2)/sum(weights(x, "working"))
   return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])) * dispersion)
+}
+
+bread.nls <- function(x, ...)
+{
+  sx <- summary(x)
+  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
 }
 
 bread.survreg <- function(x, ...)

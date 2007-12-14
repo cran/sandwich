@@ -1,3 +1,10 @@
+Changes in Version 2.0-3
+
+  o bread() method for "lm" objects now calls summary.lm()
+    explicitely (rather than the generic) so that it also
+    works with "aov" objects.
+  
+
 Changes in Version 2.0-2
 
   o Added new vcovOPG() function for computing the outer
