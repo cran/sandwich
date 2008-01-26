@@ -5,6 +5,7 @@
 \alias{bread.coxph}
 \alias{bread.gam}
 \alias{bread.nls}
+\alias{bread.hurdle}
 \title{Bread for Sandwiches}
 \description{
  Generic function for extracting an estimator for the bread of

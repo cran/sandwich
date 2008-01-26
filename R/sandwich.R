@@ -6,49 +6,6 @@ sandwich <- function(x, bread. = bread, meat. = meat, ...)
   return(1/n * (bread. %*% meat. %*% bread.))
 }
 
-bread <- function(x, ...)
-{
-  UseMethod("bread")
-}
-
-bread.lm <- function(x, ...)
-{
-  sx <- summary.lm(x)
-  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
-}
-
-bread.glm <- function(x, ...)
-{
-  sx <- summary(x)
-  wres <- as.vector(residuals(x, "working")) * weights(x, "working")
-  dispersion <- if(x$family$family %in% c("poisson", "binomial")) 1
-    else sum(wres^2)/sum(weights(x, "working"))
-  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])) * dispersion)
-}
-
-bread.nls <- function(x, ...)
-{
-  sx <- summary(x)
-  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
-}
-
-bread.survreg <- function(x, ...)
-  length(x$linear.predictors) * x$var
-
-bread.gam <- function(x, ...)
-{
-  sx <- summary(x)
-  sx$cov.unscaled * sx$n
-}
-  
-bread.coxph <- function(x, ...)
-{
-  rval <- x$var * x$n
-  dimnames(rval) <- list(names(coef(x)), names(coef(x)))
-  return(rval)
-
-}
-
 meat <- function(x, adjust = FALSE, ...)
 {
   psi <- estfun(x, ...)

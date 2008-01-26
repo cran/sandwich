@@ -1,3 +1,13 @@
+Changes in Version 2.1-0
+
+  o added bread() and estfun() methods for "hurdle"/"zeroinfl"
+    objects as computed by hurdle()/zeroinfl() in
+    package "pscl".
+  
+  o fixed bread() and estfun() methods for negative binomial
+    "glm" objects: now dispersion = 1 is used.
+  
+
 Changes in Version 2.0-3
 
   o bread() method for "lm" objects now calls summary.lm()

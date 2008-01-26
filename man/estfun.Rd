@@ -6,6 +6,7 @@
 \alias{estfun.survreg}
 \alias{estfun.coxph}
 \alias{estfun.nls}
+\alias{estfun.hurdle}
 \title{Extract Empirical Estimating Functions}
 \description{
  Generic function for extracting the empirical estimating functions
