@@ -1,5 +1,6 @@
 \name{vcovHC}
 \alias{vcovHC}
+\alias{vcovHC.default}
 \alias{meatHC}
 \title{Heteroskedasticity-Consistent Covariance Matrix Estimation}
 \description{
@@ -7,14 +8,16 @@
  coefficient estimates in regression models.
 }
 \usage{
-vcovHC(x,
+vcovHC(x, \dots)
+
+\method{vcovHC}{default}(x,
   type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
   omega = NULL, sandwich = TRUE, \dots)
 
 meatHC(x, type = , omega = NULL)
 }
 \arguments{
- \item{x}{a fitted model object of class \code{"lm"}.}
+ \item{x}{a fitted model object.}
  \item{type}{a character string specifying the estimation type. For
      details see below.}
  \item{omega}{a vector or a
@@ -28,7 +31,8 @@ meatHC(x, type = , omega = NULL)
 }
 
 \details{The function \code{meatHC} is the real work horse for estimating
-  the meat of HC sandwich estimators -- \code{vcovHC} is a wrapper calling
+  the meat of HC sandwich estimators -- the default \code{vcovHC} method
+  is a wrapper calling
   \code{\link{sandwich}} and \code{\link{bread}}. See Zeileis (2006) for
   more implementation details. The theoretical background, exemplified
   for the linear regression model, is described below and in Zeileis (2004).
@@ -101,13 +105,15 @@ URL \url{http://www.jstatsoft.org/v16/i09/}.
 ## with homoskedastic variances
 x <- sin(1:100)
 y <- 1 + x + rnorm(100)
-## compute usual covariance matrix of coefficient estimates
+## model fit and HC3 covariance
 fm <- lm(y ~ x)
-vcovHC(fm, type="const")
+vcovHC(fm)
+## usual covariance matrix
+vcovHC(fm, type = "const")
 vcov(fm)
 
-sigma2 <- sum(residuals(lm(y~x))^2)/98
-sigma2 * solve(crossprod(cbind(1,x)))
+sigma2 <- sum(residuals(lm(y ~ x))^2)/98
+sigma2 * solve(crossprod(cbind(1, x)))
 }
 
 \keyword{regression}

@@ -1,3 +1,15 @@
+Changes in Version 2.2-0
+
+  o added/enhanced bread() and estfun() methods for "rlm" 
+    and "mlogit" objects (from MASS and mlogit, respectively).
+    
+  o made vcovHC() and vcovHAC() generic with previous function
+    definitions as default methods.    
+
+  o updated vignettes (in particular using the more convenient
+    tobit() interface from the AER package).
+
+
 Changes in Version 2.1-0
 
   o added bread() and estfun() methods for "hurdle"/"zeroinfl"

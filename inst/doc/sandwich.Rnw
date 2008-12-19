@@ -1,4 +1,5 @@
-\documentclass{Z}
+\documentclass[nojss]{jss}
+\usepackage{thumbpdf}
 %% need no \usepackage{Sweave}
 
 \author{Achim Zeileis\\Wirtschaftsuniversit\"at Wien}
@@ -14,7 +15,8 @@
 \Abstract{
 This introduction to the \proglang{R} package \pkg{sandwich} is a (slightly)
 modified version of \cite{hac:Zeileis:2004a}, published in the
-\emph{Journal of Statistical Software}.
+\emph{Journal of Statistical Software}. A follow-up paper on object object-oriented
+computation of sandwich estimators is available in \citep{hac:Zeileis:2006}.
 
 Data described by econometric models typically contains autocorrelation 
 and/or heteroskedasticity of unknown form and for inference in such models
@@ -36,6 +38,16 @@ Several real-world data sets are used to illustrate how the functionality
 can be integrated into applications.
 }
 
+\Address{
+  Achim Zeileis\\
+  Department of Statistics and Mathematics\\
+  Wirtschaftsuniversit\"at Wien\\
+  Augasse 2--9\\
+  A-1090 Wien, Austria\\
+  E-mail: \email{Achim.Zeileis@R-project.org}\\
+  URL: \url{http://statmath.wu-wien.ac.at/~zeileis/}
+}
+
 \begin{document}
 
 \SweaveOpts{engine=R,eps=FALSE}
@@ -50,6 +62,7 @@ library("zoo")
 library("sandwich")
 library("strucchange")
 library("lmtest")
+options(prompt = "R> ", continue = "+   ")
 @
 
 \section{Introduction} \label{sec:intro}
@@ -100,7 +113,7 @@ estimation that provides reusable components that can be used as modular buildin
 in implementing new inferential techniques and in applications.
 
 All functions described are available in the package \pkg{sandwich} implemented in the
-\proglang{R} system for statistical  computing \citep{hac:R:2004} which is currently
+\proglang{R} system for statistical  computing \citep{hac:R:2008} which is currently
 not the most popular environment for econometric computing but which is finding increasing
 attention among econometricians \citep{hac:Cribari-Neto+Zarkos:1999,hac:Racine+Hyndman:2002}.
 Both \proglang{R} itself and the \pkg{sandwich} package (as well as all other packages 
@@ -251,7 +264,8 @@ the residuals $\hat u$, the diagonal of the hat matrix $h$
 and the residual degrees of freedom $n-k$. Thus, it has to be
 of the form \code{omega(residuals, diaghat, df)}: e.g.,
 for computing HC3 \code{omega} is set to
-\verb+function(residuals, diaghat, df) residuals^2/(1 - diaghat)^2+.
+\verb+function(residuals, diaghat, df)+ \linebreak
+\verb+residuals^2/(1 - diaghat)^2+.
 
 As a convenience option, a \code{type} argument can be set to
 \code{"const"}, \code{"HC0"} (or equivalently \code{"HC"}),
@@ -310,11 +324,8 @@ vcovHAC(lmobj, weights,
 \end{verbatim}
 
 The most important arguments are again the fitted linear model\footnote{Note, that not only
-HAC estimators for fitted \emph{linear} models can be computed with \code{vcovHAC}. If
-there is an \code{estfun} method for extracting the estimating functions from the fitted
-model supplied, the estimate $\hat \Phi$ can be computed for arbitrary fitted models. To compute 
-the full sandwich $\hat \Psi_{\mathrm{HAC}}$, the \code{summary} method has to 
-have a slot \code{cov.unscaled} in addition.} \code{lmobj}---from which
+HAC estimators for fitted \emph{linear} models can be computed with \code{vcovHAC}. 
+See \cite{hac:Zeileis:2006} for details.} \code{lmobj}---from which
 the estimating functions $\hat V_i$ can easily be extracted using the generic
 function \code{estfun(lmobj)}---and the argument \code{weights} which specifys $w$.
 The latter can be either the vector $w$ directly or a function to compute it from
@@ -759,7 +770,7 @@ the object orientation mechanism of \proglang{R} and the fact that functions
 are first-level objects are of prime importance. 
 
 
-\section*{Acknowledgements}
+\section*{Acknowledgments}
 
 We are grateful to Thomas Lumley for putting his code in the
 \pkg{weave} package at disposal and for advice in the design

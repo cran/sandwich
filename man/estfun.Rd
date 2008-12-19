@@ -2,11 +2,14 @@
 \alias{estfun}
 \alias{estfun.lm}
 \alias{estfun.glm}
+\alias{estfun.mlm}
 \alias{estfun.rlm}
 \alias{estfun.survreg}
 \alias{estfun.coxph}
 \alias{estfun.nls}
 \alias{estfun.hurdle}
+\alias{estfun.zeroinfl}
+\alias{estfun.mlogit}
 \title{Extract Empirical Estimating Functions}
 \description{
  Generic function for extracting the empirical estimating functions

@@ -1,4 +1,5 @@
-\documentclass{Z}
+\documentclass[nojss]{jss}
+\usepackage{thumbpdf}
 %% need no \usepackage{Sweave}
 
 %% Symbols
@@ -31,19 +32,28 @@ functions---most importantly for the empirical estimating functions---from which
 types of sandwich estimators can be computed.
 }
 
+\Address{
+  Achim Zeileis\\
+  Department of Statistics and Mathematics\\
+  Wirtschaftsuniversit\"at Wien\\
+  Augasse 2--9\\
+  A-1090 Wien, Austria\\
+  E-mail: \email{Achim.Zeileis@R-project.org}\\
+  URL: \url{http://statmath.wu-wien.ac.at/~zeileis/}
+}
+
 \begin{document}
 
 \SweaveOpts{engine=R,eps=FALSE}
 %\VignetteIndexEntry{Object-oriented Computation of Sandwich Estimators}
-%\VignetteDepends{sandwich,zoo,Ecdat,survival,MASS,lmtest}
+%\VignetteDepends{sandwich,zoo,AER,survival,MASS,lmtest}
 %\VignetteKeywords{covariance matrix estimators, estimating functions, object orientation, R}
 %\VignettePackage{sandwich}
 
 <<preliminaries,echo=FALSE,results=hide>>=
-library("sandwich")
-library("lmtest")
-library("survival")
+library("AER")
 library("MASS")
+options(prompt = "R> ", continue = "+   ")
 @
 
 \section{Introduction} \label{sec:intro}
@@ -61,7 +71,7 @@ heteroskedasitcity and autocorrelation consistent (HAC) estimators for time-seri
 are commonly used in applied regression, in particular in linear regression models.
 
 \cite{hac:Zeileis:2004a} discusses a set of computational tools provided by the
-\pkg{sandwich} package for the \proglang{R} system for statistical computing \citep{hac:R:2006}
+\pkg{sandwich} package for the \proglang{R} system for statistical computing \citep{hac:R:2008}
 which allows for computing HC and HAC estimators in linear regression models fitted 
 by \code{lm()}. Here, we set out where the discussion of \cite{hac:Zeileis:2004a} ends
 and generalize the tools from linear to general parametric models fitted by estimating
@@ -399,6 +409,7 @@ meatHC <- function(obj, omega, ...)
   
   crossprod(rval)/NROW(X)
 }
+
 \end{Sinput}
 \end{Schunk}
 
@@ -408,6 +419,7 @@ Based on the building blocks described in the previous sections, computing a
 sandwich estimate from a fitted model object is easy: the
 function \code{sandwich()} computes an estimate (by default the Eicker-Huber-White
 outer product estimate) for $1/n \, S(\theta)$ via
+
 \begin{Schunk}
 \begin{Sinput}
 sandwich <- function(obj, bread. = bread, meat. = meat, ...)
@@ -418,6 +430,7 @@ sandwich <- function(obj, bread. = bread, meat. = meat, ...)
 }
 \end{Sinput}
 \end{Schunk}
+
 For computing other estimates, the argument \code{meat.}~could also be set to
 \code{meatHAC} or \code{meatHC}. 
 
@@ -439,8 +452,9 @@ it has to be assured in addition that
 For both, HAC and HC estimators, the complexity of the meat functions was reduced for
 exposition in the paper: choosing the \code{weights} in \code{meatHAC} and the diagonal elements
 \code{omega} in \code{meatHC} can be controlled by a number of further arguments. To make
-these explicit for the user, wrapper functions \code{vcovHAC()} and \code{vcovHC()} are provided
-in \pkg{sandwich} which work as advertised in \cite{hac:Zeileis:2004a} and are the recommended
+these explicit for the user, wrapper functions \code{vcovHAC()} and \code{vcovHC()} 
+with suitable default methods
+are provided in \pkg{sandwich} which work as advertised in \cite{hac:Zeileis:2004a} and are the recommended
 interfaces for computing HAC and HC estimators, respectively. Furthermore, the convenience
 interfaces \code{kernHAC()}, \code{NeweyWest()} and \code{weave()} setting the right defaults for
 \citep{hac:Andrews:1991}, \cite{hac:Newey+West:1994}, and \cite{hac:Lumley+Heagerty:1999}, respectively,
@@ -588,31 +602,32 @@ coeftest(fm_nbin)
 Here, the estimated parameters are very similar to those from the poisson regression
 and the $z$~tests lead to the same conclusions as in the previous two examples.
 
+More details on various techniques for count data regression in \proglang{R} are
+provided in \cite{hac:Zeileis+Kleiber+Jackman:2008}.
 
 \subsection{Probit and tobit models}
 
 In this section, we consider an
 example from \citet[Section~22.3.6]{hac:Greene:2003} that reproduces
 the analysis of extramarital affairs by \citet{hac:Fair:1978}. The data,
-famously known as Fair's affairs, is available in the \pkg{Ecdat} package
-\citep{hac:Croissant:2005} and provides cross-section information on the number
+famously known as Fair's affairs, is available in the \pkg{AER} package
+\citep{hac:Kleiber+Zeileis:2008} and provides cross-section information on the number
 of extramarital affairs of 601 individuals along with several covariates such
-as age (\code{age}), years married (\code{ym}), religiousness (\code{religious}),
-occupation (\code{occupation}) and a self-rating of the marriage (\code{rate}).
+as \code{age}, \code{yearsmarried}, \code{religiousness},
+\code{occupation} and a self-\code{rating} of the marriage.
 Table~22.3 in \cite{hac:Greene:2003} provides the parameter estimates and corresponding
 standard errors of a tobit model (for the number of affairs) and a probit model
 (for infidelity as a binary variable). In \proglang{R}, these models can be
-fitted using \code{survreg()} from the \pkg{survival} package \citep{hac:Thernau+Lumley:2006}
+fitted using \code{tobit()} from \pkg{AER} 
+\citep[a convenience interface to \code{survreg()} from the \pkg{survival} package by][]{hac:Thernau+Lumley:2008}
 and \code{glm()}, respectively:
 
 <<>>=
-data("Fair", package = "Ecdat")
-
-fm_tobit <- survreg(Surv(nbaffairs, nbaffairs > 0, type = "left") ~ 
-   age + ym + religious + occupation + rate, data = Fair, dist = "gaussian")
-
-fm_probit <- glm(I(nbaffairs > 0) ~ age + ym + religious + occupation + rate, 
-   data = Fair, family = binomial(link = "probit"))
+library("AER")
+data("Affairs", package = "AER")
+fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating, data = Affairs)
+fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + religiousness + occupation + rating,
+  data = Affairs, family = binomial(link = "probit"))
 @
 
 Using \code{coeftest()}, we compare the usual summary based on the standard
@@ -676,10 +691,10 @@ estimators can be found in \cite{hac:Freedman:2006} and \cite{hac:Koenker:2006}.
 
 
 
-\section*{Acknowledgements}
+\section*{Acknowledgments}
 
 The extensions of \pkg{sandwich}, in particular to microeconometric models,
-was motivated by the joint work with Christian Kleiber on \cite{hac:Kleiber+Zeileis:2006}.
+was motivated by the joint work with Christian Kleiber on \cite{hac:Kleiber+Zeileis:2008}.
 We would also like to thank Henric Nilsson for helpful feedback and discussions that
 helped to improve and generalize the functions in the package. Furthermore,
 we gratefully acknowledge the valuable comments of the associate editor and two referees

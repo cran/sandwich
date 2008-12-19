@@ -18,6 +18,27 @@ estfun.lm <- function(x, ...)
   return(rval)
 }
 
+estfun.mlm <- function(x, ...)
+{
+  xmat <- model.matrix(x)
+  xmat <- naresid(x$na.action, xmat)
+  wts <- weights(x)
+  if(is.null(wts)) wts <- 1
+  res <- residuals(x)
+  cf <- coef(x)
+  rval <- lapply(1:NCOL(res), function(i) {
+    rv <- as.vector(res[,i]) * wts * xmat
+    colnames(rv) <- paste(colnames(cf)[i], colnames(rv), sep = ":")
+    rv
+  })
+  rval <- do.call("cbind", rval)
+  attr(rval, "assign") <- NULL
+  attr(rval, "contrasts") <- NULL
+  if(is.zoo(res)) rval <- zoo(rval, index(res), attr(res, "frequency"))
+  if(is.ts(res)) rval <- ts(rval, start = start(res), frequency = frequency(res))
+  return(rval)
+}
+
 estfun.glm <- function(x, ...)
 {
   xmat <- model.matrix(x)
@@ -189,4 +210,9 @@ estfun.zeroinfl <- function(x, ...) {
   colnames(rval) <- names(coef(x))
   rownames(rval) <- rownames(X)
   return(rval)
+}
+
+estfun.mlogit <- function(x, ...)
+{
+  x$gradient
 }

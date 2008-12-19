@@ -1,4 +1,8 @@
-vcovHC <- function(x, 
+vcovHC <- function(x, ...) {
+  UseMethod("vcovHC")
+}
+
+vcovHC.default <- function(x, 
   type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
   omega = NULL, sandwich = TRUE, ...)
 {

@@ -2,7 +2,11 @@
 ## although the essential part is now moved to meatHAC()
 ## interfacing the sandwich() function
 
-vcovHAC <- function(x, order.by = NULL, prewhite = FALSE,
+vcovHAC <- function(x, ...) {
+  UseMethod("vcovHAC")
+}
+
+vcovHAC.default <- function(x, order.by = NULL, prewhite = FALSE,
   weights = weightsAndrews, adjust = TRUE, diagnostics = FALSE,
   sandwich = TRUE, ar.method = "ols", data = list(), ...)
 {
