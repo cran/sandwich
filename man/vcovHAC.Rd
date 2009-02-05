@@ -77,7 +77,7 @@ construction.
 }
 
 \value{A matrix containing the covariance matrix estimate. If \code{diagnostics}
-was set to \code{TRUE} this has an attribute \code{"diagnostics} which is a list 
+was set to \code{TRUE} this has an attribute \code{"diagnostics"} which is a list 
 with
   \item{bias.correction}{multiplicative bias correction}
   \item{df}{Approximate denominator degrees of freedom}

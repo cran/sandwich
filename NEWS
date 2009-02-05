@@ -1,3 +1,8 @@
+Changes in Version 2.2-1
+
+  o documentation enhancements for new Rd parser.
+
+
 Changes in Version 2.2-0
 
   o added/enhanced bread() and estfun() methods for "rlm" 
