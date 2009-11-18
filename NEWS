@@ -1,3 +1,8 @@
+Changes in Version 2.2-2
+
+  o updates in estfun() methods for hurdle/zeroinfl objects.
+
+
 Changes in Version 2.2-1
 
   o documentation enhancements for new Rd parser.

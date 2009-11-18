@@ -90,7 +90,7 @@ with
   \emph{Econometrica}, \bold{59}, 817--858.
 
   Andrews DWK & Monahan JC (1992),
-  An Improved Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimatior.
+  An Improved Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimator.
   \emph{Econometrica}, \bold{60}, 953--966.
 
   Lumley A & Heagerty P (1999),

@@ -113,9 +113,10 @@ estfun.hurdle <- function(x, ...) {
   fulltheta <- x$theta
 
   offset <- x$offset
-  if(is.null(offset)) offset <- rep(0, NROW(X))
+  if(is.null(offset)) offset <- 0
   if(x$dist$zero == "binomial") linkobj <- make.link(x$link)
   wts <- weights(x)
+  if(is.null(wts)) wts <- 1
   Y1 <- Y > 0
 
   ## count component: working residuals
@@ -178,9 +179,10 @@ estfun.zeroinfl <- function(x, ...) {
   theta <- x$theta
 
   offset <- x$offset
-  if(is.null(offset)) offset <- rep(0, NROW(X))
+  if(is.null(offset)) offset <- 0
   linkobj <- make.link(x$link)
   wts <- weights(x)
+  if(is.null(wts)) wts <- 1
   Y1 <- Y > 0
 
   eta <- as.vector(X %*% beta + offset)

@@ -22,7 +22,7 @@ meatHC(x, type = , omega = NULL)
      details see below.}
  \item{omega}{a vector or a
      function depending on the arguments \code{residuals}
-     (the residuals of the linear model), \code{diaghat} (the diagonal 
+     (the working residuals of the model), \code{diaghat} (the diagonal 
      of the corresponding hat matrix) and \code{df} (the residual degrees of
      freedom). For details see below.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?

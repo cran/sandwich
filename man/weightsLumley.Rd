@@ -29,7 +29,7 @@ weightsLumley(x, order.by = NULL, C = NULL,
     order \code{as.integer(prewhite)} is fitted via \code{ar} with
     method \code{"ols"} and \code{demean = FALSE}.}
  \item{C}{numeric. The cutoff constant \code{C} is by default
-    4 for method \code{"truncate"} und 1 for method \code{"smooth"}.}
+    4 for method \code{"truncate"} and 1 for method \code{"smooth"}.}
  \item{method}{a character specifying the method used, see details.}
  \item{acf}{a function that computes the autocorrelation function of 
     a vector, by default \code{\link{isoacf}} is used.}
