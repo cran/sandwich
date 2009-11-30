@@ -1,6 +1,7 @@
 \name{bread}
 \alias{bread}
 \alias{bread.lm}
+\alias{bread.mlm}
 \alias{bread.survreg}
 \alias{bread.coxph}
 \alias{bread.gam}

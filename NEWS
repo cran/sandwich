@@ -1,3 +1,8 @@
+Changes in Version 2.2-3
+
+  o new bread() method for "mlm" objects.
+
+
 Changes in Version 2.2-2
 
   o updates in estfun() methods for hurdle/zeroinfl objects.

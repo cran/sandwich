@@ -38,6 +38,7 @@ export(
 
 ## methods for extracting bread matrix
   S3method("bread", "lm")
+  S3method("bread", "mlm")
   S3method("bread", "glm")
   S3method("bread", "survreg")
   S3method("bread", "coxph")

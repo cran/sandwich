@@ -9,6 +9,14 @@ bread.lm <- function(x, ...)
   return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
 }
 
+bread.mlm <- function(x, ...)
+{
+  sx <- summary.lm(x)
+  rval <- diag(ncol(residuals(x))) %x% sx$cov.unscaled * as.vector(sum(sx$df[1:2]))
+  colnames(rval) <- rownames(rval) <- colnames(vcov(x))
+  return(rval)
+}
+
 bread.glm <- function(x, ...)
 {
   sx <- summary(x)
