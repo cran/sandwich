@@ -60,3 +60,6 @@ export(
   S3method("estfun", "hurdle")
   S3method("estfun", "zeroinfl")
   S3method("estfun", "mlogit")
+
+## methods for vcovHC
+  S3method("vcovHC", "mlm")

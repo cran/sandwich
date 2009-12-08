@@ -1,3 +1,10 @@
+Changes in Version 2.2-4
+
+  o new vcovHC() method for "mlm" objects. This simply
+    combines the "meat" for each individual regression and combines
+    the result.
+
+
 Changes in Version 2.2-3
 
   o new bread() method for "mlm" objects.

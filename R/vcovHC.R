@@ -49,3 +49,47 @@ meatHC <- function(x,
 
   return(rval)
 }
+
+vcovHC.mlm <- function(x, 
+  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
+  omega = NULL, sandwich = TRUE, ...)
+{
+  ## compute meat "by hand" because meatHC() can not deal with
+  ## residual "matrices"
+  
+  ## regressors, df, hat values
+  X <- model.matrix(x)
+  attr(X, "assign") <- NULL
+  n <- NROW(X)
+  diaghat <- hatvalues(x)
+  df <- n - NCOL(X)
+
+  ## residuals
+  res <- residuals(x)
+ 
+  ## if omega not specified, set up using type
+  if(is.null(omega)) {
+    type <- match.arg(type)
+    if(type == "HC") type <- "HC0"
+    switch(type,
+      "const" = { omega <- function(residuals, diaghat, df) rep(1, length(residuals)) * sum(residuals^2)/df },
+      "HC0"   = { omega <- function(residuals, diaghat, df) residuals^2 },
+      "HC1"   = { omega <- function(residuals, diaghat, df) residuals^2 * length(residuals)/df },
+      "HC2"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat) },
+      "HC3"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^2 },
+      "HC4"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^pmin(4, length(residuals) * diaghat/as.integer(round(sum(diaghat), digits = 0))) })
+  }
+  
+  ## process omega
+  omega <- apply(res, 2, function(r) omega(r, diaghat, df))
+
+  ## compute crossproduct X' Omega X
+  rval <- lapply(1:ncol(omega), function(i) as.vector(sqrt(omega[,i])) * X)
+  rval <- do.call("cbind", rval)
+  rval <- crossprod(rval)/n
+  colnames(rval) <- rownames(rval) <- colnames(vcov(x))
+
+  ## if necessary compute full sandwich
+  if(sandwich) rval <- sandwich(x, meat = rval, ...)
+  return(rval)
+}

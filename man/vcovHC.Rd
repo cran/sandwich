@@ -1,6 +1,7 @@
 \name{vcovHC}
 \alias{vcovHC}
 \alias{vcovHC.default}
+\alias{vcovHC.mlm}
 \alias{meatHC}
 \title{Heteroskedasticity-Consistent Covariance Matrix Estimation}
 \description{
