@@ -1,3 +1,9 @@
+Changes in Version 2.2-5
+
+  o estfun() methods for "hurdle"/"zeroinfl" objects can now
+    handle multiple offset vectors (if any)
+
+
 Changes in Version 2.2-4
 
   o new vcovHC() method for "mlm" objects. This simply

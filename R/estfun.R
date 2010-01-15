@@ -113,14 +113,22 @@ estfun.hurdle <- function(x, ...) {
   fulltheta <- x$theta
 
   offset <- x$offset
-  if(is.null(offset)) offset <- 0
+  if(is.list(offset)) {
+    offsetx <- offset$count
+    offsetz <- offset$zero
+  } else {
+    offsetx <- offset
+    offsetz <- NULL
+  }
+  if(is.null(offsetx)) offsetx <- 0
+  if(is.null(offsetz)) offsetz <- 0
   if(x$dist$zero == "binomial") linkobj <- make.link(x$link)
   wts <- weights(x)
   if(is.null(wts)) wts <- 1
   Y1 <- Y > 0
 
   ## count component: working residuals
-  eta <- as.vector(X %*% beta + offset)
+  eta <- as.vector(X %*% beta + offsetx)
   mu <- exp(eta)
   theta <- fulltheta["count"]
 
@@ -140,7 +148,7 @@ estfun.hurdle <- function(x, ...) {
     })
   
   ## zero component: working residuals
-  eta <- as.vector(Z %*% gamma)
+  eta <- as.vector(Z %*% gamma + offsetz)
   mu <- if(x$dist$zero == "binomial") linkobj$linkinv(eta) else exp(eta)
   theta <- fulltheta["zero"]
 
@@ -179,15 +187,23 @@ estfun.zeroinfl <- function(x, ...) {
   theta <- x$theta
 
   offset <- x$offset
-  if(is.null(offset)) offset <- 0
+  if(is.list(offset)) {
+    offsetx <- offset$count
+    offsetz <- offset$zero
+  } else {
+    offsetx <- offset
+    offsetz <- NULL
+  }
+  if(is.null(offsetx)) offsetx <- 0
+  if(is.null(offsetz)) offsetz <- 0
   linkobj <- make.link(x$link)
   wts <- weights(x)
   if(is.null(wts)) wts <- 1
   Y1 <- Y > 0
 
-  eta <- as.vector(X %*% beta + offset)
+  eta <- as.vector(X %*% beta + offsetx)
   mu <- exp(eta)
-  etaz <- as.vector(Z %*% gamma)
+  etaz <- as.vector(Z %*% gamma + offsetz)
   muz <- linkobj$linkinv(etaz)
 
   ## density for y = 0

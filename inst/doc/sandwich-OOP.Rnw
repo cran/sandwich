@@ -35,11 +35,11 @@ types of sandwich estimators can be computed.
 \Address{
   Achim Zeileis\\
   Department of Statistics and Mathematics\\
-  Wirtschaftsuniversit\"at Wien\\
+  WU Wirtschaftsuniversit\"at Wien\\
   Augasse 2--9\\
-  A-1090 Wien, Austria\\
+  1090 Wien, Austria\\
   E-mail: \email{Achim.Zeileis@R-project.org}\\
-  URL: \url{http://statmath.wu-wien.ac.at/~zeileis/}
+  URL: \url{http://statmath.wu.ac.at/~zeileis/}
 }
 
 \begin{document}
