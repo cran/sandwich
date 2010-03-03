@@ -82,7 +82,7 @@ estfun.coxph <- function(x, ...)
 estfun.survreg <- function(x, ...)
 {
   stopifnot(require("survival"))
-  xmat <- model.matrix(x)
+  xmat <- model.matrix(terms(x), model.frame(x))
   wts <- weights(x)
   if(is.null(wts)) wts <- 1
   res <- residuals(x, type = "matrix")
