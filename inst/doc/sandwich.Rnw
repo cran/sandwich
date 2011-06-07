@@ -52,7 +52,7 @@ can be integrated into applications.
 
 \SweaveOpts{engine=R,eps=FALSE}
 %\VignetteIndexEntry{Econometric Computing with HC and HAC Covariance Matrix Estimators}
-%\VignetteDepends{sandwich,zoo,lmtest,strucchange}
+%\VignetteDepends{sandwich,zoo,lmtest,strucchange,scatterplot3d}
 %\VignetteKeywords{covariance matrix estimator, heteroskedasticity, autocorrelation, estimating functions, econometric computing, R}
 %\VignettePackage{sandwich}
 
@@ -403,7 +403,7 @@ arrows(1.17, 0.29, 1, kweights(1, "Parzen", normalize = TRUE), length = 0.1)
 text(1.3, 0.2, "Tukey-Hanning", pos = 4)
 arrows(1.32, 0.2, 1.1, kweights(1.1, "Tukey", normalize = TRUE), length = 0.1)
 @
-\caption{\label{fig:kweights} Kernel functions for kernel-based HAC estimation}
+\caption{\label{fig:kweights} Kernel functions for kernel-based HAC estimation.}
 \end{center}
 \end{figure}
 
@@ -592,7 +592,7 @@ fm.ps2 <- lm(Expenditure ~ Income, data = ps)
 abline(fm.ps2, col = 4)
 text(ps[2,2], ps[2,1], rownames(ps)[2], pos = 2)
 @
-\caption{\label{fig:hc} Expenditure on public schools and income with fitted models}
+\caption{\label{fig:hc} Expenditure on public schools and income with fitted models.}
 \end{center}
 \end{figure}
 
@@ -648,16 +648,12 @@ are depicted in Figure~\ref{fig:hac}.
 \begin{figure}[tbh]
 \begin{center}
 <<hac-plot,fig=TRUE,height=5,width=6,echo=FALSE,results=hide>>=
-if(require(scatterplot3d)) {
-  s3d <- scatterplot3d(Investment[,c(5,7,6)],
-    type = "b", angle = 65, scale.y = 1, pch = 16)
-  s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
-} else {
-  plot(Investment[, "RealInv"], type = "b", pch = 19, ylab = "Real investment")
-  lines(ts(fitted(fm.inv), start = 1964), col = 4)
-}
+library("scatterplot3d")
+s3d <- scatterplot3d(Investment[,c(5,7,6)],
+  type = "b", angle = 65, scale.y = 1, pch = 16)
+s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
 @
-\caption{\label{fig:hac} Investment equation data with fitted model}
+\caption{\label{fig:hac} Investment equation data with fitted model.}
 \end{center}
 \end{figure}
 
@@ -747,7 +743,7 @@ plot(RealInt, ylab = "Real interest rate")
 lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
 lines(confint(bp, vcov = kernHAC))
 @
-\caption{\label{fig:sc} OLS-based CUSUM test (left) and fitted model (right) for real interest data}
+\caption{\label{fig:sc} OLS-based CUSUM test (left) and fitted model (right) for real interest data.}
 \end{center}
 \end{figure}
 

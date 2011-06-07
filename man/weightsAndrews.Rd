@@ -25,7 +25,7 @@ bwAndrews(x, order.by = NULL, kernel = c("Quadratic Spectral", "Truncated",
 }
 
 \arguments{
- \item{x}{a fitted model object of class \code{"lm"} or \code{"glm"}.}
+ \item{x}{a fitted model object.}
  \item{order.by}{Either a vector \code{z} or a formula with a single explanatory
     variable like \code{~ z}. The observations in the model
     are ordered by the size of \code{z}. If set to \code{NULL} (the

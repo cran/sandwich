@@ -1,3 +1,10 @@
+Changes in Version 2.2-7
+
+  o HC4m and HC5 estimators, as suggested by Cribari-Neto
+    and coauthors, have been added to vcovHC() and related
+    functions.
+
+
 Changes in Version 2.2-6
 
   o bug fix in estfun() method for "survreg" objects

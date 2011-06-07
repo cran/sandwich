@@ -3,16 +3,17 @@ vcovHC <- function(x, ...) {
 }
 
 vcovHC.default <- function(x, 
-  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
+  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4", "HC4m", "HC5"),
   omega = NULL, sandwich = TRUE, ...)
 {
+  type <- match.arg(type)
   rval <- meatHC(x, type = type, omega = omega)
   if(sandwich) rval <- sandwich(x, meat = rval, ...)
   return(rval)
 }
 
 meatHC <- function(x, 
-  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
+  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4", "HC4m", "HC5"),
   omega = NULL)
 {
   ## extract X
@@ -39,7 +40,27 @@ meatHC <- function(x,
       "HC1"   = { omega <- function(residuals, diaghat, df) residuals^2 * length(residuals)/df },
       "HC2"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat) },
       "HC3"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^2 },
-      "HC4"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^pmin(4, length(residuals) * diaghat/as.integer(round(sum(diaghat), digits = 0))) })
+      "HC4"   = { omega <- function(residuals, diaghat, df) {
+        n <- length(residuals)
+	p <- as.integer(round(sum(diaghat),  digits = 0))
+	delta <- pmin(4, n * diaghat/p)
+        residuals^2 / (1 - diaghat)^delta
+      }},
+      "HC4m"  = { omega <- function(residuals, diaghat, df) {
+        gamma <- c(1.0, 1.5) ## as recommended by Cribari-Neto & Da Silva
+        n <- length(residuals)
+	p <- as.integer(round(sum(diaghat),  digits = 0))
+	delta <- pmin(gamma[1], n * diaghat/p) + pmin(gamma[2], n * diaghat/p)
+        residuals^2 / (1 - diaghat)^delta
+      }},
+      "HC5"   = { omega <- function(residuals, diaghat, df) {
+        k <- 0.7 ## as recommended by Cribari-Neto et al.
+        n <- length(residuals)
+	p <- as.integer(round(sum(diaghat),  digits = 0))
+	delta <- pmin(n * diaghat/p, pmax(4, n * k * max(diaghat)/p))
+        residuals^2 / sqrt((1 - diaghat)^delta)
+      }}
+    )
   }
   
   ## process omega
@@ -51,7 +72,7 @@ meatHC <- function(x,
 }
 
 vcovHC.mlm <- function(x, 
-  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
+  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4", "HC4m", "HC5"),
   omega = NULL, sandwich = TRUE, ...)
 {
   ## compute meat "by hand" because meatHC() can not deal with
@@ -77,7 +98,27 @@ vcovHC.mlm <- function(x,
       "HC1"   = { omega <- function(residuals, diaghat, df) residuals^2 * length(residuals)/df },
       "HC2"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat) },
       "HC3"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^2 },
-      "HC4"   = { omega <- function(residuals, diaghat, df) residuals^2 / (1 - diaghat)^pmin(4, length(residuals) * diaghat/as.integer(round(sum(diaghat), digits = 0))) })
+      "HC4"   = { omega <- function(residuals, diaghat, df) {
+        n <- length(residuals)
+	p <- as.integer(round(sum(diaghat),  digits = 0))
+	delta <- pmin(4, n * diaghat/p)
+        residuals^2 / (1 - diaghat)^delta
+      }},
+      "HC4m"  = { omega <- function(residuals, diaghat, df) {
+        gamma <- c(1.0, 1.5)
+        n <- length(residuals)
+	p <- as.integer(round(sum(diaghat),  digits = 0))
+	delta <- pmin(gamma[1], n * diaghat/p) + pmin(gamma[2], n * diaghat/p)
+        residuals^2 / (1 - diaghat)^delta
+      }},
+      "HC5"   = { omega <- function(residuals, diaghat, df) {
+        k <- 0.7
+        n <- length(residuals)
+	p <- as.integer(round(sum(diaghat),  digits = 0))
+	delta <- pmin(n * diaghat/p, pmax(4, n * k * max(diaghat)/p))
+        residuals^2 / sqrt((1 - diaghat)^delta)
+      }}
+    )
   }
   
   ## process omega

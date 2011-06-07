@@ -12,7 +12,7 @@
 vcovHC(x, \dots)
 
 \method{vcovHC}{default}(x,
-  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4"),
+  type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4", "HC4m", "HC5"),
   omega = NULL, sandwich = TRUE, \dots)
 
 meatHC(x, type = , omega = NULL)
@@ -57,15 +57,16 @@ meatHC(x, type = , omega = NULL)
   
   \code{omega <- function(residuals, diaghat, df) residuals^2}
   
-  Instead of specifying of providing the diagonal \code{omega} or a function for
+  Instead of specifying the diagonal \code{omega} or a function for
   estimating it, the \code{type} argument can be used to specify the 
-  HC0 to HC4 estimators. If \code{omega} is used, \code{type} is ignored.
+  HC0 to HC5 estimators. If \code{omega} is used, \code{type} is ignored.
   
-  Long \& Ervin (2000) conduct a simulation study of HC estimators in
+  Long \& Ervin (2000) conduct a simulation study of HC estimators (HC0 to HC3) in
   the linear regression model, recommending to use HC3 which is thus the
-  default in \code{vcovHC}. Cribari-Neto (2004) suggests the HC4 type
-  estimator which is tailored to take into account the effect of leverage
-  points in the design matrix. For more details see the references.
+  default in \code{vcovHC}. Cribari-Neto (2004), Cribari-Neto, Souza, \& Vasconcellos (2007),
+  and Cribari-Neto \& Da Silva (2011), respectively, suggest the HC4, HC5, and
+  modified HC4m type estimators. All of them are tailored to take into account
+  the effect of leverage points in the design matrix. For more details see the references.
 }
 
 \value{
@@ -76,6 +77,14 @@ meatHC(x, type = , omega = NULL)
 Cribari-Neto F. (2004), Asymptotic inference under heteroskedasticity
 of unknown form. \emph{Computational Statistics \& Data Analysis}
 \bold{45}, 215--233.
+
+Cribari-Neto F., Da Silva W.B. (2011), A new heteroskedasticity-consistent
+covariance matrix estimator for the linear regression model.
+\emph{Advances in Statistical Analysis}, \bold{95}(2), 129--146.
+
+Cribari-Neto F., Souza T.C., Vasconcellos, K.L.P. (2007), Inference under
+heteroskedasticity and leveraged data. \emph{Communications in Statistics -- Theory and
+Methods}, \bold{36}, 1877--1888. Errata: \bold{37}, 3329--3330, 2008.
 
 Long J. S., Ervin L. H. (2000), Using Heteroscedasticity Consistent Standard
 Errors in the Linear Regression Model. \emph{The American Statistician},

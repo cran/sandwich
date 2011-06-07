@@ -18,7 +18,7 @@ bwNeweyWest(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
 }
 
 \arguments{
- \item{x}{a fitted model object of class \code{"lm"} or \code{"glm"}.}
+ \item{x}{a fitted model object.}
  \item{lag}{integer specifying the maximum lag with positive 
     weight for the Newey-West estimator. If set to \code{NULL}
     \code{floor(bwNeweyWest(x, ...))} is used.}

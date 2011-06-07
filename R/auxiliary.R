@@ -49,7 +49,7 @@ isoacf <- function(x, lagmax = NULL, weave1 = FALSE)
   } else {
     lagmax <- length(x) - 1
     lagmax <- min(length(x) - 1, lagmax)
-    covs <- as.vector(acf(x, lag = lagmax -1, plot = FALSE)$acf)[-1]
+    covs <- as.vector(acf(x, lag.max = lagmax -1, plot = FALSE)$acf)[-1]
     rval <- c(1, -isoreg(1:(length(covs)+1), c(-covs, 0))$yf)
   }
   return(rval)
