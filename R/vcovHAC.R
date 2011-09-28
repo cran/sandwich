@@ -333,10 +333,11 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
     if(!is.null(unames) && "(Intercept)" %in% unames)
       weights[which(unames == "(Intercept)")] <- 0
     else {
-      res <- try(as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE)))
+      res <- try(as.vector(rowMeans(estfun(x)/model.matrix(x), na.rm = TRUE)), silent = TRUE)
       if(inherits(res, "try-error")) res <- try(residuals(x), silent = TRUE)
       if(!inherits(res, "try-error")) weights[which(colSums((umat - res)^2) < 1e-16)] <- 0      
     }
+    if(all(weights <= 0)) weights <- rep(1, length.out = k)
   } else {
     weights <- rep(weights, length.out = k)
   }

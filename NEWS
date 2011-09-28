@@ -1,3 +1,9 @@
+Changes in Version 2.2-8
+
+  o fixed a bug in bwNeweyWest() for "mlm" objects that only have
+    an intercept.
+
+
 Changes in Version 2.2-7
 
   o HC4m and HC5 estimators, as suggested by Cribari-Neto
