@@ -7,6 +7,7 @@ estfun.lm <- function(x, ...)
 {
   xmat <- model.matrix(x)
   xmat <- naresid(x$na.action, xmat)
+  if(any(alias <- is.na(coef(x)))) xmat <- xmat[, !alias, drop = FALSE]
   wts <- weights(x)
   if(is.null(wts)) wts <- 1
   res <- residuals(x)
@@ -30,10 +31,11 @@ estfun.mlm <- function(x, ...)
     rv <- as.vector(res[,i]) * wts * xmat
     colnames(rv) <- paste(colnames(cf)[i], colnames(rv), sep = ":")
     rv
-  })
+  })  
   rval <- do.call("cbind", rval)
   attr(rval, "assign") <- NULL
   attr(rval, "contrasts") <- NULL
+  if(any(alias <- is.na(as.vector(cf)))) rval <- rval[, !alias, drop = FALSE]
   if(is.zoo(res)) rval <- zoo(rval, index(res), attr(res, "frequency"))
   if(is.ts(res)) rval <- ts(rval, start = start(res), frequency = frequency(res))
   return(rval)
@@ -43,6 +45,7 @@ estfun.glm <- function(x, ...)
 {
   xmat <- model.matrix(x)
   xmat <- naresid(x$na.action, xmat)
+  if(any(alias <- is.na(coef(x)))) xmat <- xmat[, !alias, drop = FALSE]
   wres <- as.vector(residuals(x, "working")) * weights(x, "working")
   dispersion <- if(substr(x$family$family, 1, 17) %in% c("poisson", "binomial", "Negative Binomial")) 1
     else sum(wres^2, na.rm = TRUE)/sum(weights(x, "working"), na.rm = TRUE)

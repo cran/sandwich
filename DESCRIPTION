@@ -1,6 +1,6 @@
 Package: sandwich
-Version: 2.2-8
-Date: 2011-09-28
+Version: 2.2-9
+Date: 2012-01-14
 Title: Robust Covariance Matrix Estimators
 Authors@R: c(person(given = "Thomas", family = "Lumley", role = "aut",
         email = "tlumley@u.washington.edu"), person(given = "Achim",
@@ -16,6 +16,6 @@ Depends: R (>= 2.0.0), stats, zoo
 Suggests: car, lmtest, strucchange, AER, survival, MASS, scatterplot3d
 Imports: stats
 License: GPL-2
-Packaged: 2011-09-28 19:57:45 UTC; zeileis
+Packaged: 2012-01-14 17:28:56 UTC; zeileis
 Repository: CRAN
-Date/Publication: 2011-09-28 20:07:57
+Date/Publication: 2012-01-14 17:31:01

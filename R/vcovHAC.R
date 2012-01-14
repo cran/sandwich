@@ -48,7 +48,8 @@ meatHAC <- function(x, order.by = NULL, prewhite = FALSE,
   umat <- umat[index, , drop = FALSE]
 
   if(prewhite > 0) {
-    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method)
+    var.fit <- try(ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method))
+    if(inherits(var.fit, "try-error")) stop(sprintf("VAR(%i) prewhitening of estimating functions failed", prewhite))
     if(k > 1) D <- solve(diag(ncol(umat)) - apply(var.fit$ar, 2:3, sum))
       else D <- as.matrix(1/(1 - sum(var.fit$ar)))
     umat <- as.matrix(na.omit(var.fit$resid))
@@ -165,8 +166,9 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   if(length(weights) < 2) weights <- 1
 
   if(prewhite > 0) {
-    umat <- as.matrix(na.omit(ar(umat, order.max = prewhite,
-      demean = FALSE, aic = FALSE, method = ar.method)$resid))
+    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method)
+    if(inherits(var.fit, "try-error")) stop(sprintf("VAR(%i) prewhitening of estimating functions failed", prewhite))
+    umat <- as.matrix(na.omit(var.fit$resid))
     n <- n - prewhite ##??
   }
 
@@ -351,8 +353,9 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
   m <- floor(ifelse(prewhite > 0, 3, 4) * (n/100)^mrate)
 
   if(prewhite > 0) {
-    umat <- as.matrix(na.omit(ar(umat, order.max = prewhite,
-      demean = FALSE, aic = FALSE, method = ar.method)$resid))
+    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method)
+    if(inherits(var.fit, "try-error")) stop(sprintf("VAR(%i) prewhitening of estimating functions failed", prewhite))
+    umat <- as.matrix(na.omit(var.fit$resid))
     n <- n - prewhite
   }
 

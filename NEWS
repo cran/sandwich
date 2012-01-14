@@ -1,3 +1,17 @@
+Changes in Version 2.2-9
+
+  o added convenience function lrvar() to compute the long-run
+    variance of the mean of a time series: a simple wrapper
+    for kernHAC() and NeweyWest() applied to lm(x ~ 1).
+
+  o lm/mlm/glm models with aliased parameters were not handled
+    correctly (leading to errors in sandwich/vcovHC etc.), fixed
+    now.
+
+  o An improved error message is issued if prewhitening in vcovHAC()
+    cannot work due to collinearity in the estimating functions.
+
+
 Changes in Version 2.2-8
 
   o fixed a bug in bwNeweyWest() for "mlm" objects that only have

@@ -18,6 +18,7 @@ meatHC <- function(x,
 {
   ## extract X
   X <- model.matrix(x)
+  if(any(alias <- is.na(coef(x)))) X <- X[, !alias, drop = FALSE]
   attr(X, "assign") <- NULL
   n <- NROW(X)
 
@@ -81,6 +82,7 @@ vcovHC.mlm <- function(x,
   ## regressors, df, hat values
   X <- model.matrix(x)
   attr(X, "assign") <- NULL
+  if(any(alias <- apply(coef(x), 1, function(z) all(is.na(z))))) X <- X[, !alias, drop = FALSE]
   n <- NROW(X)
   diaghat <- hatvalues(x)
   df <- n - NCOL(X)
