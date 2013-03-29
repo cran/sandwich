@@ -1,0 +1,221 @@
+
+> library("AER")
+Loading required package: car
+Loading required package: MASS
+Loading required package: nnet
+Loading required package: Formula
+Loading required package: lmtest
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following object(s) are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+Loading required package: sandwich
+Loading required package: strucchange
+Loading required package: survival
+Loading required package: splines
+
+> library("MASS")
+
+> options(prompt = "R> ", continue = "+   ")
+
+> par(mar = rep(0, 4))
+
+> plot(0, 0, xlim = c(0, 85), ylim = c(0, 110), type = "n", 
++     axes = FALSE, xlab = "", ylab = "")
+
+> lgrey <- grey(0.88)
+
+> dgrey <- grey(0.75)
+
+> rect(45, 90, 70, 110, lwd = 2, col = dgrey)
+
+> rect(20, 40, 40, 60, col = lgrey)
+
+> rect(30, 40, 40, 60, col = dgrey)
+
+> rect(20, 40, 40, 60, lwd = 2)
+
+> rect(5, 0, 20, 20, lwd = 2, col = lgrey)
+
+> rect(22.5, 0, 37.5, 20, lwd = 2, col = lgrey)
+
+> rect(40, 0, 55, 20, lwd = 2, col = lgrey)
+
+> rect(40, 0, 55, 20, lwd = 2, col = lgrey)
+
+> rect(60, 0, 80, 20, col = lgrey)
+
+> rect(70, 0, 80, 20, col = dgrey)
+
+> rect(60, 0, 80, 20, lwd = 2)
+
+> text(57.5, 100, "fitted model object\n(class: foo)")
+
+> text(25, 50, "estfun")
+
+> text(35, 50, "foo")
+
+> text(12.5, 10, "meatHC")
+
+> text(30, 10, "meatHAC")
+
+> text(47.5, 10, "meat")
+
+> text(65, 10, "bread")
+
+> text(75, 10, "foo")
+
+> arrows(57.5, 89, 70, 21, lwd = 1.5, length = 0.15, 
++     angle = 20)
+
+> arrows(57.5, 89, 30, 61, lwd = 1.5, length = 0.15, 
++     angle = 20)
+
+> arrows(30, 39, 30, 21, lwd = 1.5, length = 0.15, angle = 20)
+
+> arrows(30, 39, 12.5, 21, lwd = 1.5, length = 0.15, 
++     angle = 20)
+
+> arrows(30, 39, 47.5, 21, lwd = 1.5, length = 0.15, 
++     angle = 20)
+
+> set.seed(123)
+
+> x <- rnorm(250)
+
+> y <- rnbinom(250, mu = exp(1 + x), size = 1)
+
+> fm_pois <- glm(y ~ x + I(x^2), family = poisson)
+
+> coeftest(fm_pois)
+
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.063268   0.041357 25.7094  < 2e-16 ***
+x            0.996072   0.053534 18.6062  < 2e-16 ***
+I(x^2)      -0.049124   0.023146 -2.1223  0.03381 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> coeftest(fm_pois, vcov = sandwich)
+
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.063268   0.083776 12.6918   <2e-16 ***
+x            0.996072   0.105217  9.4668   <2e-16 ***
+I(x^2)      -0.049124   0.036284 -1.3539   0.1758    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> fm_qpois <- glm(y ~ x + I(x^2), family = quasipoisson)
+
+> coeftest(fm_qpois)
+
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.063268   0.090435 11.7572   <2e-16 ***
+x            0.996072   0.117063  8.5088   <2e-16 ***
+I(x^2)      -0.049124   0.050613 -0.9706   0.3318    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> fm_nbin <- glm.nb(y ~ x + I(x^2))
+
+> coeftest(fm_nbin)
+
+z test of coefficients:
+
+             Estimate Std. Error z value Pr(>|z|)    
+(Intercept)  1.066057   0.088574 12.0358   <2e-16 ***
+x            0.999616   0.094894 10.5340   <2e-16 ***
+I(x^2)      -0.052652   0.064883 -0.8115   0.4171    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> library("AER")
+
+> data("Affairs", package = "AER")
+
+> fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousness + 
++     occupation + rating, data = Affairs)
+
+> fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + 
++     religiousness + occupation + rating, data = Affairs, family = binomial(link = "probit" .... [TRUNCATED] 
+
+> coeftest(fm_tobit)
+
+z test of coefficients:
+
+               Estimate Std. Error z value  Pr(>|z|)    
+(Intercept)    8.174197   2.741446  2.9817  0.002866 ** 
+age           -0.179333   0.079093 -2.2674  0.023368 *  
+yearsmarried   0.554142   0.134518  4.1195 3.798e-05 ***
+religiousness -1.686220   0.403752 -4.1764 2.962e-05 ***
+occupation     0.326053   0.254425  1.2815  0.200007    
+rating        -2.284973   0.407828 -5.6028 2.109e-08 ***
+Log(scale)     2.109859   0.067098 31.4444 < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> coeftest(fm_tobit, vcov = sandwich)
+
+z test of coefficients:
+
+               Estimate Std. Error z value  Pr(>|z|)    
+(Intercept)    8.174197   3.077933  2.6557  0.007913 ** 
+age           -0.179333   0.088915 -2.0169  0.043706 *  
+yearsmarried   0.554142   0.137162  4.0400 5.344e-05 ***
+religiousness -1.686220   0.399854 -4.2171 2.475e-05 ***
+occupation     0.326053   0.245978  1.3255  0.184993    
+rating        -2.284973   0.393479 -5.8071 6.356e-09 ***
+Log(scale)     2.109859   0.054837 38.4754 < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> coeftest(fm_probit)
+
+z test of coefficients:
+
+               Estimate Std. Error z value  Pr(>|z|)    
+(Intercept)    0.976668   0.365375  2.6731 0.0075163 ** 
+age           -0.022024   0.010319 -2.1343 0.0328214 *  
+yearsmarried   0.059901   0.017121  3.4986 0.0004677 ***
+religiousness -0.183646   0.051715 -3.5511 0.0003836 ***
+occupation     0.037513   0.032845  1.1421 0.2533995    
+rating        -0.272983   0.052574 -5.1923 2.077e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> coeftest(fm_probit, vcov = sandwich)
+
+z test of coefficients:
+
+               Estimate Std. Error z value  Pr(>|z|)    
+(Intercept)    0.976668   0.393033  2.4850 0.0129569 *  
+age           -0.022024   0.011274 -1.9534 0.0507678 .  
+yearsmarried   0.059901   0.017557  3.4119 0.0006452 ***
+religiousness -0.183646   0.053047 -3.4620 0.0005363 ***
+occupation     0.037513   0.032922  1.1395 0.2545089    
+rating        -0.272983   0.053327 -5.1190 3.071e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+ *** Run successfully completed ***
+> proc.time()
+   user  system elapsed 
+  1.308   0.080   1.382 

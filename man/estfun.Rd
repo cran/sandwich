@@ -4,6 +4,8 @@
 \alias{estfun.glm}
 \alias{estfun.mlm}
 \alias{estfun.rlm}
+\alias{estfun.polr}
+\alias{estfun.clm}
 \alias{estfun.survreg}
 \alias{estfun.coxph}
 \alias{estfun.nls}
@@ -37,7 +39,7 @@ and the estimated parameters (of dimension \eqn{k}).
 \seealso{\code{\link{lm}}, \code{\link{glm}}}
 
 \references{
-  Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
+  Zeileis A (2006), Object-Oriented Computation of Sandwich Estimators.
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
   URL \url{http://www.jstatsoft.org/v16/i09/}.
 }

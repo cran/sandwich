@@ -74,7 +74,80 @@ estfun.rlm <- function(x, ...)
   return(rval)
 }
 
-## check: coxph and survreg
+estfun.polr <- function(x, ...)
+{
+  ## link processing
+  mueta <- x$method
+  if(mueta == "logistic") mueta <- "logit"
+  mueta <- make.link(mueta)$mu.eta
+  
+  ## observations
+  xmat <- model.matrix(x)[, -1L, drop = FALSE]
+  n <- nrow(xmat)
+  k <- ncol(xmat)
+  m <- length(x$zeta)
+  mf <- model.frame(x)
+  y <- as.numeric(model.response(mf))
+  w <- model.weights(mf)
+  if(is.null(w)) w <- rep(1, n)
+
+  ## estimates  
+  prob <- x$fitted.values[cbind(1:n, y)]
+  xb <- if(k >= 1L) as.vector(xmat %*% x$coefficients) else rep(0, n)
+  zeta <- x$zeta
+  lp <- cbind(0, mueta(matrix(zeta, nrow = n, ncol = m, byrow = TRUE) - xb), 0)
+
+  ## estimating functions
+  rval <- matrix(0, nrow = n, ncol = k + m + 2L)
+  if(k >= 1L) rval[, 1L:k] <- (-xmat * as.vector(lp[cbind(1:n, y + 1L)] - lp[cbind(1:n, y)]))
+  rval[cbind(1:n, k + y)] <- -as.vector(lp[cbind(1:n, y)])
+  rval[cbind(1:n, k + y + 1L)] <- as.vector(lp[cbind(1:n, y + 1L)])
+  rval <- rval[, -c(k + 1L, k + m + 2L), drop = FALSE]
+  rval <- w/prob * rval
+
+  ## dimnames and return
+  dimnames(rval) <- list(rownames(xmat), c(colnames(xmat), names(x$zeta)))
+  return(rval)
+}
+
+estfun.clm <- function(x, ...)
+{
+  if(x$threshold != "flexible") stop("only flexible thresholds implemented at the moment")
+
+  ## link processing
+  mueta <- make.link(x$link)$mu.eta
+  
+  ## observations
+  xmat <- model.matrix(x)
+  if(length(xmat) > 1L) stop("estimating functions for scale regression not implemented yet")
+  xmat <- xmat$X[, -1L, drop = FALSE]
+  n <- nrow(xmat)
+  k <- ncol(xmat)
+  m <- length(x$alpha)
+  mf <- model.frame(x)
+  y <- as.numeric(model.response(mf))
+  w <- model.weights(mf)
+  if(is.null(w)) w <- rep(1, n)
+
+  ## estimates  
+  prob <- x$fitted.values
+  xb <- if(k >= 1L) as.vector(xmat %*% x$beta) else rep(0, n)
+  zeta <- x$alpha
+  lp <- cbind(0, mueta(matrix(zeta, nrow = n, ncol = m, byrow = TRUE) - xb), 0)
+
+  ## estimating functions
+  rval <- matrix(0, nrow = n, ncol = k + m + 2L)
+  if(k >= 1L) rval[, 1L:k] <- (-xmat * as.vector(lp[cbind(1:n, y + 1L)] - lp[cbind(1:n, y)]))
+  rval[cbind(1:n, k + y)] <- -as.vector(lp[cbind(1:n, y)])
+  rval[cbind(1:n, k + y + 1L)] <- as.vector(lp[cbind(1:n, y + 1L)])
+  rval <- rval[, -c(k + 1L, k + m + 2L), drop = FALSE]
+  rval <- w/prob * rval
+
+  ## dimnames, re-order and return
+  dimnames(rval) <- list(rownames(xmat), c(colnames(xmat), names(x$alpha)))
+  ix <- if(k >= 1L) c((k + 1L):(k + m), 1L:k) else 1L:m
+  return(rval[, ix, drop = FALSE])
+}
 
 estfun.coxph <- function(x, ...)
 {

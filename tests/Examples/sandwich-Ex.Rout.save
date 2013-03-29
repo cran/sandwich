@@ -1,0 +1,727 @@
+
+R version 2.15.2 (2012-10-26) -- "Trick or Treat"
+Copyright (C) 2012 The R Foundation for Statistical Computing
+ISBN 3-900051-07-0
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "sandwich"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('sandwich')
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following object(s) are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+> 
+> assign(".oldSearch", search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("Investment")
+> ### * Investment
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: Investment
+> ### Title: US Investment Data
+> ### Aliases: Investment
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## Willam H. Greene, Econometric Analysis, 2nd Ed.
+> ## Chapter 15
+> ## load data set, p. 411, Table 15.1
+> data(Investment)
+> 
+> ## fit linear model, p. 412, Table 15.2
+> fm <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
+> summary(fm)
+
+Call:
+lm(formula = RealInv ~ RealGNP + RealInt, data = Investment)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-34.987  -6.638   0.180  10.408  26.288 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+(Intercept) -12.53360   24.91527  -0.503    0.622    
+RealGNP       0.16914    0.02057   8.224 3.87e-07 ***
+RealInt      -1.00144    2.36875  -0.423    0.678    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Residual standard error: 17.21 on 16 degrees of freedom
+  (1 observation deleted due to missingness)
+Multiple R-squared: 0.8141,	Adjusted R-squared: 0.7908 
+F-statistic: 35.03 on 2 and 16 DF,  p-value: 1.429e-06 
+
+> 
+> ## visualize residuals, p. 412, Figure 15.1
+> plot(ts(residuals(fm), start = 1964),
++   type = "b", pch = 19, ylim = c(-35, 35), ylab = "Residuals")
+> sigma <- sqrt(sum(residuals(fm)^2)/fm$df.residual) ## maybe used df = 26 instead of 16 ??
+> abline(h = c(-2, 0, 2) * sigma, lty = 2)
+> 
+> if(require(lmtest)) {
++ ## Newey-West covariances, Example 15.3
++ coeftest(fm, vcov = NeweyWest(fm, lag = 4))
++ ## Note, that the following is equivalent:
++ coeftest(fm, vcov = kernHAC(fm, kernel = "Bartlett", bw = 5, prewhite = FALSE, adjust = FALSE))
++ 
++ ## Durbin-Watson test, p. 424, Example 15.4
++ dwtest(fm)
++ 
++ ## Breusch-Godfrey test, p. 427, Example 15.6
++ bgtest(fm, order = 4)
++ }
+Loading required package: lmtest
+
+	Breusch-Godfrey test for serial correlation of order up to 4
+
+data:  fm 
+LM test = 12.0697, df = 4, p-value = 0.01684
+
+> 
+> ## visualize fitted series
+> plot(Investment[, "RealInv"], type = "b", pch = 19, ylab = "Real investment")
+> lines(ts(fitted(fm), start = 1964), col = 4)
+> 
+> 
+> ## 3-d visualization of fitted model
+> if(require(scatterplot3d)) {
++ s3d <- scatterplot3d(Investment[,c(5,7,6)],
++   type = "b", angle = 65, scale.y = 1, pch = 16)
++ s3d$plane3d(fm, lty.box = "solid", col = 4)
++ }
+Loading required package: scatterplot3d
+> 
+> 
+> 
+> cleanEx()
+
+detaching 'package:scatterplot3d', 'package:lmtest'
+
+> nameEx("NeweyWest")
+> ### * NeweyWest
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: NeweyWest
+> ### Title: Newey-West HAC Covariance Matrix Estimation
+> ### Aliases: bwNeweyWest NeweyWest
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> ## fit investment equation
+> data(Investment)
+> fm <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
+> 
+> ## Newey & West (1994) compute this type of estimator
+> NeweyWest(fm)
+            (Intercept)       RealGNP     RealInt
+(Intercept) 594.1004817 -0.5617817294 36.04992496
+RealGNP      -0.5617817  0.0005563172 -0.04815937
+RealInt      36.0499250 -0.0481593694 13.24912546
+> 
+> ## The Newey & West (1987) estimator requires specification
+> ## of the lag and suppression of prewhitening
+> NeweyWest(fm, lag = 4, prewhite = FALSE)
+            (Intercept)       RealGNP      RealInt
+(Intercept) 359.4170681 -0.3115505035 -4.089319305
+RealGNP      -0.3115505  0.0002805888 -0.005355931
+RealInt      -4.0893193 -0.0053559312 11.171472998
+> 
+> ## bwNeweyWest() can also be passed to kernHAC(), e.g.
+> ## for the quadratic spectral kernel
+> kernHAC(fm, bw = bwNeweyWest)
+            (Intercept)       RealGNP     RealInt
+(Intercept)  794.986166 -0.7562570101 48.19485118
+RealGNP       -0.756257  0.0007537517 -0.06485461
+RealInt       48.194851 -0.0648546058 17.58798679
+> 
+> 
+> 
+> cleanEx()
+> nameEx("PublicSchools")
+> ### * PublicSchools
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: PublicSchools
+> ### Title: US Expenditures for Public Schools
+> ### Aliases: PublicSchools
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## Willam H. Greene, Econometric Analysis, 2nd Ed.
+> ## Chapter 14
+> ## load data set, p. 385, Table 14.1
+> data(PublicSchools)
+> 
+> ## omit NA in Wisconsin and scale income
+> ps <- na.omit(PublicSchools)
+> ps$Income <- ps$Income * 0.0001
+> 
+> ## fit quadratic regression, p. 385, Table 14.2
+> fmq <- lm(Expenditure ~ Income + I(Income^2), data = ps)
+> summary(fmq)
+
+Call:
+lm(formula = Expenditure ~ Income + I(Income^2), data = ps)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-160.709  -36.896   -4.551   37.290  109.729 
+
+Coefficients:
+            Estimate Std. Error t value Pr(>|t|)   
+(Intercept)    832.9      327.3   2.545  0.01428 * 
+Income       -1834.2      829.0  -2.213  0.03182 * 
+I(Income^2)   1587.0      519.1   3.057  0.00368 **
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+Residual standard error: 56.68 on 47 degrees of freedom
+Multiple R-squared: 0.6553,	Adjusted R-squared: 0.6407 
+F-statistic: 44.68 on 2 and 47 DF,  p-value: 1.345e-11 
+
+> 
+> ## compare standard and HC0 standard errors
+> ## p. 391, Table 14.3
+> library(sandwich)
+> coef(fmq)
+(Intercept)      Income I(Income^2) 
+   832.9144  -1834.2029   1587.0423 
+> sqrt(diag(vcovHC(fmq, type = "const")))
+(Intercept)      Income I(Income^2) 
+   327.2925    828.9855    519.0768 
+> sqrt(diag(vcovHC(fmq, type = "HC0")))
+(Intercept)      Income I(Income^2) 
+   460.8917   1243.0430    829.9927 
+> 
+> 
+> if(require(lmtest)) {
++ ## compare t ratio
++ coeftest(fmq, vcov = vcovHC(fmq, type = "HC0"))
++ 
++ ## White test, p. 393, Example 14.5
++ wt <- lm(residuals(fmq)^2 ~ poly(Income, 4), data = ps)
++ wt.stat <- summary(wt)$r.squared * nrow(ps)
++ c(wt.stat, pchisq(wt.stat, df = 3, lower = FALSE))
++ 
++ ## Bresch-Pagan test, p. 395, Example 14.7
++ bptest(fmq, studentize = FALSE)
++ bptest(fmq)
++ 
++ ## Francisco Cribari-Neto, Asymptotic Inference, CSDA 45
++ ## quasi z-tests, p. 229, Table 8
++ ## with Alaska
++ coeftest(fmq, df = Inf)[3,4]
++ coeftest(fmq, df = Inf, vcov = vcovHC(fmq, type = "HC0"))[3,4]
++ coeftest(fmq, df = Inf, vcov = vcovHC(fmq, type = "HC3"))[3,4]
++ coeftest(fmq, df = Inf, vcov = vcovHC(fmq, type = "HC4"))[3,4]
++ ## without Alaska (observation 2)
++ fmq1 <- lm(Expenditure ~ Income + I(Income^2), data = ps[-2,])
++ coeftest(fmq1, df = Inf)[3,4]
++ coeftest(fmq1, df = Inf, vcov = vcovHC(fmq1, type = "HC0"))[3,4]
++ coeftest(fmq1, df = Inf, vcov = vcovHC(fmq1, type = "HC3"))[3,4]
++ coeftest(fmq1, df = Inf, vcov = vcovHC(fmq1, type = "HC4"))[3,4]
++ }
+Loading required package: lmtest
+[1] 0.8923303
+> 
+> ## visualization, p. 230, Figure 1
+> plot(Expenditure ~ Income, data = ps,
++   xlab = "per capita income",
++   ylab = "per capita spending on public schools")
+> inc <- seq(0.5, 1.2, by = 0.001)
+> lines(inc, predict(fmq, data.frame(Income = inc)), col = 4)
+> fml <- lm(Expenditure ~ Income, data = ps)
+> abline(fml)
+> text(ps[2,2], ps[2,1], rownames(ps)[2], pos = 2)
+> 
+> 
+> 
+> cleanEx()
+
+detaching 'package:lmtest'
+
+> nameEx("bread")
+> ### * bread
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: bread
+> ### Title: Bread for Sandwiches
+> ### Aliases: bread bread.lm bread.mlm bread.survreg bread.coxph bread.gam
+> ###   bread.nls bread.rlm bread.hurdle bread.zeroinfl bread.mlogit
+> ###   bread.polr bread.clm
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## linear regression
+> x <- sin(1:10)
+> y <- rnorm(10)
+> fm <- lm(y ~ x)
+> 
+> ## bread: n * (x'x)^{-1}
+> bread(fm)
+            (Intercept)          x
+(Intercept)   1.0414689 -0.2938577
+x            -0.2938577  2.0823419
+> solve(crossprod(cbind(1, x))) * 10
+                      x
+   1.0414689 -0.2938577
+x -0.2938577  2.0823419
+> 
+> 
+> 
+> cleanEx()
+> nameEx("estfun")
+> ### * estfun
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: estfun
+> ### Title: Extract Empirical Estimating Functions
+> ### Aliases: estfun estfun.lm estfun.glm estfun.mlm estfun.rlm estfun.polr
+> ###   estfun.clm estfun.survreg estfun.coxph estfun.nls estfun.hurdle
+> ###   estfun.zeroinfl estfun.mlogit
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## linear regression
+> x <- sin(1:10)
+> y <- rnorm(10)
+> fm <- lm(y ~ x)
+> 
+> ## estimating function: (y - x'beta) * x
+> estfun(fm)
+   (Intercept)           x
+1  -0.68507480 -0.57647056
+2   0.13214846  0.12016225
+3  -0.96783127 -0.13658036
+4   1.36873882 -1.03586495
+5   0.08173006 -0.07837294
+6  -0.99685418  0.27853651
+7   0.40942540  0.26898700
+8   0.69524135  0.68784276
+9   0.47205088  0.19454089
+10 -0.50957471  0.27721940
+> residuals(fm) * cbind(1, x)
+                            x
+ [1,] -0.68507480 -0.57647056
+ [2,]  0.13214846  0.12016225
+ [3,] -0.96783127 -0.13658036
+ [4,]  1.36873882 -1.03586495
+ [5,]  0.08173006 -0.07837294
+ [6,] -0.99685418  0.27853651
+ [7,]  0.40942540  0.26898700
+ [8,]  0.69524135  0.68784276
+ [9,]  0.47205088  0.19454089
+[10,] -0.50957471  0.27721940
+> 
+> 
+> 
+> cleanEx()
+> nameEx("isoacf")
+> ### * isoacf
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: isoacf
+> ### Title: Isotonic Autocorrelation Function
+> ### Aliases: isoacf pava.blocks
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> x <- filter(rnorm(100), 0.9, "recursive")
+> isoacf(x)
+  [1]  1.00000000  0.75620784  0.52668286  0.31877074  0.17874234  0.10451987
+  [7]  0.07597397  0.07597397  0.07054562  0.03324149 -0.02266489 -0.02266489
+ [13] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [19] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [25] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [31] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [37] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [43] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [49] -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489 -0.02266489
+ [55] -0.03242424 -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610
+ [61] -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610
+ [67] -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610
+ [73] -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610
+ [79] -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610
+ [85] -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03500610 -0.03924011
+ [91] -0.03924011 -0.03924011 -0.03924011 -0.03924011 -0.03924011 -0.03924011
+ [97] -0.03924011 -0.03924011 -0.03924011 -0.03924011
+> acf(x, plot = FALSE)$acf
+, , 1
+
+             [,1]
+ [1,]  1.00000000
+ [2,]  0.75620784
+ [3,]  0.52668286
+ [4,]  0.31877074
+ [5,]  0.17874234
+ [6,]  0.10451987
+ [7,]  0.06774750
+ [8,]  0.08420043
+ [9,]  0.07054562
+[10,]  0.03324149
+[11,] -0.02547696
+[12,] -0.08386780
+[13,] -0.12702588
+[14,] -0.15733924
+[15,] -0.22570274
+[16,] -0.27858103
+[17,] -0.32634007
+[18,] -0.31457877
+[19,] -0.32132555
+[20,] -0.32323138
+[21,] -0.28412580
+
+> 
+> 
+> 
+> cleanEx()
+> nameEx("kweights")
+> ### * kweights
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: kweights
+> ### Title: Kernel Weights
+> ### Aliases: kweights
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> curve(kweights(x, kernel = "Quadratic", normalize = TRUE),
++       from = 0, to = 3.2, xlab = "x", ylab = "k(x)")
+> curve(kweights(x, kernel = "Bartlett", normalize = TRUE),
++       from = 0, to = 3.2, col = 2, add = TRUE)
+> curve(kweights(x, kernel = "Parzen", normalize = TRUE),
++       from = 0, to = 3.2, col = 3, add = TRUE)
+> curve(kweights(x, kernel = "Tukey", normalize = TRUE),
++       from = 0, to = 3.2, col = 4, add = TRUE)
+> curve(kweights(x, kernel = "Truncated", normalize = TRUE),
++       from = 0, to = 3.2, col = 5, add = TRUE)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("lrvar")
+> ### * lrvar
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: lrvar
+> ### Title: Long-Run Variance of the Mean
+> ### Aliases: lrvar
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> set.seed(1)
+> ## iid series (with variance of mean 1/n)
+> ## and Andrews kernel HAC (with prewhitening)
+> x <- rnorm(100)
+> lrvar(x)
+[1] 0.007958048
+> 
+> ## analogous multivariate case with Newey-West estimator (without prewhitening)
+> y <- matrix(rnorm(200), ncol = 2)
+> lrvar(y, type = "Newey-West", prewhite = FALSE)
+             [,1]         [,2]
+[1,] 0.0097884718 0.0005978738
+[2,] 0.0005978738 0.0073428222
+> 
+> ## AR(1) series with autocorrelation 0.9
+> z <- filter(rnorm(100), 0.9, method = "recursive")
+> lrvar(z)
+[1] 0.4385546
+> 
+> 
+> 
+> cleanEx()
+> nameEx("meat")
+> ### * meat
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: meat
+> ### Title: A Simple Meat Matrix Estimator
+> ### Aliases: meat
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> x <- sin(1:10)
+> y <- rnorm(10)
+> fm <- lm(y ~ x)
+> 
+> meat(fm)
+            (Intercept)           x
+(Intercept)  0.54308202 -0.06199868
+x           -0.06199868  0.21823310
+> meatHC(fm, type = "HC")
+            (Intercept)           x
+(Intercept)  0.54308202 -0.06199868
+x           -0.06199868  0.21823310
+> meatHAC(fm)
+            (Intercept)          x
+(Intercept)  0.32259620 0.08446047
+x            0.08446047 0.37529225
+> 
+> 
+> 
+> cleanEx()
+> nameEx("sandwich")
+> ### * sandwich
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: sandwich
+> ### Title: Making Sandwiches with Bread and Meat
+> ### Aliases: sandwich
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> x <- sin(1:10)
+> y <- rnorm(10)
+> fm <- lm(y ~ x)
+> 
+> sandwich(fm)
+            (Intercept)           x
+(Intercept)  0.06458514 -0.04395562
+x           -0.04395562  0.10690628
+> vcovHC(fm, type = "HC")
+            (Intercept)           x
+(Intercept)  0.06458514 -0.04395562
+x           -0.04395562  0.10690628
+> 
+> 
+> 
+> cleanEx()
+> nameEx("vcovHAC")
+> ### * vcovHAC
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovHAC
+> ### Title: Heteroskedasticity and Autocorrelation Consistent (HAC)
+> ###   Covariance Matrix Estimation
+> ### Aliases: vcovHAC vcovHAC.default meatHAC
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> x <- sin(1:100)
+> y <- 1 + x + rnorm(100)
+> fm <- lm(y ~ x)
+> vcovHAC(fm)
+             (Intercept)            x
+(Intercept)  0.008125428 -0.002043239
+x           -0.002043239  0.018939164
+> vcov(fm)
+             (Intercept)            x
+(Intercept) 8.124921e-03 2.055475e-05
+x           2.055475e-05 1.616308e-02
+> 
+> 
+> 
+> cleanEx()
+> nameEx("vcovHC")
+> ### * vcovHC
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovHC
+> ### Title: Heteroskedasticity-Consistent Covariance Matrix Estimation
+> ### Aliases: vcovHC vcovHC.default vcovHC.mlm meatHC
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> ## generate linear regression relationship
+> ## with homoskedastic variances
+> x <- sin(1:100)
+> y <- 1 + x + rnorm(100)
+> ## model fit and HC3 covariance
+> fm <- lm(y ~ x)
+> vcovHC(fm)
+             (Intercept)            x
+(Intercept)  0.008318070 -0.002037159
+x           -0.002037159  0.019772693
+> ## usual covariance matrix
+> vcovHC(fm, type = "const")
+             (Intercept)            x
+(Intercept) 8.124921e-03 2.055475e-05
+x           2.055475e-05 1.616308e-02
+> vcov(fm)
+             (Intercept)            x
+(Intercept) 8.124921e-03 2.055475e-05
+x           2.055475e-05 1.616308e-02
+> 
+> sigma2 <- sum(residuals(lm(y ~ x))^2)/98
+> sigma2 * solve(crossprod(cbind(1, x)))
+                          x
+  8.124921e-03 2.055475e-05
+x 2.055475e-05 1.616308e-02
+> 
+> 
+> 
+> cleanEx()
+> nameEx("vcovOPG")
+> ### * vcovOPG
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovOPG
+> ### Title: Outer Product of Gradients Covariance Matrix Estimation
+> ### Aliases: vcovOPG
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> ## generate poisson regression relationship
+> x <- sin(1:100)
+> y <- rpois(100, exp(1 + x))
+> ## compute usual covariance matrix of coefficient estimates
+> fm <- glm(y ~ x, family = poisson)
+> vcov(fm)
+             (Intercept)            x
+(Intercept)  0.004526581 -0.003679570
+x           -0.003679570  0.008110051
+> vcovOPG(fm)
+             (Intercept)            x
+(Intercept)  0.005183615 -0.003086646
+x           -0.003086646  0.009584083
+> 
+> 
+> 
+> cleanEx()
+> nameEx("weightsAndrews")
+> ### * weightsAndrews
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: weightsAndrews
+> ### Title: Kernel-based HAC Covariance Matrix Estimation
+> ### Aliases: weightsAndrews bwAndrews kernHAC
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> curve(kweights(x, kernel = "Quadratic", normalize = TRUE),
++       from = 0, to = 3.2, xlab = "x", ylab = "k(x)")
+> curve(kweights(x, kernel = "Bartlett", normalize = TRUE),
++       from = 0, to = 3.2, col = 2, add = TRUE)
+> curve(kweights(x, kernel = "Parzen", normalize = TRUE),
++       from = 0, to = 3.2, col = 3, add = TRUE)
+> curve(kweights(x, kernel = "Tukey", normalize = TRUE),
++       from = 0, to = 3.2, col = 4, add = TRUE)
+> curve(kweights(x, kernel = "Truncated", normalize = TRUE),
++       from = 0, to = 3.2, col = 5, add = TRUE)
+> 
+> ## fit investment equation
+> data(Investment)
+> fm <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
+> 
+> ## compute quadratic spectral kernel HAC estimator
+> kernHAC(fm)
+            (Intercept)       RealGNP     RealInt
+(Intercept) 788.6120652 -0.7502080996 49.78912814
+RealGNP      -0.7502081  0.0007483977 -0.06641343
+RealInt      49.7891281 -0.0664134303 17.71735491
+> kernHAC(fm, verbose = TRUE)
+
+Bandwidth chosen: 1.74474889764603 
+            (Intercept)       RealGNP     RealInt
+(Intercept) 788.6120652 -0.7502080996 49.78912814
+RealGNP      -0.7502081  0.0007483977 -0.06641343
+RealInt      49.7891281 -0.0664134303 17.71735491
+> 
+> ## use Parzen kernel instead, VAR(2) prewhitening, no finite sample
+> ## adjustment and Newey & West (1994) bandwidth selection
+> kernHAC(fm, kernel = "Parzen", prewhite = 2, adjust = FALSE,
++   bw = bwNeweyWest, verbose = TRUE)
+
+Bandwidth chosen: 2.8144444946606 
+            (Intercept)       RealGNP      RealInt
+(Intercept) 608.3101258 -0.5089107386 -64.93690203
+RealGNP      -0.5089107  0.0004340803   0.04689293
+RealInt     -64.9369020  0.0468929322  15.58251456
+> 
+> ## compare with estimate under assumption of spheric errors
+> vcov(fm)
+            (Intercept)       RealGNP     RealInt
+(Intercept) 620.7706170 -0.5038304429  8.47475285
+RealGNP      -0.5038304  0.0004229789 -0.01145679
+RealInt       8.4747529 -0.0114567949  5.61097245
+> 
+> 
+> 
+> cleanEx()
+> nameEx("weightsLumley")
+> ### * weightsLumley
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: weightsLumley
+> ### Title: Weighted Empirical Adaptive Variance Estimation
+> ### Aliases: weightsLumley weave
+> ### Keywords: regression ts
+> 
+> ### ** Examples
+> 
+> x <- sin(1:100)
+> y <- 1 + x + rnorm(100)
+> fm <- lm(y ~ x)
+> weave(fm)
+             (Intercept)            x
+(Intercept)  0.007957440 -0.001936926
+x           -0.001936926  0.018775226
+> vcov(fm)
+             (Intercept)            x
+(Intercept) 8.124921e-03 2.055475e-05
+x           2.055475e-05 1.616308e-02
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  1.056 0.044 1.14 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

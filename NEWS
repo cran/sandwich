@@ -1,6 +1,15 @@
+Changes in Version 2.2-10
+
+  o Added estfun() and bread() methods for ordered response models
+    from MASS::polr and ordinal::clm.
+
+  o Added output of examples and vignettes as .Rout.save for
+    R CMD check.
+
+
 Changes in Version 2.2-9
 
-  o added convenience function lrvar() to compute the long-run
+  o Added convenience function lrvar() to compute the long-run
     variance of the mean of a time series: a simple wrapper
     for kernHAC() and NeweyWest() applied to lm(x ~ 1).
 

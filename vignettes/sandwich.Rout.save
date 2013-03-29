@@ -1,0 +1,199 @@
+
+> library("zoo")
+
+Attaching package: 'zoo'
+
+The following object(s) are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+> library("sandwich")
+
+> library("strucchange")
+
+> library("lmtest")
+
+> options(prompt = "R> ", continue = "+   ")
+
+> curve(kweights(x, kernel = "Quadratic", normalize = TRUE), 
++     from = 0, to = 3.2, xlab = "x", ylab = "K(x)")
+
+> curve(kweights(x, kernel = "Bartlett", normalize = TRUE), 
++     from = 0, to = 3.2, col = 2, add = TRUE)
+
+> curve(kweights(x, kernel = "Parzen", normalize = TRUE), 
++     from = 0, to = 3.2, col = 3, add = TRUE)
+
+> curve(kweights(x, kernel = "Tukey", normalize = TRUE), 
++     from = 0, to = 3.2, col = 4, add = TRUE)
+
+> lines(c(0, 0.5), c(1, 1), col = 6)
+
+> lines(c(0.5, 0.5), c(1, 0), lty = 3, col = 6)
+
+> lines(c(0.5, 3.2), c(0, 0), col = 6)
+
+> curve(kweights(x, kernel = "Quadratic", normalize = TRUE), 
++     from = 0, to = 3.2, col = 1, add = TRUE)
+
+> text(0.5, 0.98, "Truncated", pos = 4)
+
+> text(0.8, kweights(0.8, "Bartlett", normalize = TRUE), 
++     "Bartlett", pos = 4)
+
+> text(1.35, kweights(1.4, "Quadratic", normalize = TRUE), 
++     "Quadratic Spectral", pos = 2)
+
+> text(1.15, 0.29, "Parzen", pos = 4)
+
+> arrows(1.17, 0.29, 1, kweights(1, "Parzen", normalize = TRUE), 
++     length = 0.1)
+
+> text(1.3, 0.2, "Tukey-Hanning", pos = 4)
+
+> arrows(1.32, 0.2, 1.1, kweights(1.1, "Tukey", normalize = TRUE), 
++     length = 0.1)
+
+> library("sandwich")
+
+> library("lmtest")
+
+> data("PublicSchools")
+
+> ps <- na.omit(PublicSchools)
+
+> ps$Income <- ps$Income * 1e-04
+
+> fm.ps <- lm(Expenditure ~ Income + I(Income^2), data = ps)
+
+> coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC0"))
+
+z test of coefficients:
+
+            Estimate Std. Error z value Pr(>|z|)  
+(Intercept)   832.91     460.89  1.8072  0.07073 .
+Income      -1834.20    1243.04 -1.4756  0.14006  
+I(Income^2)  1587.04     829.99  1.9121  0.05586 .
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
+
+z test of coefficients:
+
+            Estimate Std. Error z value Pr(>|z|)
+(Intercept)   832.91    3008.01  0.2769   0.7819
+Income      -1834.20    8183.19 -0.2241   0.8226
+I(Income^2)  1587.04    5488.93  0.2891   0.7725
+
+
+> plot(Expenditure ~ Income, data = ps, xlab = "per capita income", 
++     ylab = "per capita spending on public schools")
+
+> inc <- seq(0.5, 1.2, by = 0.001)
+
+> lines(inc, predict(fm.ps, data.frame(Income = inc)), 
++     col = 4, lty = 2)
+
+> fm.ps2 <- lm(Expenditure ~ Income, data = ps)
+
+> abline(fm.ps2, col = 4)
+
+> text(ps[2, 2], ps[2, 1], rownames(ps)[2], pos = 2)
+
+> data("Investment")
+
+> fm.inv <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
+
+> coeftest(fm.inv, df = Inf, vcov = NeweyWest(fm.inv, 
++     lag = 4, prewhite = FALSE))
+
+z test of coefficients:
+
+              Estimate Std. Error z value Pr(>|z|)    
+(Intercept) -12.533601  18.958298 -0.6611   0.5085    
+RealGNP       0.169136   0.016751 10.0972   <2e-16 ***
+RealInt      -1.001438   3.342375 -0.2996   0.7645    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> coeftest(fm.inv, df = Inf, vcov = NeweyWest)
+
+z test of coefficients:
+
+              Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) -12.533601  24.374177 -0.5142    0.6071    
+RealGNP       0.169136   0.023586  7.1709 7.449e-13 ***
+RealInt      -1.001438   3.639935 -0.2751    0.7832    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> parzenHAC <- function(x, ...) kernHAC(x, kernel = "Parzen", 
++     prewhite = 2, adjust = FALSE, bw = bwNeweyWest, ...)
+
+> coeftest(fm.inv, df = Inf, vcov = parzenHAC)
+
+z test of coefficients:
+
+              Estimate Std. Error z value  Pr(>|z|)    
+(Intercept) -12.533601  24.663944 -0.5082    0.6113    
+RealGNP       0.169136   0.020835  8.1181 4.737e-16 ***
+RealInt      -1.001438   3.947469 -0.2537    0.7997    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+
+
+> library("scatterplot3d")
+
+> s3d <- scatterplot3d(Investment[, c(5, 7, 6)], type = "b", 
++     angle = 65, scale.y = 1, pch = 16)
+
+> s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
+
+> library("strucchange")
+
+> data("RealInt")
+
+> ocus <- gefp(RealInt ~ 1, fit = lm, vcov = kernHAC)
+
+> bp <- breakpoints(RealInt ~ 1)
+
+> confint(bp, vcov = kernHAC)
+
+	 Confidence intervals for breakpoints
+	 of optimal 3-segment partition: 
+
+Call:
+confint.breakpointsfull(object = bp, vcov. = kernHAC)
+
+Breakpoints at observation number:
+  2.5 % breakpoints 97.5 %
+1    37          47     48
+2    77          79     81
+
+Corresponding to breakdates:
+  2.5 %   breakpoints 97.5 % 
+1 1970(1) 1972(3)     1972(4)
+2 1980(1) 1980(3)     1981(1)
+
+> par(mfrow = c(1, 2))
+
+> plot(ocus, aggregate = FALSE, main = "")
+
+> plot(RealInt, ylab = "Real interest rate")
+
+> lines(ts(fitted(bp), start = start(RealInt), freq = 4), 
++     col = 4)
+
+> lines(confint(bp, vcov = kernHAC))
+
+> options(prompt = "  ")
+
+ *** Run successfully completed ***
+> proc.time()
+   user  system elapsed 
+  1.520   0.072   1.587 
