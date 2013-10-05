@@ -37,6 +37,7 @@ meatHC(x, type = , omega = NULL)
   \code{\link{sandwich}} and \code{\link{bread}}. See Zeileis (2006) for
   more implementation details. The theoretical background, exemplified
   for the linear regression model, is described below and in Zeileis (2004).
+  Analogous formulas are employed for other types of models.
 
   When \code{type = "const"} constant variances are assumed and
   and \code{vcovHC} gives the usual estimate of the covariance matrix of
@@ -74,35 +75,35 @@ meatHC(x, type = , omega = NULL)
 }
 
 \references{
-Cribari-Neto F. (2004), Asymptotic inference under heteroskedasticity
-of unknown form. \emph{Computational Statistics \& Data Analysis}
+Cribari-Neto F. (2004), Asymptotic Inference under Heteroskedasticity
+of Unknown Form. \emph{Computational Statistics \& Data Analysis}
 \bold{45}, 215--233.
 
-Cribari-Neto F., Da Silva W.B. (2011), A new heteroskedasticity-consistent
-covariance matrix estimator for the linear regression model.
+Cribari-Neto F., Da Silva W.B. (2011), A New Heteroskedasticity-Consistent
+Covariance Matrix Estimator for the Linear Regression Model.
 \emph{Advances in Statistical Analysis}, \bold{95}(2), 129--146.
 
 Cribari-Neto F., Souza T.C., Vasconcellos, K.L.P. (2007), Inference under
-heteroskedasticity and leveraged data. \emph{Communications in Statistics -- Theory and
+Heteroskedasticity and Leveraged Data. \emph{Communications in Statistics -- Theory and
 Methods}, \bold{36}, 1877--1888. Errata: \bold{37}, 3329--3330, 2008.
 
 Long J. S., Ervin L. H. (2000), Using Heteroscedasticity Consistent Standard
 Errors in the Linear Regression Model. \emph{The American Statistician},
 \bold{54}, 217--224.
 
-MacKinnon J. G., White H. (1985), Some heteroskedasticity-consistent
-covariance matrix estimators with improved finite sample properties.
+MacKinnon J. G., White H. (1985), Some Heteroskedasticity-Consistent
+Covariance Matrix Estimators with Improved Finite Sample Properties.
 \emph{Journal of Econometrics} \bold{29}, 305--325.
 
-White H. (1980), A heteroskedasticity-consistent covariance matrix and
-a direct test for heteroskedasticity. \emph{Econometrica} \bold{48},
+White H. (1980), A Heteroskedasticity-Consistent Covariance Matrix and
+a Direct Test for Heteroskedasticity. \emph{Econometrica} \bold{48},
 817--838.
 
 Zeileis A (2004), Econometric Computing with HC and HAC Covariance Matrix
 Estimators. \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
 URL \url{http://www.jstatsoft.org/v11/i10/}.
 
-Zeileis A (2006), Object-oriented Computation of Sandwich Estimators.
+Zeileis A (2006), Object-Oriented Computation of Sandwich Estimators.
 \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
 URL \url{http://www.jstatsoft.org/v16/i09/}.
 }

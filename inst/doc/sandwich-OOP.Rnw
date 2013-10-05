@@ -5,10 +5,10 @@
 %% Symbols
 \newcommand{\darrow}{\stackrel{\mbox{\tiny \textnormal{d}}}{\longrightarrow}}
 
-\author{Achim Zeileis\\Wirtschaftsuniversit\"at Wien}
+\author{Achim Zeileis\\Universit\"at Innsbruck}
 \Plainauthor{Achim Zeileis}
 
-\title{Object-oriented Computation of Sandwich Estimators}
+\title{Object-Oriented Computation of Sandwich Estimators}
 
 \Keywords{covariance matrix estimators, estimating functions, object orientation, \proglang{R}}
 \Plainkeywords{covariance matrix estimators, estimating functions, object orientation, R}
@@ -34,18 +34,19 @@ types of sandwich estimators can be computed.
 
 \Address{
   Achim Zeileis\\
-  Department of Statistics and Mathematics\\
-  WU Wirtschaftsuniversit\"at Wien\\
-  Augasse 2--9\\
-  1090 Wien, Austria\\
+  Department of Statistics\\
+  Faculty of Economics and Statistics\\
+  Universit\"at Innsbruck\\
+  Universit\"atsstr.~15\\
+  6020 Innsbruck, Austria\\
   E-mail: \email{Achim.Zeileis@R-project.org}\\
-  URL: \url{http://statmath.wu.ac.at/~zeileis/}
+  URL: \url{http://eeecon.uibk.ac.at/~zeileis/}
 }
 
 \begin{document}
 
 \SweaveOpts{engine=R,eps=FALSE}
-%\VignetteIndexEntry{Object-oriented Computation of Sandwich Estimators}
+%\VignetteIndexEntry{Object-Oriented Computation of Sandwich Estimators}
 %\VignetteDepends{sandwich,zoo,AER,survival,MASS,lmtest}
 %\VignetteKeywords{covariance matrix estimators, estimating functions, object orientation, R}
 %\VignettePackage{sandwich}

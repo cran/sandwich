@@ -73,7 +73,7 @@ Andrews & Monahan (1992).
 
 The covariance matrix estimators have been improved by the addition of a bias correction and an
 approximate denominator degrees of freedom for test and confidence interval
-construction.
+construction. See Lumley & Heagerty (1999) for details.
 }
 
 \value{A matrix containing the covariance matrix estimate. If \code{diagnostics}
@@ -93,7 +93,7 @@ with
   An Improved Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimator.
   \emph{Econometrica}, \bold{60}, 953--966.
 
-  Lumley A & Heagerty P (1999),
+  Lumley T & Heagerty P (1999),
   Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.
   \emph{Journal of the Royal Statistical Society B}, \bold{61}, 459--477.
 
@@ -107,7 +107,7 @@ with
   URL \url{http://www.jstatsoft.org/v11/i10/}.  
 
   Zeileis A (2006),
-  Object-oriented Computation of Sandwich Estimators.
+  Object-Oriented Computation of Sandwich Estimators.
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
   URL \url{http://www.jstatsoft.org/v16/i09/}.
 }

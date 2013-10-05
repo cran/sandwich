@@ -18,7 +18,7 @@ citEntry(entry="Article",
 )
 
 citEntry(entry        = "Article",
-         title        = "Object-oriented Computation of Sandwich Estimators",
+         title        = "Object-Oriented Computation of Sandwich Estimators",
          author       = "Achim Zeileis", 
          journal      = "Journal of Statistical Software",
          year         = "2006",
@@ -29,7 +29,7 @@ citEntry(entry        = "Article",
          
          textVersion = 
          paste("Achim Zeileis (2006).", 
-               "Object-oriented Computation of Sandwich Estimators.",
+               "Object-Oriented Computation of Sandwich Estimators.",
                "Journal of Statistical Software 16(9), 1-16.",
 	       "URL http://www.jstatsoft.org/v16/i09/."),
          header = "If sandwich is applied to models other than lm() also cite:"

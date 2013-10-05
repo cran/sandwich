@@ -1,7 +1,6 @@
 
-R version 2.15.2 (2012-10-26) -- "Trick or Treat"
-Copyright (C) 2012 The R Foundation for Statistical Computing
-ISBN 3-900051-07-0
+R version 3.0.1 (2013-05-16) -- "Good Sport"
+Copyright (C) 2013 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -20,16 +19,8 @@ Type 'q()' to quit R.
 > source(file.path(R.home("share"), "R", "examples-header.R"))
 > options(warn = 1)
 > library('sandwich')
-Loading required package: zoo
-
-Attaching package: 'zoo'
-
-The following object(s) are masked from 'package:base':
-
-    as.Date, as.Date.numeric
-
 > 
-> assign(".oldSearch", search(), pos = 'CheckExEnv')
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
 > cleanEx()
 > nameEx("Investment")
 > ### * Investment
@@ -65,12 +56,12 @@ Coefficients:
 RealGNP       0.16914    0.02057   8.224 3.87e-07 ***
 RealInt      -1.00144    2.36875  -0.423    0.678    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 17.21 on 16 degrees of freedom
   (1 observation deleted due to missingness)
-Multiple R-squared: 0.8141,	Adjusted R-squared: 0.7908 
-F-statistic: 35.03 on 2 and 16 DF,  p-value: 1.429e-06 
+Multiple R-squared:  0.8141,	Adjusted R-squared:  0.7908 
+F-statistic: 35.03 on 2 and 16 DF,  p-value: 1.429e-06
 
 > 
 > ## visualize residuals, p. 412, Figure 15.1
@@ -92,10 +83,18 @@ F-statistic: 35.03 on 2 and 16 DF,  p-value: 1.429e-06
 + bgtest(fm, order = 4)
 + }
 Loading required package: lmtest
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following object is masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
 
 	Breusch-Godfrey test for serial correlation of order up to 4
 
-data:  fm 
+data:  fm
 LM test = 12.0697, df = 4, p-value = 0.01684
 
 > 
@@ -116,7 +115,7 @@ Loading required package: scatterplot3d
 > 
 > cleanEx()
 
-detaching 'package:scatterplot3d', 'package:lmtest'
+detaching 'package:scatterplot3d', 'package:lmtest', 'package:zoo'
 
 > nameEx("NeweyWest")
 > ### * NeweyWest
@@ -198,11 +197,11 @@ Coefficients:
 Income       -1834.2      829.0  -2.213  0.03182 * 
 I(Income^2)   1587.0      519.1   3.057  0.00368 **
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Residual standard error: 56.68 on 47 degrees of freedom
-Multiple R-squared: 0.6553,	Adjusted R-squared: 0.6407 
-F-statistic: 44.68 on 2 and 47 DF,  p-value: 1.345e-11 
+Multiple R-squared:  0.6553,	Adjusted R-squared:  0.6407 
+F-statistic: 44.68 on 2 and 47 DF,  p-value: 1.345e-11
 
 > 
 > ## compare standard and HC0 standard errors
@@ -247,6 +246,14 @@ F-statistic: 44.68 on 2 and 47 DF,  p-value: 1.345e-11
 + coeftest(fmq1, df = Inf, vcov = vcovHC(fmq1, type = "HC4"))[3,4]
 + }
 Loading required package: lmtest
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following object is masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
 [1] 0.8923303
 > 
 > ## visualization, p. 230, Figure 1
@@ -263,7 +270,7 @@ Loading required package: lmtest
 > 
 > cleanEx()
 
-detaching 'package:lmtest'
+detaching 'package:lmtest', 'package:zoo'
 
 > nameEx("bread")
 > ### * bread
@@ -659,7 +666,7 @@ RealGNP      -0.7502081  0.0007483977 -0.06641343
 RealInt      49.7891281 -0.0664134303 17.71735491
 > kernHAC(fm, verbose = TRUE)
 
-Bandwidth chosen: 1.74474889764603 
+Bandwidth chosen: 1.74474889764602 
             (Intercept)       RealGNP     RealInt
 (Intercept) 788.6120652 -0.7502080996 49.78912814
 RealGNP      -0.7502081  0.0007483977 -0.06641343
@@ -670,7 +677,7 @@ RealInt      49.7891281 -0.0664134303 17.71735491
 > kernHAC(fm, kernel = "Parzen", prewhite = 2, adjust = FALSE,
 +   bw = bwNeweyWest, verbose = TRUE)
 
-Bandwidth chosen: 2.8144444946606 
+Bandwidth chosen: 2.8144444946607 
             (Intercept)       RealGNP      RealInt
 (Intercept) 608.3101258 -0.5089107386 -64.93690203
 RealGNP      -0.5089107  0.0004340803   0.04689293
@@ -714,8 +721,9 @@ x           2.055475e-05 1.616308e-02
 > 
 > ### * <FOOTER>
 > ###
-> cat("Time elapsed: ", proc.time() - get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  1.056 0.044 1.14 0 0 
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  1.232 0.032 1.268 0 0 
 > grDevices::dev.off()
 null device 
           1 

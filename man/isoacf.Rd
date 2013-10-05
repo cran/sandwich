@@ -30,7 +30,7 @@ See also Robertson et al. (1988).
 }
 
 \references{
-  Lumley A & Heagerty P (1999),
+  Lumley T & Heagerty P (1999),
   Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.
   \emph{Journal of the Royal Statistical Society B}, \bold{61},
   459--477.
