@@ -3,7 +3,7 @@
 
 Attaching package: 'zoo'
 
-The following object(s) are masked from 'package:base':
+The following objects are masked from 'package:base':
 
     as.Date, as.Date.numeric
 
@@ -76,7 +76,7 @@ z test of coefficients:
 Income      -1834.20    1243.04 -1.4756  0.14006  
 I(Income^2)  1587.04     829.99  1.9121  0.05586 .
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 
 > coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
@@ -117,7 +117,7 @@ z test of coefficients:
 RealGNP       0.169136   0.016751 10.0972   <2e-16 ***
 RealInt      -1.001438   3.342375 -0.2996   0.7645    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 
 > coeftest(fm.inv, df = Inf, vcov = NeweyWest)
@@ -129,7 +129,7 @@ z test of coefficients:
 RealGNP       0.169136   0.023586  7.1709 7.449e-13 ***
 RealInt      -1.001438   3.639935 -0.2751    0.7832    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 
 > parzenHAC <- function(x, ...) kernHAC(x, kernel = "Parzen", 
@@ -144,7 +144,7 @@ z test of coefficients:
 RealGNP       0.169136   0.020835  8.1181 4.737e-16 ***
 RealInt      -1.001438   3.947469 -0.2537    0.7997    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 
 > library("scatterplot3d")
@@ -196,4 +196,4 @@ Corresponding to breakdates:
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
-  1.520   0.072   1.587 
+  1.624   0.056   1.675 

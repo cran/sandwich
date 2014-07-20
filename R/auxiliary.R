@@ -32,7 +32,7 @@ isoacf <- function(x, lagmax = NULL, weave1 = FALSE)
   acfWeave <- function(x, lag = trunc(5*sqrt(length(x))))
   {
     x <- x - mean(x)
-    n <- length(x)
+    # n <- length(x)
     autocov <- function(ii, xx)
       cov(xx[1:(length(xx)-ii+1)],xx[ii:length(xx)])
     covs <- sapply(2:lag, autocov, xx = x)
