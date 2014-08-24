@@ -27,6 +27,9 @@ meatHAC <- function(x, order.by = NULL, prewhite = FALSE,
   weights = weightsAndrews, adjust = TRUE, diagnostics = FALSE,
   ar.method = "ols", data = list())
 {
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   prewhite <- as.integer(prewhite)
 
   umat <- estfun(x)[, , drop = FALSE]
@@ -106,6 +109,9 @@ weightsAndrews <- function(x, order.by = NULL, bw = bwAndrews,
   kernel = c("Quadratic Spectral", "Truncated", "Bartlett", "Parzen", "Tukey-Hanning"),
   prewhite = 1, ar.method = "ols", tol = 1e-7, data = list(), verbose = FALSE, ...)
 {
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   kernel <- match.arg(kernel)
   if(is.function(bw))
     bw <- bw(x, order.by = order.by, kernel = kernel,
@@ -123,6 +129,9 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   "Bartlett", "Parzen", "Tukey-Hanning"), approx = c("AR(1)", "ARMA(1,1)"),
   weights = NULL, prewhite = 1, ar.method = "ols", data = list(), ...)
 {
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   kernel <- match.arg(kernel)
   approx <- match.arg(approx)
   prewhite <- as.integer(prewhite)
@@ -239,6 +248,9 @@ kernHAC <- function(x, order.by = NULL, prewhite = 1, bw = bwAndrews,
 weightsLumley <- function(x, order.by = NULL, C = NULL,
   method = c("truncate", "smooth"), acf = isoacf, tol = 1e-7, data = list(), ...)
 {
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   method <- match.arg(method)
   res <- residuals(x, "response") #FIXME# available for which models?
   n <- length(res)
@@ -300,6 +312,9 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
   "Quadratic Spectral", "Truncated", "Tukey-Hanning"), weights = NULL, prewhite = 1,
   ar.method = "ols", data = list(), ...)
 {
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   kernel <- match.arg(kernel)
   if(kernel %in% c("Truncated", "Tukey-Hanning"))
     stop(paste("Automatic bandwidth selection only available for ", 

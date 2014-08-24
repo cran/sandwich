@@ -1,5 +1,6 @@
 sandwich <- function(x, bread. = bread, meat. = meat, ...)
 {
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
   if(is.function(bread.)) bread. <- bread.(x)
   if(is.function(meat.)) meat. <- meat.(x, ...)
   n <- NROW(estfun(x))
@@ -8,6 +9,7 @@ sandwich <- function(x, bread. = bread, meat. = meat, ...)
 
 meat <- function(x, adjust = FALSE, ...)
 {
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
   psi <- estfun(x, ...)
   k <- NCOL(psi)
   n <- NROW(psi)
@@ -17,7 +19,9 @@ meat <- function(x, adjust = FALSE, ...)
   return(rval)
 }
 
-vcovOPG <- function(x, adjust = FALSE, ...) {
+vcovOPG <- function(x, adjust = FALSE, ...)
+{
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
   psi <- estfun(x, ...)
   k <- NCOL(psi)
   n <- NROW(psi)

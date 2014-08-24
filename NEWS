@@ -1,4 +1,13 @@
-Changes in Version 2.3-0
+Changes in Version 2.3-2
+
+  o sandwich(), vcovHC(), and vcovHAC() did not work when models were
+    fitted with na.action = na.exclude because the estfun() then (correctly)
+    preserved the NAs. This is now avoided and all functions handle the
+    na.exclude case like the na.omit case. (Thanks to John Fox for spotting
+    the problem and suggesting the solution.)
+
+
+Changes in Version 2.3-1
 
   o The estfun() methods for "survreg" and "coxph" objects incorrectly
     returned the unweighted estimating functions in case the objects

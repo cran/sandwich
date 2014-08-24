@@ -16,6 +16,9 @@ meatHC <- function(x,
   type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4", "HC4m", "HC5"),
   omega = NULL)
 {
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   ## extract X
   X <- model.matrix(x)
   if(any(alias <- is.na(coef(x)))) X <- X[, !alias, drop = FALSE]
@@ -79,6 +82,9 @@ vcovHC.mlm <- function(x,
   ## compute meat "by hand" because meatHC() can not deal with
   ## residual "matrices"
   
+  ## ensure that NAs are omitted
+  if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
+
   ## regressors, df, hat values
   X <- model.matrix(x)
   attr(X, "assign") <- NULL
