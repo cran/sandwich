@@ -151,7 +151,6 @@ estfun.clm <- function(x, ...)
 
 estfun.coxph <- function(x, ...)
 {
-  stopifnot(require("survival"))
   wts <- x$weights
   if(is.null(wts)) wts <- 1
   wts * residuals(x, type = "score", ...)
@@ -159,7 +158,6 @@ estfun.coxph <- function(x, ...)
 
 estfun.survreg <- function(x, ...)
 {
-  stopifnot(require("survival"))
   mf <- model.frame(x)
   xmat <- model.matrix(terms(x), mf)
   wts <- model.weights(mf)

@@ -116,7 +116,7 @@ weightsAndrews <- function(x, order.by = NULL, bw = bwAndrews,
   if(is.function(bw))
     bw <- bw(x, order.by = order.by, kernel = kernel,
       prewhite = prewhite, data = data, ar.method = ar.method, ...)
-  if(verbose) cat(paste("\nBandwidth chosen:", bw, "\n"))
+  if(verbose) cat(paste("\nBandwidth chosen:", format(bw), "\n"))
       
   n <- NROW(estfun(x)) - as.integer(prewhite)
   

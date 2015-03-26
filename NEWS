@@ -1,3 +1,13 @@
+Changes in Version 2.3-3
+
+  o Now the default methods of vcovHC() and vcovHAC() are also correctly
+    registered as S3 methods in the NAMESPACE.
+
+  o Corrected errors in Equation 3 of vignette("sandwich"). The equation
+    incorrectly listed the error terms "u" instead of the observations "y"
+    on the right-hand side (pointed out by Karl-Kuno Kunze).
+
+
 Changes in Version 2.3-2
 
   o sandwich(), vcovHC(), and vcovHAC() did not work when models were

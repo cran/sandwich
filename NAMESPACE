@@ -66,5 +66,7 @@ export(
   S3method("estfun", "zeroinfl")
   S3method("estfun", "mlogit")
 
-## methods for vcovHC
+## methods for vcovHC/vcovHAC
+  S3method("vcovHC", "default")
   S3method("vcovHC", "mlm")
+  S3method("vcovHAC", "default")

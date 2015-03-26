@@ -169,7 +169,7 @@ the coefficients $\beta$ can be consistently estimated by
 OLS giving the well-known OLS estimator $\hat \beta$ with corresponding OLS residuals $\hat u_i$:
 \begin{eqnarray}
   \hat \beta & = & \left( X^\top X \right)^{-1} X^\top y \\
-  \hat u & = & (I_n - H) \, u \; = \; (I_n - X \left( X^\top X \right)^{-1} X^\top) \, u
+  \hat u & = & (I_n - H) \, y \; = \; (I_n - X \left( X^\top X \right)^{-1} X^\top) \, y
 \end{eqnarray}
 where $I_n$ is the $n$-dimensional identity matrix and $H$ is usually 
 called hat matrix. The estimates $\hat \beta$ are unbiased and

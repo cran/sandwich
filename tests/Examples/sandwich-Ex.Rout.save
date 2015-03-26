@@ -1,7 +1,7 @@
 
-R Under development (unstable) (2014-07-07 r66085) -- "Unsuffered Consequences"
+R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
 Copyright (C) 2014 The R Foundation for Statistical Computing
-Platform: x86_64-unknown-linux-gnu (64-bit)
+Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -95,7 +95,7 @@ The following objects are masked from 'package:base':
 	Breusch-Godfrey test for serial correlation of order up to 4
 
 data:  fm
-LM test = 12.0697, df = 4, p-value = 0.01684
+LM test = 12.07, df = 4, p-value = 0.01684
 
 > 
 > ## visualize fitted series
@@ -666,7 +666,7 @@ RealGNP      -0.7502081  0.0007483977 -0.06641343
 RealInt      49.7891281 -0.0664134303 17.71735491
 > kernHAC(fm, verbose = TRUE)
 
-Bandwidth chosen: 1.74474889764602 
+Bandwidth chosen: 1.744749 
             (Intercept)       RealGNP     RealInt
 (Intercept) 788.6120652 -0.7502080996 49.78912814
 RealGNP      -0.7502081  0.0007483977 -0.06641343
@@ -677,7 +677,7 @@ RealInt      49.7891281 -0.0664134303 17.71735491
 > kernHAC(fm, kernel = "Parzen", prewhite = 2, adjust = FALSE,
 +   bw = bwNeweyWest, verbose = TRUE)
 
-Bandwidth chosen: 2.8144444946607 
+Bandwidth chosen: 2.814444 
             (Intercept)       RealGNP      RealInt
 (Intercept) 608.3101258 -0.5089107386 -64.93690203
 RealGNP      -0.5089107  0.0004340803   0.04689293
@@ -723,7 +723,7 @@ x           2.055475e-05 1.616308e-02
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  1.168 0.024 1.445 0 0 
+Time elapsed:  0.992 0.04 1.04 0 0 
 > grDevices::dev.off()
 null device 
           1 
