@@ -33,6 +33,7 @@ meatHAC <- function(x, order.by = NULL, prewhite = FALSE,
   prewhite <- as.integer(prewhite)
 
   umat <- estfun(x)[, , drop = FALSE]
+  if(is.zoo(umat)) umat <- as.matrix(coredata(umat))
   n.orig <- n <- nrow(umat)
   k <- ncol(umat)
 
@@ -137,6 +138,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   prewhite <- as.integer(prewhite)
 
   umat <- estfun(x)[,, drop = FALSE]
+  if(is.zoo(umat)) umat <- as.matrix(coredata(umat))
   n <- nrow(umat)
   k <- ncol(umat)
 
@@ -323,6 +325,7 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
   prewhite <- as.integer(prewhite)
 
   umat <- estfun(x)[,, drop = FALSE]
+  if(is.zoo(umat)) umat <- as.matrix(coredata(umat))
   n <- nrow(umat)
   k <- ncol(umat)
 

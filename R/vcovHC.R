@@ -32,7 +32,10 @@ meatHC <- function(x,
   ## the following might work, but "intercept" is also claimed for "coxph"
   ## res <- if(attr(terms(x), "intercept") > 0) estfun(x)[,1] else rowMeans(estfun(x)/X, na.rm = TRUE)
   ## hence better rely on
-  res <- rowMeans(estfun(x)/X, na.rm = TRUE)
+  ef <- estfun(x)
+  res <- rowMeans(ef/X, na.rm = TRUE)
+  ## handle rows with just zeros
+  res[apply(abs(ef) < .Machine$double.eps, 1L, all)] <- 0
   
   ## if omega not specified, set up using type
   if(is.null(omega)) {
