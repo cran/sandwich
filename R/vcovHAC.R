@@ -16,7 +16,7 @@ vcovHAC.default <- function(x, order.by = NULL, prewhite = FALSE,
 				  
   if(sandwich) {
     diagn <- attr(rval, "diagnostics")
-    rval <- sandwich(x, meat = rval, ...)
+    rval <- sandwich(x, meat. = rval, ...)
     attr(rval, "diagnostics") <- diagn
   }
 

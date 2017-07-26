@@ -1,3 +1,14 @@
+Changes in Version 2.4-0
+
+  o Various flavors of clustered sandwich estimators in vcovCL(), panel
+    sandwich estimators in vcovPL(), and panel-corrected estimators a la
+    Beck & Katz in vcovPC(). The new vignette("sandwich-CL", package = "sandwich")
+    introduces all functions and illustrates their use and properties.
+
+  o The new function vcovBS() provides a basic (clustered) bootstrap
+    covariance matrix estimate, using case-based resampling.
+
+
 Changes in Version 2.3-4
 
   o In meatHAC(), bwAndrews(), and bwNeweyWest() it is now assured that

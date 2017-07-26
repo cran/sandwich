@@ -1,18 +1,23 @@
 Package: sandwich
-Version: 2.3-4
-Date: 2015-09-24
+Version: 2.4-0
+Date: 2017-07-26
 Title: Robust Covariance Matrix Estimators
-Authors@R: c(person(given = "Thomas", family = "Lumley", role = "aut", email = "tlumley@u.washington.edu"),
-             person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"))
-Description: Model-robust standard error estimators for cross-sectional, time series, and longitudinal data.
-Depends: R (>= 2.0.0)
-Imports: stats, zoo
-Suggests: car, lmtest, strucchange, AER, survival, MASS, scatterplot3d
+Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org"),
+             person(given = "Thomas", family = "Lumley", role = "aut", email = "tlumley@u.washington.edu"),
+	     person(given = "Susanne", family = "Berger", role = "ctb", email = "Susanne.Berger@uibk.ac.at"),
+	     person(given = "Nathaniel", family = "Graham", role = "ctb", email = "npgraham1@gmail.com"))
+Description: Model-robust standard error estimators for cross-sectional, time series, clustered, panel, and longitudinal data.
+Depends: R (>= 2.10.0)
+Imports: stats, utils, zoo
+Suggests: AER, car, geepack, lattice, lmtest, MASS, multiwayvcov, pcse,
+        plm, pscl, scatterplot3d, stats4, strucchange, survival
 License: GPL-2 | GPL-3
 NeedsCompilation: no
-Packaged: 2015-09-24 08:54:29 UTC; zeileis
-Author: Thomas Lumley [aut],
-  Achim Zeileis [aut, cre]
+Packaged: 2017-07-26 19:08:36 UTC; zeileis
+Author: Achim Zeileis [aut, cre],
+  Thomas Lumley [aut],
+  Susanne Berger [ctb],
+  Nathaniel Graham [ctb]
 Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
 Repository: CRAN
-Date/Publication: 2015-09-24 12:43:21
+Date/Publication: 2017-07-26 19:36:29 UTC

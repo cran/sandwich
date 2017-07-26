@@ -1,0 +1,315 @@
+
+> library("sandwich")
+
+> library("geepack")
+
+> library("lattice")
+
+> library("lmtest")
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+
+> library("multiwayvcov")
+
+> library("pcse")
+
+Attaching package: 'pcse'
+
+The following object is masked from 'package:sandwich':
+
+    vcovPC
+
+
+> library("plm")
+Loading required package: Formula
+
+> library("pscl")
+Loading required package: MASS
+Classes and Methods for R developed in the
+
+Political Science Computational Laboratory
+
+Department of Political Science
+
+Stanford University
+
+Simon Jackman
+
+hurdle and zeroinfl functions by Achim Zeileis
+
+
+> panel.xyref <- function(x, y, ...) {
++     panel.abline(h = 0.95, col = "slategray")
++     panel.xyplot(x, y, ...)
++ }
+
+> se <- function(vcov) sapply(vcov, function(x) sqrt(diag(x)))
+
+> options(prompt = "R> ", continue = "+  ", digits = 5)
+
+> if (file.exists("sim-CL.rda")) {
++     load("sim-CL.rda")
++ } else {
++     source("sim-CL.R")
++ }
+
+> data("InstInnovation", package = "sandwich")
+
+> library("pscl")
+
+> h_innov <- hurdle(cites ~ institutions + log(capital/employment) + 
++     log(sales), data = InstInnovation, dist = "negbin")
+
+> library("sandwich")
+
+> library("lmtest")
+
+> coeftest(h_innov, vcov = vcovCL, cluster = InstInnovation$company)
+
+t test of coefficients:
+
+                              Estimate Std. Error t value Pr(>|t|)    
+count_(Intercept)              0.49025    0.89445    0.55   0.5836    
+count_institutions             0.00397    0.00430    0.92   0.3567    
+count_log(capital/employment)  0.30431    0.15214    2.00   0.0455 *  
+count_log(sales)               0.38434    0.04999    7.69  1.7e-14 ***
+zero_(Intercept)              -0.01007    0.26908   -0.04   0.9701    
+zero_institutions              0.00658    0.00209    3.15   0.0016 ** 
+zero_log(capital/employment)  -0.17431    0.06481   -2.69   0.0072 ** 
+zero_log(sales)                0.17601    0.02776    6.34  2.5e-10 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+
+> se(vc_innov)
+                               standard     basic      CL-1      boot
+count_(Intercept)             0.2249894 0.6034277 0.8944541 0.8667209
+count_institutions            0.0016022 0.0024664 0.0043029 0.0041135
+count_log(capital/employment) 0.0546614 0.0817540 0.1521416 0.1494889
+count_log(sales)              0.0126165 0.0322071 0.0499917 0.0612687
+zero_(Intercept)              0.1460246 0.1530406 0.2690844 0.2791141
+zero_institutions             0.0013508 0.0013473 0.0020870 0.0020777
+zero_log(capital/employment)  0.0333649 0.0358768 0.0648053 0.0666365
+zero_log(sales)               0.0164233 0.0165897 0.0277648 0.0295080
+
+> data("PetersenCL", package = "sandwich")
+
+> p_lm <- lm(y ~ x, data = PetersenCL)
+
+> library("multiwayvcov")
+
+> se(list(sandwich = vcovCL(p_lm, cluster = PetersenCL$firm), 
++     multiwayvcov = cluster.vcov(p_lm, cluster = PetersenCL$firm)))
+            sandwich multiwayvcov
+(Intercept) 0.067013     0.067013
+x           0.050596     0.050596
+
+> library("plm")
+
+> p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling", 
++     indexes = c("firmid", "year"))
+
+> library("geepack")
+
+> vcov.geeglm <- function(object) {
++     vc <- object$geese$vbeta
++     rownames(vc) <- colnames(vc) <- names(coef(object))
++     return(vc)
++ }
+
+> p_gee <- geeglm(y ~ x, data = PetersenCL, id = PetersenCL$firm, 
++     corstr = "independence", family = gaussian)
+
+> se(list(sandwich = vcovCL(p_lm, cluster = PetersenCL$firm, 
++     cadjust = FALSE, type = "HC0"), plm = vcovHC(p_plm, cluster = "group"), 
++     gee .... [TRUNCATED] 
+            sandwich      plm  geepack
+(Intercept) 0.066939 0.066939 0.066939
+x           0.050540 0.050540 0.050540
+
+> se(list(sandwich = vcovCL(p_lm, cluster = PetersenCL[, 
++     1:2], multi0 = TRUE), multiwayvcov = cluster.vcov(p_lm, cluster = PetersenCL[, 
++      .... [TRUNCATED] 
+            sandwich multiwayvcov
+(Intercept) 0.065066     0.065066
+x           0.053561     0.053561
+
+> se(list(sandwich = vcovPL(p_lm, cluster = PetersenCL$firm, 
++     adjust = FALSE), plm = vcovSCC(p_plm)))
+            sandwich      plm
+(Intercept) 0.024357 0.024357
+x           0.028163 0.028163
+
+> library("pcse")
+
+> se(list(sandwich = sandwich::vcovPC(p_lm, cluster = PetersenCL$firm, 
++     order.by = PetersenCL$year), pcse = pcse::vcovPC(p_lm, groupN = Petersen .... [TRUNCATED] 
+            sandwich     pcse
+(Intercept) 0.022201 0.022201
+x           0.025276 0.025276
+
+> PU <- subset(PetersenCL, !(firm == 1 & year == 10))
+
+> pu_lm <- lm(y ~ x, data = PU)
+
+> se(list(sandwichT = sandwich::vcovPC(pu_lm, cluster = PU$firm, 
++     order.by = PU$year, pairwise = TRUE), pcseT = pcse::vcovPC(pu_lm, 
++     PU$fi .... [TRUNCATED] 
+            sandwichT    pcseT sandwichF    pcseF
+(Intercept)  0.022070 0.022070  0.022603 0.022603
+x            0.025338 0.025338  0.025241 0.025241
+
+> my.settings <- canonical.theme(color = TRUE)
+
+> my.settings[["strip.background"]]$col <- "gray"
+
+> my.settings[["strip.border"]]$col <- "black"
+
+> my.settings[["superpose.line"]]$lwd <- 1
+
+> s01$vcov <- factor(s01$vcov, levels(s01$vcov)[c(2, 
++     4, 3, 1, 8, 5, 7, 6)])
+
+> my.settings[["superpose.line"]]$col <- c("#377eb8", 
++     "green", "#006400", "#000080", "#ff7f00", "#f781bf", "#984ea3", 
++     "#e41a1c")
+
+> my.settings[["superpose.symbol"]]$col <- c("#377eb8", 
++     "green", "#006400", "#000080", "#ff7f00", "#f781bf", "#984ea3", 
++     "#e41a1c")
+
+> my.settings[["superpose.symbol"]]$pch <- c(rep(1, 
++     4), rep(2, 2), rep(3, 2))
+
+> xyplot(coverage ~ rho | par, groups = ~factor(vcov), 
++     data = s01, subset = par != "(Intercept)", ylim = c(0.1, 
++         1), type = "b", xlab .... [TRUNCATED] 
+
+> my.settings <- canonical.theme(color = TRUE)
+
+> my.settings[["strip.background"]]$col <- "gray"
+
+> my.settings[["strip.border"]]$col <- "black"
+
+> my.settings[["superpose.line"]]$lwd <- 1
+
+> s02$dist <- factor(as.character(s02$dist), levels = c("gaussian", 
++     "binomial(logit)", "poisson"))
+
+> s02$vcov <- factor(s02$vcov, levels(s02$vcov)[c(2, 
++     4, 3, 1, 8, 5, 7, 6)])
+
+> my.settings[["superpose.line"]]$col <- c("#377eb8", 
++     "green", "#006400", "#000080", "#ff7f00", "#f781bf", "#984ea3", 
++     "#e41a1c")
+
+> my.settings[["superpose.symbol"]]$col <- c("#377eb8", 
++     "green", "#006400", "#000080", "#ff7f00", "#f781bf", "#984ea3", 
++     "#e41a1c")
+
+> my.settings[["superpose.symbol"]]$pch <- c(rep(1, 
++     4), rep(2, 2), rep(3, 2))
+
+> xyplot(coverage ~ rho | dist, groups = ~factor(vcov), 
++     data = s02, subset = par != "(Intercept)", ylim = c(0.5, 
++         1), type = "b", xla .... [TRUNCATED] 
+
+> s33 <- na.omit(s33)
+
+> my.settings <- canonical.theme(color = TRUE)
+
+> my.settings[["strip.background"]]$col <- "gray"
+
+> my.settings[["strip.border"]]$col <- "black"
+
+> my.settings[["superpose.line"]]$lwd <- 1
+
+> s33$vcov <- factor(s33$vcov, levels(s33$vcov)[c(2, 
++     1, 4, 3)])
+
+> my.settings[["superpose.line"]]$col <- c("#377eb8", 
++     "#000080", "#ff7f00", "#f781bf")
+
+> my.settings[["superpose.symbol"]]$col <- c("#377eb8", 
++     "#000080", "#ff7f00", "#f781bf")
+
+> my.settings[["superpose.symbol"]]$pch <- c(rep(1, 
++     2), rep(2, 2))
+
+> xyplot(coverage ~ rho | dist, groups = ~factor(vcov), 
++     data = s33, subset = par == "x1", ylim = c(0.8, 1), type = "b", 
++     xlab = expressio .... [TRUNCATED] 
+
+> my.settings <- canonical.theme(color = TRUE)
+
+> my.settings[["strip.background"]]$col <- "gray"
+
+> my.settings[["strip.border"]]$col <- "black"
+
+> my.settings[["superpose.line"]]$lwd <- 1
+
+> s04$dist <- factor(as.character(s04$dist), c("gaussian", 
++     "binomial(logit)", "poisson"))
+
+> my.settings[["superpose.line"]]$col <- c("#377eb8", 
++     "#00E5EE", "#e41a1c", "#4daf4a")
+
+> my.settings[["superpose.symbol"]]$col <- c("#377eb8", 
++     "#00E5EE", "#e41a1c", "#4daf4a")
+
+> xyplot(coverage ~ nid | dist, groups = ~factor(vcov), 
++     data = na.omit(s04), subset = par != "(Intercept)", type = "b", 
++     xlab = "G", ylab .... [TRUNCATED] 
+
+> my.settings <- canonical.theme(color = TRUE)
+
+> my.settings[["strip.background"]]$col <- "gray"
+
+> my.settings[["strip.border"]]$col <- "black"
+
+> my.settings[["superpose.line"]]$lwd <- 1
+
+> s0607$vcov <- factor(s0607$vcov, levels(s0607$vcov)[c(1, 
++     3, 2)])
+
+> my.settings[["superpose.line"]]$col <- c("#377eb8", 
++     "green", "#006400")
+
+> my.settings[["superpose.symbol"]]$col <- c("#377eb8", 
++     "green", "#006400")
+
+> xyplot(coverage ~ nround | factor(par) + factor(copula), 
++     groups = ~factor(vcov), data = na.omit(s0607), subset = par != 
++         "(Intercep ..." ... [TRUNCATED] 
+
+> my.settings <- canonical.theme(color = TRUE)
+
+> my.settings[["strip.background"]]$col <- "gray"
+
+> my.settings[["strip.border"]]$col <- "black"
+
+> my.settings[["superpose.line"]]$lwd <- 1
+
+> s08$vcov <- factor(s08$vcov, levels(s08$vcov)[c(1, 
++     3, 2)])
+
+> my.settings[["superpose.line"]]$col <- c("#377eb8", 
++     "green", "#006400")
+
+> my.settings[["superpose.symbol"]]$col <- c("#377eb8", 
++     "green", "#006400")
+
+> xyplot(coverage ~ nround | factor(par) + factor(dist), 
++     groups = ~factor(vcov), data = na.omit(s08), subset = par != 
++         "(Intercept)", .... [TRUNCATED] 
+
+ *** Run successfully completed ***
+> proc.time()
+   user  system elapsed 
+  7.492   0.748   8.240 

@@ -1,6 +1,6 @@
 
-R version 3.1.2 (2014-10-31) -- "Pumpkin Helmet"
-Copyright (C) 2014 The R Foundation for Statistical Computing
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -21,6 +21,66 @@ Type 'q()' to quit R.
 > library('sandwich')
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("InstInnovation")
+> ### * InstInnovation
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: InstInnovation
+> ### Title: Innovation and Institutional Ownership
+> ### Aliases: InstInnovation
+> ### Keywords: datasets
+> 
+> ### ** Examples
+> 
+> ## Poisson models from Table I in Aghion et al. (2013)
+> 
+> ## load data set
+> data("InstInnovation", package = "sandwich")
+> 
+> ## log-scale variable
+> InstInnovation$lograndd <- log(InstInnovation$randd)
+> InstInnovation$lograndd[InstInnovation$lograndd == -Inf] <- 0
+> 
+> ## regression formulas
+> f1 <- cites ~ institutions + log(capital/employment) + log(sales) + industry + year
+> f2 <- cites ~ institutions + log(capital/employment) + log(sales) +
++   industry + year + lograndd + drandd
+> f3 <- cites ~ institutions + log(capital/employment) + log(sales) +
++   industry + year + lograndd + drandd + dprecites + log(precites)
+> 
+> ## Poisson models
+> tab_I_3_pois <- glm(f1, data = InstInnovation, family = poisson)
+> tab_I_4_pois <- glm(f2, data = InstInnovation, family = poisson)
+> tab_I_5_pois <- glm(f3, data = InstInnovation, family = poisson)
+> 
+> ## one-way clustered covariances
+> vCL_I_3 <- vcovCL(tab_I_3_pois, cluster = InstInnovation$company)
+> vCL_I_4 <- vcovCL(tab_I_4_pois, cluster = InstInnovation$company)
+> vCL_I_5 <- vcovCL(tab_I_5_pois, cluster = InstInnovation$company)
+> 
+> ## replication of columns 3 to 5 from Table I in Aghion et al. (2013)
+> cbind(coef(tab_I_3_pois), sqrt(diag(vCL_I_3)))[2:4, ]
+                               [,1]        [,2]
+institutions            0.009687237 0.002406388
+log(capital/employment) 0.482883549 0.135953255
+log(sales)              0.820317600 0.041523405
+> cbind(coef(tab_I_4_pois), sqrt(diag(vCL_I_4)))[c(2:4, 148), ]
+                               [,1]        [,2]
+institutions            0.008460789 0.002242345
+log(capital/employment) 0.346008637 0.165274677
+log(sales)              0.349190437 0.117219737
+lograndd                0.492667825 0.140473107
+> cbind(coef(tab_I_5_pois), sqrt(diag(vCL_I_5)))[c(2:4, 148), ]
+                               [,1]        [,2]
+institutions            0.007381543 0.002443707
+log(capital/employment) 0.440056227 0.131984715
+log(sales)              0.183853108 0.063364163
+lograndd                0.008971905 0.107406681
+> 
+> 
+> 
 > cleanEx()
 > nameEx("Investment")
 > ### * Investment
@@ -279,9 +339,9 @@ detaching 'package:lmtest', 'package:zoo'
 > 
 > ### Name: bread
 > ### Title: Bread for Sandwiches
-> ### Aliases: bread bread.lm bread.mlm bread.survreg bread.coxph bread.gam
-> ###   bread.nls bread.rlm bread.hurdle bread.zeroinfl bread.mlogit
-> ###   bread.polr bread.clm
+> ### Aliases: bread bread.default bread.lm bread.mlm bread.survreg
+> ###   bread.coxph bread.gam bread.nls bread.rlm bread.hurdle bread.zeroinfl
+> ###   bread.mlogit bread.polr bread.clm
 > ### Keywords: regression
 > 
 > ### ** Examples
@@ -533,6 +593,133 @@ x           -0.04395562  0.10690628
 > 
 > 
 > cleanEx()
+> nameEx("vcovBS")
+> ### * vcovBS
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovBS
+> ### Title: (Clustered) Bootstrap Covariance Matrix Estimation
+> ### Aliases: vcovBS vcovBS.default .vcovBSenv
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## Petersen's data
+> data("PetersenCL", package = "sandwich")
+> m <- lm(y ~ x, data = PetersenCL)
+> 
+> ## comparison of different standard errors
+> set.seed(1)
+> cbind(
++   "classical" = sqrt(diag(vcov(m))),
++   "HC-cluster" = sqrt(diag(vcovCL(m, cluster = PetersenCL$firm))),
++   "BS-cluster" = sqrt(diag(vcovBS(m, cluster = PetersenCL$firm)))
++ )
+             classical HC-cluster BS-cluster
+(Intercept) 0.02835932 0.06701270 0.07067533
+x           0.02858329 0.05059573 0.04878784
+> 
+> 
+> 
+> cleanEx()
+> nameEx("vcovCL")
+> ### * vcovCL
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovCL
+> ### Title: Clustered Covariance Matrix Estimation
+> ### Aliases: vcovCL meatCL
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## Petersen's data
+> data("PetersenCL", package = "sandwich")
+> m <- lm(y ~ x, data = PetersenCL)
+> 
+> ## clustered covariances
+> ## one-way
+> vcovCL(m, cluster = PetersenCL$firm)
+              (Intercept)             x
+(Intercept)  4.490702e-03 -6.473517e-05
+x           -6.473517e-05  2.559927e-03
+> ## one-way with HC2
+> vcovCL(m, cluster = PetersenCL$firm, type = "HC2")
+              (Intercept)             x
+(Intercept)  4.494487e-03 -6.592912e-05
+x           -6.592912e-05  2.568236e-03
+> ## two-way
+> vcovCL(m, cluster = PetersenCL[, c("firm", "year")])
+              (Intercept)             x
+(Intercept)  4.233313e-03 -2.845344e-05
+x           -2.845344e-05  2.868462e-03
+> 
+> ## comparison with cross-section sandwiches
+> ## HC0
+> all.equal(sandwich(m), vcovCL(m, type = "HC0", cadjust = FALSE))
+[1] TRUE
+> ## HC2
+> all.equal(vcovHC(m, type = "HC2"), vcovCL(m, type = "HC2"))
+[1] TRUE
+> ## HC3
+> all.equal(vcovHC(m, type = "HC3"), vcovCL(m, type = "HC3"))
+[1] TRUE
+> 
+> ## Innovation data
+> data("InstInnovation", package = "sandwich")
+> 
+> ## replication of one-way clustered standard errors for model 3, Table I
+> ## and model 1, Table II in Berger et al. (2016)
+> 
+> ## count regression formula
+> f1 <- cites ~ institutions + log(capital/employment) + log(sales) + industry + year
+> 
+> ## model 3, Table I: Poisson model
+> ## one-way clustered standard errors
+> tab_I_3_pois <- glm(f1, data = InstInnovation, family = poisson)
+> vcov_pois <- vcovCL(tab_I_3_pois, InstInnovation$company)
+> sqrt(diag(vcov_pois))[2:4]
+           institutions log(capital/employment)              log(sales) 
+            0.002406388             0.135953255             0.041523405 
+> 
+> ## coefficient tables
+> if(require("lmtest")) {
++ coeftest(tab_I_3_pois, vcov = vcov_pois)[2:4, ]
++ }
+Loading required package: lmtest
+Loading required package: zoo
+
+Attaching package: 'zoo'
+
+The following objects are masked from 'package:base':
+
+    as.Date, as.Date.numeric
+
+                           Estimate  Std. Error   z value     Pr(>|z|)
+institutions            0.009687237 0.002406388  4.025634 5.682195e-05
+log(capital/employment) 0.482883549 0.135953255  3.551835 3.825545e-04
+log(sales)              0.820317600 0.041523405 19.755548 7.187199e-87
+> 
+> ## Not run: 
+> ##D ## model 1, Table II: negative binomial hurdle model
+> ##D ## (requires "pscl" or alternatively "countreg" from R-Forge)
+> ##D library("pscl")
+> ##D library("lmtest")
+> ##D tab_II_3_hurdle <- hurdle(f1, data = InstInnovation, dist = "negbin")
+> ##D #  dist = "negbin", zero.dist = "negbin", separate = FALSE)
+> ##D vcov_hurdle <- vcovCL(tab_II_3_hurdle, InstInnovation$company)
+> ##D sqrt(diag(vcov_hurdle))[c(2:4, 149:151)]
+> ##D coeftest(tab_II_3_hurdle, vcov = vcov_hurdle)[c(2:4, 149:151), ]
+> ## End(Not run)
+> 
+> 
+> 
+> cleanEx()
+
+detaching 'package:lmtest', 'package:zoo'
+
 > nameEx("vcovHAC")
 > ### * vcovHAC
 > 
@@ -631,6 +818,79 @@ x           -0.003086646  0.009584083
 > 
 > 
 > cleanEx()
+> nameEx("vcovPC")
+> ### * vcovPC
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovPC
+> ### Title: Panel-Corrected Covariance Matrix Estimation
+> ### Aliases: vcovPC meatPC
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## Petersen's data
+> data("PetersenCL", package = "sandwich")
+> m <- lm(y ~ x, data = PetersenCL)
+> 
+> ## Beck and Katz (1995) standard errors
+> ## balanced panel
+> sqrt(diag(vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)))
+(Intercept)           x 
+ 0.02220064  0.02527598 
+> 
+> ## unbalanced panel
+> PU <- subset(PetersenCL, !(firm == 1 & year == 10))
+> pu_lm <- lm(y ~ x, data = PU)
+> sqrt(diag(vcovPC(pu_lm, cluster = PU$firm, order.by = PU$year, pairwise = TRUE)))
+(Intercept)           x 
+ 0.02206979  0.02533772 
+> sqrt(diag(vcovPC(pu_lm, cluster = PU$firm, order.by = PU$year, pairwise = FALSE)))
+(Intercept)           x 
+ 0.02260277  0.02524119 
+> 
+> 
+> 
+> cleanEx()
+> nameEx("vcovPL")
+> ### * vcovPL
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovPL
+> ### Title: Clustered Covariance Matrix Estimation for panel data
+> ### Aliases: vcovPL meatPL
+> ### Keywords: regression
+> 
+> ### ** Examples
+> 
+> ## Petersen's data
+> data("PetersenCL", package = "sandwich")
+> m <- lm(y ~ x, data = PetersenCL)
+> 
+> ## Driscoll and Kraay standard errors
+> ## lag length set to: T - 1 (maximum lag length)
+> ## as proposed by Petersen (2009)
+> sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "max", adjust = FALSE)))
+(Intercept)           x 
+ 0.01618977  0.01426121 
+> 
+> ## lag length set to: floor(4 * (T / 100)^(2/9))
+> ## rule of thumb proposed by Hoechle (2007) based on Newey & West (1994)
+> sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "NW1994")))
+(Intercept)           x 
+ 0.02289115  0.02441980 
+> 
+> ## lag length set to: floor(T^(1/4))
+> ## rule of thumb based on Newey & West (1987)
+> sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "NW1987")))
+(Intercept)           x 
+ 0.02436219  0.02816896 
+> 
+> 
+> 
+> cleanEx()
 > nameEx("weightsAndrews")
 > ### * weightsAndrews
 > 
@@ -723,7 +983,7 @@ x           2.055475e-05 1.616308e-02
 > ###
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  0.992 0.04 1.04 0 0 
+Time elapsed:  8.368 0.4 8.765 0 0 
 > grDevices::dev.off()
 null device 
           1 

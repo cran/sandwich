@@ -8,7 +8,7 @@ vcovHC.default <- function(x,
 {
   type <- match.arg(type)
   rval <- meatHC(x, type = type, omega = omega)
-  if(sandwich) rval <- sandwich(x, meat = rval, ...)
+  if(sandwich) rval <- sandwich(x, meat. = rval, ...)
   return(rval)
 }
 
@@ -142,6 +142,6 @@ vcovHC.mlm <- function(x,
   colnames(rval) <- rownames(rval) <- colnames(vcov(x))
 
   ## if necessary compute full sandwich
-  if(sandwich) rval <- sandwich(x, meat = rval, ...)
+  if(sandwich) rval <- sandwich(x, meat. = rval, ...)
   return(rval)
 }
