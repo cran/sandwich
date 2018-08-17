@@ -28,6 +28,26 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
   ## be an attribute of the model...FIXME: other specifications?
   if(is.null(cluster)) cluster <- attr(x, "cluster")
 
+  ## cluster (and potentially order.by) may be a formula
+  if(inherits(cluster, "formula")) {
+    ## merge if both cluster and order.by are formula: ~ cluster + order.by
+    if(inherits(order.by, "formula")) {
+      cluster_orderby <- ~ cluster + order.by
+      cluster_orderby[[2L]][[3L]] <- order.by[[2L]]
+      cluster_orderby[[2L]][[2L]] <- cluster[[2L]]
+      cluster <- cluster_orderby
+      order.by <- NULL
+    }
+    ## get variable(s) from expanded model frame
+    cluster_tmp <- expand.model.frame(x, cluster, na.expand = FALSE)
+    cluster <- model.frame(cluster, cluster_tmp, na.action = na.pass)
+
+    ## handle omitted or excluded observations
+    if(n != NROW(cluster) && !is.null(x$na.action) && class(x$na.action) %in% c("exclude", "omit")) {
+      cluster <- cluster[-x$na.action, , drop = FALSE]
+    }
+  }
+
   ## cluster can also be a list with both indexes
   if(is.list(cluster)) {
     if(length(cluster) > 1L & is.null(order.by)) order.by <- cluster[[2L]]
@@ -48,6 +68,13 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
     ix <- sapply(ix, "[", 2L)
     ix[is.na(ix)] <- "0"
     order.by <- as.integer(ix) + 1L
+  }
+
+  ## handle omitted or excluded observations in both cluster and/or order.by
+  ## (again, in case the formula interface was not used)
+  if(any(n != c(NROW(cluster), NROW(order.by))) && !is.null(x$na.action) && class(x$na.action) %in% c("exclude", "omit")) {
+    if(n != NROW(cluster))   cluster <-  cluster[-x$na.action]
+    if(n != NROW(order.by)) order.by <- order.by[-x$na.action]
   }
 
   ## reorder scores and cluster/time variables

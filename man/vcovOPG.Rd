@@ -1,18 +1,21 @@
 \name{vcovOPG}
 \alias{vcovOPG}
-\title{Outer Product of Gradients Covariance Matrix Estimation}
+\title{Outer-Product-of-Gradients Covariance Matrix Estimation}
+
 \description{
  Outer product of gradients estimation for the covariance matrix of the coefficient estimates
  in regression models.
 }
+
 \usage{
 vcovOPG(x, adjust = FALSE, \dots)
 }
+
 \arguments{
  \item{x}{a fitted model object.}
  \item{adjust}{logical. Should a finite sample adjustment be made?
-    This amounts to multiplication with \deqn{n/(n-k)} where \deqn{n} is the
-    number of observations and \deqn{k} the number of estimated parameters.}
+    This amounts to multiplication with \eqn{n/(n-k)} where \eqn{n} is the
+    number of observations and \eqn{k} the number of estimated parameters.}
  \item{\dots}{arguments passed to the \code{\link{estfun}} function.}
 }
 

@@ -16,7 +16,7 @@ vcovHAC(x, \dots)
   data = list(), \dots)
 
 meatHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
-  adjust = TRUE, diagnostics = FALSE, ar.method = "ols", data = list())
+  adjust = TRUE, diagnostics = FALSE, ar.method = "ols", data = list(), \dots)
 }
 \arguments{
  \item{x}{a fitted model object.}
@@ -45,7 +45,8 @@ meatHAC(x, order.by = NULL, prewhite = FALSE, weights = weightsAndrews,
  \item{data}{an optional data frame containing the variables in the \code{order.by} 
     model. By default the variables are taken from the environment which
     \code{vcovHAC} is called from.}
- \item{\dots}{arguments passed to \code{\link{sandwich}}.}
+ \item{\dots}{arguments passed to \code{\link{sandwich}} (in \code{vcovHAC})
+   and \code{\link{estfun}} (in \code{meatHAC}), respectively.}
 }
 
 \details{The function \code{meatHAC} is the real work horse for estimating

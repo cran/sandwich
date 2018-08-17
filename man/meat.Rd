@@ -13,8 +13,8 @@ meat(x, adjust = FALSE, \dots)
 \arguments{
  \item{x}{a fitted model object.}
  \item{adjust}{logical. Should a finite sample adjustment be made?
-    This amounts to multiplication with \deqn{n/(n-k)} where \deqn{n} is the
-    number of observations and \deqn{k} the number of estimated parameters.}
+    This amounts to multiplication with \eqn{n/(n-k)} where \eqn{n} is the
+    number of observations and \eqn{k} the number of estimated parameters.}
  \item{\dots}{arguments passed to the \code{\link{estfun}} function.}
 }
 
@@ -22,7 +22,7 @@ meat(x, adjust = FALSE, \dots)
 details see Zeileis (2006).
 }
 
-\value{A \deqn{k \times k}{k x k} matrix corresponding containing
+\value{A \eqn{k \times k}{k x k} matrix corresponding containing
 the scaled cross products of the empirical estimating functions.}
 
 \seealso{\code{\link{sandwich}}, \code{\link{bread}}, \code{\link{estfun}}}

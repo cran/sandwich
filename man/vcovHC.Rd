@@ -15,7 +15,7 @@ vcovHC(x, \dots)
   type = c("HC3", "const", "HC", "HC0", "HC1", "HC2", "HC4", "HC4m", "HC5"),
   omega = NULL, sandwich = TRUE, \dots)
 
-meatHC(x, type = , omega = NULL)
+meatHC(x, type = , omega = NULL, \dots)
 }
 \arguments{
  \item{x}{a fitted model object.}
@@ -28,7 +28,8 @@ meatHC(x, type = , omega = NULL)
      freedom). For details see below.}
  \item{sandwich}{logical. Should the sandwich estimator be computed?
     If set to \code{FALSE} only the meat matrix is returned.}
- \item{\dots}{arguments passed to \code{\link{sandwich}}.}
+ \item{\dots}{arguments passed to \code{\link{sandwich}} (in \code{vcovHC})
+   and \code{\link{estfun}} (in \code{meatHC}), respectively.}
 }
 
 \details{The function \code{meatHC} is the real work horse for estimating
@@ -76,7 +77,7 @@ meatHC(x, type = , omega = NULL)
 
 \references{
 Cribari-Neto F. (2004), Asymptotic Inference under Heteroskedasticity
-of Unknown Form. \emph{Computational Statistics \& Data Analysis}
+of Unknown Form. \emph{Computational Statistics & Data Analysis}
 \bold{45}, 215--233.
 
 Cribari-Neto F., Da Silva W.B. (2011), A New Heteroskedasticity-Consistent

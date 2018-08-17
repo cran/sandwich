@@ -1,11 +1,13 @@
 
-R version 3.4.1 (2017-06-30) -- "Single Candle"
-Copyright (C) 2017 The R Foundation for Statistical Computing
+R version 3.5.1 (2018-07-02) -- "Feather Spray"
+Copyright (C) 2018 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
 Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
 
 R is a collaborative project with many contributors.
 Type 'contributors()' for more information and
@@ -21,6 +23,7 @@ Type 'q()' to quit R.
 > library('sandwich')
 > 
 > base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
 > cleanEx()
 > nameEx("InstInnovation")
 > ### * InstInnovation
@@ -56,9 +59,9 @@ Type 'q()' to quit R.
 > tab_I_5_pois <- glm(f3, data = InstInnovation, family = poisson)
 > 
 > ## one-way clustered covariances
-> vCL_I_3 <- vcovCL(tab_I_3_pois, cluster = InstInnovation$company)
-> vCL_I_4 <- vcovCL(tab_I_4_pois, cluster = InstInnovation$company)
-> vCL_I_5 <- vcovCL(tab_I_5_pois, cluster = InstInnovation$company)
+> vCL_I_3 <- vcovCL(tab_I_3_pois, cluster = ~ company)
+> vCL_I_4 <- vcovCL(tab_I_4_pois, cluster = ~ company)
+> vCL_I_5 <- vcovCL(tab_I_5_pois, cluster = ~ company)
 > 
 > ## replication of columns 3 to 5 from Table I in Aghion et al. (2013)
 > cbind(coef(tab_I_3_pois), sqrt(diag(vCL_I_3)))[2:4, ]
@@ -116,7 +119,7 @@ Coefficients:
 RealGNP       0.16914    0.02057   8.224 3.87e-07 ***
 RealInt      -1.00144    2.36875  -0.423    0.678    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 17.21 on 16 degrees of freedom
   (1 observation deleted due to missingness)
@@ -145,9 +148,9 @@ F-statistic: 35.03 on 2 and 16 DF,  p-value: 1.429e-06
 Loading required package: lmtest
 Loading required package: zoo
 
-Attaching package: 'zoo'
+Attaching package: ‘zoo’
 
-The following objects are masked from 'package:base':
+The following objects are masked from ‘package:base’:
 
     as.Date, as.Date.numeric
 
@@ -175,7 +178,7 @@ Loading required package: scatterplot3d
 > 
 > cleanEx()
 
-detaching 'package:scatterplot3d', 'package:lmtest', 'package:zoo'
+detaching ‘package:scatterplot3d’, ‘package:lmtest’, ‘package:zoo’
 
 > nameEx("NeweyWest")
 > ### * NeweyWest
@@ -257,7 +260,7 @@ Coefficients:
 Income       -1834.2      829.0  -2.213  0.03182 * 
 I(Income^2)   1587.0      519.1   3.057  0.00368 **
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 Residual standard error: 56.68 on 47 degrees of freedom
 Multiple R-squared:  0.6553,	Adjusted R-squared:  0.6407 
@@ -308,9 +311,9 @@ F-statistic: 44.68 on 2 and 47 DF,  p-value: 1.345e-11
 Loading required package: lmtest
 Loading required package: zoo
 
-Attaching package: 'zoo'
+Attaching package: ‘zoo’
 
-The following objects are masked from 'package:base':
+The following objects are masked from ‘package:base’:
 
     as.Date, as.Date.numeric
 
@@ -330,7 +333,7 @@ The following objects are masked from 'package:base':
 > 
 > cleanEx()
 
-detaching 'package:lmtest', 'package:zoo'
+detaching ‘package:lmtest’, ‘package:zoo’
 
 > nameEx("bread")
 > ### * bread
@@ -600,8 +603,8 @@ x           -0.04395562  0.10690628
 > 
 > ### Name: vcovBS
 > ### Title: (Clustered) Bootstrap Covariance Matrix Estimation
-> ### Aliases: vcovBS vcovBS.default .vcovBSenv
-> ### Keywords: regression
+> ### Aliases: vcovBS vcovBS.default vcovBS.lm vcovBS.glm .vcovBSenv
+> ### Keywords: regression bootstrap
 > 
 > ### ** Examples
 > 
@@ -613,12 +616,18 @@ x           -0.04395562  0.10690628
 > set.seed(1)
 > cbind(
 +   "classical" = sqrt(diag(vcov(m))),
-+   "HC-cluster" = sqrt(diag(vcovCL(m, cluster = PetersenCL$firm))),
-+   "BS-cluster" = sqrt(diag(vcovBS(m, cluster = PetersenCL$firm)))
++   "HC-cluster" = sqrt(diag(vcovCL(m, cluster = ~ firm))),
++   "BS-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm)))
 + )
              classical HC-cluster BS-cluster
 (Intercept) 0.02835932 0.06701270 0.07067533
 x           0.02858329 0.05059573 0.04878784
+> 
+> ## two-way wild cluster bootstrap with Mammen distribution
+> vcovBS(m, cluster = ~ firm + year, type = "wild-mammen")
+            (Intercept)           x
+(Intercept) 0.003535619 0.000488708
+x           0.000488708 0.002589785
 > 
 > 
 > 
@@ -641,17 +650,25 @@ x           0.02858329 0.05059573 0.04878784
 > 
 > ## clustered covariances
 > ## one-way
-> vcovCL(m, cluster = PetersenCL$firm)
+> vcovCL(m, cluster = ~ firm)
+              (Intercept)             x
+(Intercept)  4.490702e-03 -6.473517e-05
+x           -6.473517e-05  2.559927e-03
+> vcovCL(m, cluster = PetersenCL$firm) ## same
               (Intercept)             x
 (Intercept)  4.490702e-03 -6.473517e-05
 x           -6.473517e-05  2.559927e-03
 > ## one-way with HC2
-> vcovCL(m, cluster = PetersenCL$firm, type = "HC2")
+> vcovCL(m, cluster = ~ firm, type = "HC2")
               (Intercept)             x
 (Intercept)  4.494487e-03 -6.592912e-05
 x           -6.592912e-05  2.568236e-03
 > ## two-way
-> vcovCL(m, cluster = PetersenCL[, c("firm", "year")])
+> vcovCL(m, cluster = ~ firm + year)
+              (Intercept)             x
+(Intercept)  4.233313e-03 -2.845344e-05
+x           -2.845344e-05  2.868462e-03
+> vcovCL(m, cluster = PetersenCL[, c("firm", "year")]) ## same
               (Intercept)             x
 (Intercept)  4.233313e-03 -2.845344e-05
 x           -2.845344e-05  2.868462e-03
@@ -691,9 +708,9 @@ x           -2.845344e-05  2.868462e-03
 Loading required package: lmtest
 Loading required package: zoo
 
-Attaching package: 'zoo'
+Attaching package: ‘zoo’
 
-The following objects are masked from 'package:base':
+The following objects are masked from ‘package:base’:
 
     as.Date, as.Date.numeric
 
@@ -718,7 +735,7 @@ log(sales)              0.820317600 0.041523405 19.755548 7.187199e-87
 > 
 > cleanEx()
 
-detaching 'package:lmtest', 'package:zoo'
+detaching ‘package:lmtest’, ‘package:zoo’
 
 > nameEx("vcovHAC")
 > ### * vcovHAC
@@ -795,7 +812,7 @@ x 2.055475e-05 1.616308e-02
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: vcovOPG
-> ### Title: Outer Product of Gradients Covariance Matrix Estimation
+> ### Title: Outer-Product-of-Gradients Covariance Matrix Estimation
 > ### Aliases: vcovOPG
 > ### Keywords: regression ts
 > 
@@ -836,19 +853,48 @@ x           -0.003086646  0.009584083
 > 
 > ## Beck and Katz (1995) standard errors
 > ## balanced panel
-> sqrt(diag(vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)))
+> sqrt(diag(vcovPC(m, cluster = ~ firm + year)))
 (Intercept)           x 
  0.02220064  0.02527598 
 > 
 > ## unbalanced panel
 > PU <- subset(PetersenCL, !(firm == 1 & year == 10))
 > pu_lm <- lm(y ~ x, data = PU)
-> sqrt(diag(vcovPC(pu_lm, cluster = PU$firm, order.by = PU$year, pairwise = TRUE)))
+> sqrt(diag(vcovPC(pu_lm, cluster = ~ firm + year, pairwise = TRUE)))
 (Intercept)           x 
  0.02206979  0.02533772 
-> sqrt(diag(vcovPC(pu_lm, cluster = PU$firm, order.by = PU$year, pairwise = FALSE)))
+> sqrt(diag(vcovPC(pu_lm, cluster = ~ firm + year, pairwise = FALSE)))
 (Intercept)           x 
  0.02260277  0.02524119 
+> 
+> ## the following specifications of cluster/order.by are equivalent
+> vcovPC(m, cluster = ~ firm + year)
+              (Intercept)             x
+(Intercept)  4.928685e-04 -4.396037e-05
+x           -4.396037e-05  6.388754e-04
+> vcovPC(m, cluster = PetersenCL[, c("firm", "year")])
+              (Intercept)             x
+(Intercept)  4.928685e-04 -4.396037e-05
+x           -4.396037e-05  6.388754e-04
+> vcovPC(m, cluster = ~ firm, order.by = ~ year)
+              (Intercept)             x
+(Intercept)  4.928685e-04 -4.396037e-05
+x           -4.396037e-05  6.388754e-04
+> vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)
+              (Intercept)             x
+(Intercept)  4.928685e-04 -4.396037e-05
+x           -4.396037e-05  6.388754e-04
+> 
+> ## these are also the same when observations within each
+> ## cluster are already ordered
+> vcovPC(m, cluster = ~ firm)
+              (Intercept)             x
+(Intercept)  4.928685e-04 -4.396037e-05
+x           -4.396037e-05  6.388754e-04
+> vcovPC(m, cluster = PetersenCL$firm)
+              (Intercept)             x
+(Intercept)  4.928685e-04 -4.396037e-05
+x           -4.396037e-05  6.388754e-04
 > 
 > 
 > 
@@ -859,7 +905,7 @@ x           -0.003086646  0.009584083
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: vcovPL
-> ### Title: Clustered Covariance Matrix Estimation for panel data
+> ### Title: Clustered Covariance Matrix Estimation for Panel Data
 > ### Aliases: vcovPL meatPL
 > ### Keywords: regression
 > 
@@ -872,21 +918,50 @@ x           -0.003086646  0.009584083
 > ## Driscoll and Kraay standard errors
 > ## lag length set to: T - 1 (maximum lag length)
 > ## as proposed by Petersen (2009)
-> sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "max", adjust = FALSE)))
+> sqrt(diag(vcovPL(m, cluster = ~ firm + year, lag = "max", adjust = FALSE)))
 (Intercept)           x 
  0.01618977  0.01426121 
 > 
 > ## lag length set to: floor(4 * (T / 100)^(2/9))
 > ## rule of thumb proposed by Hoechle (2007) based on Newey & West (1994)
-> sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "NW1994")))
+> sqrt(diag(vcovPL(m, cluster = ~ firm + year, lag = "NW1994")))
 (Intercept)           x 
  0.02289115  0.02441980 
 > 
 > ## lag length set to: floor(T^(1/4))
 > ## rule of thumb based on Newey & West (1987)
-> sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "NW1987")))
+> sqrt(diag(vcovPL(m, cluster = ~ firm + year, lag = "NW1987")))
 (Intercept)           x 
  0.02436219  0.02816896 
+> 
+> ## the following specifications of cluster/order.by are equivalent
+> vcovPL(m, cluster = ~ firm + year)
+             (Intercept)            x
+(Intercept) 5.935164e-04 2.222292e-05
+x           2.222292e-05 7.934905e-04
+> vcovPL(m, cluster = PetersenCL[, c("firm", "year")])
+             (Intercept)            x
+(Intercept) 5.935164e-04 2.222292e-05
+x           2.222292e-05 7.934905e-04
+> vcovPL(m, cluster = ~ firm, order.by = ~ year)
+             (Intercept)            x
+(Intercept) 5.935164e-04 2.222292e-05
+x           2.222292e-05 7.934905e-04
+> vcovPL(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)
+             (Intercept)            x
+(Intercept) 5.935164e-04 2.222292e-05
+x           2.222292e-05 7.934905e-04
+> 
+> ## these are also the same when observations within each
+> ## cluster are already ordered
+> vcovPL(m, cluster = ~ firm)
+             (Intercept)            x
+(Intercept) 5.935164e-04 2.222292e-05
+x           2.222292e-05 7.934905e-04
+> vcovPL(m, cluster = PetersenCL$firm)
+             (Intercept)            x
+(Intercept) 5.935164e-04 2.222292e-05
+x           2.222292e-05 7.934905e-04
 > 
 > 
 > 
@@ -981,9 +1056,10 @@ x           2.055475e-05 1.616308e-02
 > 
 > ### * <FOOTER>
 > ###
+> cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.368 0.4 8.765 0 0 
+Time elapsed:  8.195 0.964 9.165 0 0 
 > grDevices::dev.off()
 null device 
           1 

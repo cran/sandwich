@@ -22,7 +22,7 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
   k <- NCOL(ef)
   n <- NROW(ef)
 
-  ## set up return value with correction dimension and names
+  ## set up return value with correct dimension and names
   rval <- matrix(0, nrow = k, ncol = k,
     dimnames = list(colnames(ef), colnames(ef)))
 
@@ -33,11 +33,19 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
   ## resort to cross-section if no clusters are supplied
   if (is.null(cluster)) cluster <- 1L:n
 
-  ## FIXME enforcement of factors needed?
-  ## cluster <- lapply(as.data.frame(cluster), as.factor)
-
   ## collect 'cluster' variables in a data frame
-  cluster <- as.data.frame(cluster)
+  if(inherits(cluster, "formula")) {
+    cluster_tmp <- expand.model.frame(x, cluster, na.expand = FALSE)
+    cluster <- model.frame(cluster, cluster_tmp, na.action = na.pass)
+  } else {
+    cluster <- as.data.frame(cluster)
+  }
+  
+  ## handle omitted or excluded observations
+  if((n != NROW(cluster)) && !is.null(x$na.action) && (class(x$na.action) %in% c("exclude", "omit"))) {
+    cluster <- cluster[-x$na.action, , drop = FALSE]
+  }
+  
   if(NROW(cluster) != n) stop("number of observations in 'cluster' and 'estfun()' do not match")
 
   ## for multi-way clustering: set up interaction patterns
@@ -46,8 +54,9 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
     cl <- lapply(1L:p, function(i) combn(1L:p, i, simplify = FALSE))
     cl <- unlist(cl, recursive = FALSE)
     sign <- sapply(cl, function(i) (-1L)^(length(i) + 1L))    
+    paste_ <- function(...) paste(..., sep = "_")
     for (i in (p + 1L):length(cl)) {
-      cluster <- cbind(cluster, Reduce(paste0, cluster[, cl[[i]] ])) ## faster than: interaction()
+      cluster <- cbind(cluster, Reduce(paste_, unclass(cluster[, cl[[i]] ]))) ## faster than: interaction()
     }
     if(multi0) cluster[[length(cl)]] <- 1L:n
   } else {
@@ -63,9 +72,10 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
       length(unique(cluster[[i]]))
     }
   })
-  gmin <- min(g[1L:p])
-  ## FIXME: additional argument for optionally using only smallest number of clusters?
-  if(FALSE) g[] <- gmin
+  #gmin <- min(g[1L:p])
+    ## FIXME: additional argument for optionally using only smallest number of clusters?
+    ## See also Cameron, Gelbach and Miller (2011, page 241)
+  #if(FALSE) g[] <- gmin
 
   ## type of bias correction
   if(is.null(type)) {
@@ -77,9 +87,9 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
   ## building blocks for HC2/HC3
   if(type %in% c("HC2", "HC3"))
   {
-    if(all(g == n)) {
-      h <- hatvalues(x)
-    } else {
+    if(any(g == n)) h <- hatvalues(x)
+
+    if(!all(g == n)) {
       if(!(class(x)[1L] %in% c("lm", "glm"))) warning("clustered HC2/HC3 are only applicable to (generalized) linear regression models")
 
       ## regressor matrix
@@ -114,17 +124,14 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
     ## estimating functions for aggregation by i-th clustering variable
     efi <- ef
 
-    ## adjustments for bias correction (sigh...)
-    adj <- if(type %in% c("HC0", "HC1")) {
-       if(multi0 & (i == length(cl))) {
-         if(type == "HC1") (n - k)/(n - 1L) else 1
-       } else {
-         g[i]/(g[i] - 1L)
-       }
-    } else {
-      1
-    }
-    
+    ## add cluster adjustment g/(g - 1) or not?
+    ## only exception: HC0 adjustment for multiway clustering at "last interaction"
+    adj <- if(multi0 & (i == length(cl))) {
+               if(type == "HC1") (n - k)/(n - 1L) else 1
+           } else {
+               if(cadjust) g[i]/(g[i] - 1L) else 1
+           }  
+      
     ## HC2/HC3
     if(type %in% c("HC2", "HC3")) {
       if(g[i] == n) {
@@ -149,17 +156,22 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
           efi[ij, ] <- drop(Hij %*% res[ij]) * X[ij, , drop = FALSE]
         }
       }
+
+      ## "inverse" cluster adjustment that Bell & McCaffrey (2002) and hence also
+      ## Cameron & Miller (2005, Eq. 25) recommend for HC3 (but not HC2)
+      ## -> canceled out again if cadjust = TRUE
+      efi <- sqrt((g[i] - 1L)/g[i]) * efi
     }
 
     ## aggregate within cluster levels      
-    efi <- if(g[i] < n) apply(efi, 2L, tapply, cluster[[i]], sum) else efi
+    efi <- if(g[i] < n) apply(efi, 2L, rowsum, cluster[[i]]) else efi
 
     ## aggregate across cluster variables
     rval <- rval + sign[i] * adj * crossprod(efi)/n
   }
 
+  ## HC1 adjustment with residual degrees of freedom: (n - 1)/(n - k)
   if(type == "HC1") rval <- (n - 1L)/(n - k) * rval
-  if(!cadjust) rval <- (gmin - 1L)/gmin * rval
 
   return(rval)
 }

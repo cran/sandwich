@@ -13,32 +13,32 @@
 \format{
 A data frame containing 6208 observations on 25 variables.
 \describe{
-  \item{company}{factor. company names.}
-  \item{sales}{numeric. sales (in millions of dollars).}
-  \item{acompetition}{numeric. constant inverse Lerner index.}
-  \item{competition}{numeric. varying inverse Lerner index.}
-  \item{capital}{numeric. net stock of property, plant, and equipment.}
-  \item{cites}{integer. future cite-weighted patents.}
-  \item{precites}{numeric. presample average of cite-weighted patents.}
-  \item{dprecites}{factor. indicates zero precites.}
-  \item{patents}{integer. granted patents.}
-  \item{drandd}{factor. indicates a zero R&D stock.}
+  \item{company}{factor. Company names.}
+  \item{sales}{numeric. Sales (in millions of dollars).}
+  \item{acompetition}{numeric. Constant inverse Lerner index.}
+  \item{competition}{numeric. Varying inverse Lerner index.}
+  \item{capital}{numeric. Net stock of property, plant, and equipment.}
+  \item{cites}{integer. Future cite-weighted patents.}
+  \item{precites}{numeric. Presample average of cite-weighted patents.}
+  \item{dprecites}{factor. Indicates zero precites.}
+  \item{patents}{integer. Granted patents.}
+  \item{drandd}{factor. Indicates a zero R&D stock.}
   \item{randd}{numeric. R&D stock (in millions of dollars).}
-  \item{employment}{numeric. employment (in 1000s).}
-  \item{sp500}{factor. membership of firms in the S&P500 index.}
+  \item{employment}{numeric. Employment (in 1000s).}
+  \item{sp500}{factor. Membership of firms in the S&P500 index.}
   \item{tobinq}{numeric. Tobin's q.}
-  \item{value}{numeric. stock market value.}
-  \item{institutions}{numeric. proportion of stock owned by institutions.}
-  \item{industry}{factor. four-digit industry code.}
-  \item{year}{factor. estimation period.}
-  \item{top1}{numeric. share of the largest institution.}
-  \item{quasiindexed}{numeric. share of "quasi-indexed" institutional owners.}
-  \item{nonquasiindexed}{numeric. share of "non-quasi-indexed"
+  \item{value}{numeric. Stock market value.}
+  \item{institutions}{numeric. Proportion of stock owned by institutions.}
+  \item{industry}{factor. Four-digit industry code.}
+  \item{year}{factor. Estimation period.}
+  \item{top1}{numeric. Share of the largest institution.}
+  \item{quasiindexed}{numeric. Share of "quasi-indexed" institutional owners.}
+  \item{nonquasiindexed}{numeric. Share of "non-quasi-indexed"
     institutional owners.}
-  \item{transient}{numeric. share of "transient" institutional owners.}
-  \item{dedicated}{numeric. share of "dedicated" institutional owners.}
-  \item{competition4}{numeric. varying inverse Lerner index in the firm's four-digit industry.}
-  \item{subsample}{factor. subsample for the replication of columns
+  \item{transient}{numeric. Share of "transient" institutional owners.}
+  \item{dedicated}{numeric. Share of "dedicated" institutional owners.}
+  \item{competition4}{numeric. Varying inverse Lerner index in the firm's four-digit industry.}
+  \item{subsample}{factor. Subsample for the replication of columns
     1--5 from Table 4 in Aghion et al. (2013).}
 }
 }
@@ -75,7 +75,6 @@ calculated as the median gross margin from the entire Compustat database
 in the firm's three-digit industry (see Aghion et al. (2013)).
 A time-invariant measure for competition (acompetition) is constructed by averaging the
 Lerner over the sample period.
-
 
 The classification of institutions into "quasiindexed", "transient" and
 "dedicated" follows Bushee (1998) and distinguishes between institutional
@@ -134,9 +133,9 @@ tab_I_4_pois <- glm(f2, data = InstInnovation, family = poisson)
 tab_I_5_pois <- glm(f3, data = InstInnovation, family = poisson)
 
 ## one-way clustered covariances
-vCL_I_3 <- vcovCL(tab_I_3_pois, cluster = InstInnovation$company)
-vCL_I_4 <- vcovCL(tab_I_4_pois, cluster = InstInnovation$company)
-vCL_I_5 <- vcovCL(tab_I_5_pois, cluster = InstInnovation$company)
+vCL_I_3 <- vcovCL(tab_I_3_pois, cluster = ~ company)
+vCL_I_4 <- vcovCL(tab_I_4_pois, cluster = ~ company)
+vCL_I_5 <- vcovCL(tab_I_5_pois, cluster = ~ company)
 
 ## replication of columns 3 to 5 from Table I in Aghion et al. (2013)
 cbind(coef(tab_I_3_pois), sqrt(diag(vCL_I_3)))[2:4, ]

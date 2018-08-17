@@ -18,10 +18,14 @@ meatPC(x, cluster = NULL, order.by = NULL,
 
 \arguments{
   \item{x}{a fitted model object.}
-  \item{cluster}{a variable indicating the clustering of observations
-    or a \code{list} (or \code{data.frame}) thereof. By default,
-    either \code{attr(x, "cluster")} is used.}
-  \item{order.by}{a variable indicating the aggregation within time periods.}
+  \item{cluster}{a variable indicating the clustering of observations,
+    a \code{list} (or \code{data.frame}) thereof, or a formula specifying
+    which variables from the fitted model should be used (see examples).
+    By default (\code{cluster = NULL}), either \code{attr(x, "cluster")} is used
+    (if any) or otherwise every observation is assumed to be its own cluster.}
+  \item{order.by}{a variable, list/data.frame, or formula indicating the
+    aggregation within time periods. By default \code{attr(x, "order.by")} is used
+    (if any) or otherwise observations within clusters are assumed to be ordered.}
   \item{pairwise}{logical. For unbalanced panels. Indicating whether
   the meat should be estimated pair- or casewise.}
   \item{sandwich}{logical. Should the sandwich estimator be computed?
@@ -50,6 +54,20 @@ meatPC(x, cluster = NULL, order.by = NULL,
   For \code{pairwise = FALSE}, a balanced subset of the panel is used,
   whereas for \code{pairwise = TRUE}, a pairwise balanced sample is
   employed.
+
+  The \code{cluster}/\code{order.by} specification can be made in a number of ways:
+  Either both can be a single variable or \code{cluster} can be a 
+  \code{list}/\code{data.frame} of two variables.
+  If \code{\link[stats]{expand.model.frame}} works for the model object \code{x},
+  the \code{cluster} (and potentially additionally \code{order.by}) can also be
+  a \code{formula}. By default (\code{cluster = NULL, order.by = NULL}),
+  \code{attr(x, "cluster")} and \code{attr(x, "order.by")} are checked and
+  used if available. If not, every observation is assumed to be its own cluster,
+  and observations within clusters are assumed to be ordered accordingly.
+  If the number of observations in the model \code{x} is smaller than in the
+  original \code{data} due to \code{NA} processing, then the same \code{NA} processing
+  can be applied to \code{cluster} if necessary (and \code{x$na.action} being
+  available).
 }
 
 \value{
@@ -57,17 +75,22 @@ meatPC(x, cluster = NULL, order.by = NULL,
 }
 
 \references{
-Bailey D & Katz JN (2011).
-\dQuote{Implementing Panel-Corrected Standard Errors in R: The pcse Package},
-\emph{Journal of Statistical Software, Code Snippets}, \bold{42}(1), 1--11.
-URL \url{http://www.jstatsoft.org/v42/c01/}
+Bailey D, Katz JN (2011).
+  \dQuote{Implementing Panel-Corrected Standard Errors in R: The pcse Package},
+  \emph{Journal of Statistical Software, Code Snippets}, \bold{42}(1), 1--11.
+  \url{http://www.jstatsoft.org/v42/c01/}
   
-Beck N & Katz JN (1995).
-\dQuote{What To Do (and Not To Do) with Time-Series-Cross-Section Data
-  in Comparative Politics},
-\emph{American Political Science Review}, \bold{89}(3), 634--647.
-URL \url{http://www.jstor.org/stable/2082979}
+Beck N, Katz JN (1995).
+  \dQuote{What To Do (and Not To Do) with Time-Series-Cross-Section Data in Comparative Politics},
+  \emph{American Political Science Review}, \bold{89}(3), 634--647.
+  \url{http://www.jstor.org/stable/2082979}
   
+Berger S, Graham N, Zeileis A (2017).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  Technical Report 2017-12,
+  \emph{Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.}
+  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12}.
+
 Zeileis A (2004).
   \dQuote{Econometric Computing with HC and HAC Covariance Matrix Estimator},
   \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
@@ -79,6 +102,8 @@ Zeileis A (2006).
   \doi{10.18637/jss.v016.i09}
 }
 
+\seealso{\code{\link{vcovCL}}, \code{\link{vcovPL}}}
+
 \examples{
 ## Petersen's data
 data("PetersenCL", package = "sandwich")
@@ -86,13 +111,24 @@ m <- lm(y ~ x, data = PetersenCL)
 
 ## Beck and Katz (1995) standard errors
 ## balanced panel
-sqrt(diag(vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)))
+sqrt(diag(vcovPC(m, cluster = ~ firm + year)))
 
 ## unbalanced panel
 PU <- subset(PetersenCL, !(firm == 1 & year == 10))
 pu_lm <- lm(y ~ x, data = PU)
-sqrt(diag(vcovPC(pu_lm, cluster = PU$firm, order.by = PU$year, pairwise = TRUE)))
-sqrt(diag(vcovPC(pu_lm, cluster = PU$firm, order.by = PU$year, pairwise = FALSE)))
+sqrt(diag(vcovPC(pu_lm, cluster = ~ firm + year, pairwise = TRUE)))
+sqrt(diag(vcovPC(pu_lm, cluster = ~ firm + year, pairwise = FALSE)))
+
+## the following specifications of cluster/order.by are equivalent
+vcovPC(m, cluster = ~ firm + year)
+vcovPC(m, cluster = PetersenCL[, c("firm", "year")])
+vcovPC(m, cluster = ~ firm, order.by = ~ year)
+vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)
+
+## these are also the same when observations within each
+## cluster are already ordered
+vcovPC(m, cluster = ~ firm)
+vcovPC(m, cluster = PetersenCL$firm)
 }
 
 \keyword{regression}

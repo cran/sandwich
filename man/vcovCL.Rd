@@ -16,12 +16,13 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
 
 \arguments{
   \item{x}{a fitted model object.}
-  \item{cluster}{a variable indicating the clustering of observations
-    or a \code{list} (or \code{data.frame}) thereof. By default,
-    either \code{attr(x, "cluster")} is used. If that is also \code{NULL}
-    each observation is its own cluster.}
+  \item{cluster}{a variable indicating the clustering of observations,
+    a \code{list} (or \code{data.frame}) thereof, or a formula specifying
+    which variables from the fitted model should be used (see examples).
+    By default (\code{cluster = NULL}), either \code{attr(x, "cluster")} is used
+    (if any) or otherwise every observation is assumed to be its own cluster.}
   \item{type}{a character string specifying the estimation type (HC0--HC3). 
-    The default is to use \code{"HC1"} for \code{"lm"} objects and
+    The default is to use \code{"HC1"} for \code{lm} objects and
     \code{"HC0"} otherwise.}
   \item{sandwich}{logical. Should the sandwich estimator be computed?
     If set to \code{FALSE} only the meat matrix is returned.}
@@ -43,8 +44,8 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   
   The function \code{meatCL} is the work horse for estimating
   the meat of clustered sandwich estimators. \code{vcovCL} is a wrapper calling
-  \code{\link{sandwich}} and \code{\link{bread}} (Zeileis 2006). \code{vcovCL} is applicable beyond \code{lm} or \code{glm} class objects.
-  
+  \code{\link{sandwich}} and \code{\link{bread}} (Zeileis 2006).
+  \code{vcovCL} is applicable beyond \code{lm} or \code{glm} class objects.
 
   \code{\link{bread}} and \code{\link{meat}} matrices are multiplied to
   construct clustered sandwich estimators.
@@ -53,28 +54,36 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   all individuals, first sum over cluster.
  
   A two-way clustered sandwich estimator \eqn{M} (e.g., for cluster dimensions
-  "firm" and "industry") is a linear combination of
+  "firm" and "industry" or "id" and "time") is a linear combination of
   one-way clustered sandwich estimators for both dimensions
-  (\eqn{M_{firm}, M_{time}}) minus the
+  (\eqn{M_{id}, M_{time}}) minus the
   clustered sandwich estimator, with clusters formed out of the
   intersection of both dimensions (\eqn{M_{id \cap time}}):
   \deqn{M = M_{id} + M_{time} - M_{id \cap time}}
-  Instead of substracting \eqn{M_{id \cap time}} as the last
-  substacted matrix, Ma (2014) suggests to substract the basic HC0
+  Additionally, each of the three terms can be weighted by the corresponding
+  cluster bias adjustment factor (see below and Equation 20 in Berger et al. 2017).
+  Instead of subtracting \eqn{M_{id \cap time}} as the last
+  subtracted matrix, Ma (2014) suggests to subtract the basic HC0
   covariance matrix when only a single observation is in each
   intersection of \eqn{id}  and \eqn{time}.
-  Set \code{multi0 = TRUE} to substract the basic HC0 covariance matrix as
-  the last substracted matrix in multi-way clustering. For details,
+  Set \code{multi0 = TRUE} to subtract the basic HC0 covariance matrix as
+  the last subtracted matrix in multi-way clustering. For details,
   see also Petersen (2009) and Thompson (2011).
   
   With the \code{type} argument, HC0 to HC3 types of
-  bias adjustment can be employed.
+  bias adjustment can be employed, following the terminology used by
+  MacKinnon and White (1985) for heteroskedasticity corrections. HC0 applies no small sample bias adjustment.
+  HC1 applies a degrees of freedom-based correction, \eqn{(n-1)/(n-k)} where \eqn{n} is the
+  number of observations and \eqn{k} is the number of explanatory or predictor variables in the model.
+  HC1 is the most commonly used approach, and is the default, though it is less effective
+  than HC2 and HC3 when the number of clusters is relatively small (Cameron et al. 2008).
   HC2 and HC3 types of bias adjustment are geared towards the linear
-  model, but they are also applicable for GLMs (see Mc Caffrey and Bell
-  (2002) and Kauermann and Carroll (2001) for details).
-  A precondition for HC2 and HC3 types of bias adjustment is the existence
-  of a hat matrix or a weighted version of the hat matrix for GLMs,
-  respectively.
+  model, but they are also applicable for GLMs (see Bell and McCaffrey
+  2002, and Kauermann and Carroll 2001, for details).
+  A precondition for HC2 and HC3 types of bias adjustment is the availability
+  of a hat matrix (or a weighted version therof for GLMs) and hence
+  these two types are currently only implemented for \code{\link{lm}}
+  and \code{\link{glm}} objects.
   
   The \code{cadjust} argument allows to
   switch the cluster bias adjustment factor \eqn{G/(G-1)} on and
@@ -82,13 +91,21 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   See Cameron et al. (2008) and Cameron et al. (2011) for more details about
   small-sample modifications.
 
-  Cameron et al. (2011) observe that sometimes the covariance matrix is
-  not positive-semidefinite. To force the covariance matrix to be
-  positive-semidefinite, set
-  \code{fix = TRUE}. Following Cameron et al. (2011), the eigendecomposition of the estimated
-  covariance matrix is used and any negative eigenvalue(s) are converted to zero.
+  The \code{cluster} specification can be made in a number of ways: The \code{cluster}
+  can be a single variable or a \code{list}/\code{data.frame} of multiple
+  clustering variables. If \code{\link[stats]{expand.model.frame}} works
+  for the model object \code{x}, the \code{cluster} can also be a \code{formula}.
+  By default (\code{cluster = NULL}), \code{attr(x, "cluster")} is checked and
+  used if available. If not, every observation is assumed to be its own cluster.
+  If the number of observations in the model \code{x} is smaller than in the
+  original \code{data} due to \code{NA} processing, then the same \code{NA} processing
+  can be applied to \code{cluster} if necessary (and \code{x$na.action} being
+  available).
 
-  
+  Cameron et al. (2011) observe that sometimes the covariance matrix is
+  not positive-semidefinite and recommend to employ the eigendecomposition of the estimated
+  covariance matrix, setting any negative eigenvalue(s) to zero. This fix
+  is applied, if necessary, when \code{fix = TRUE} is specified.
 }
 
 \value{
@@ -96,19 +113,29 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
 }
 
 \references{
-Cameron AC & Gelbach JB & Miller DL (2008).
+Bell RM, McCaffrey DF (2002).
+  \dQuote{Bias Reduction in Standard Errors for Linear Regression with Multi-Stage Samples},
+  \emph{Survey Methodology}, \bold{28}(2), 169--181.
+
+Berger S, Graham N, Zeileis A (2017).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  Technical Report 2017-12,
+  \emph{Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.}
+  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12}.
+
+Cameron AC, Gelbach JB, Miller DL (2008).
   \dQuote{Bootstrap-Based Improvements for Inference with Clustered Errors},
   \emph{The Review of Economics and Statistics}, \bold{90}(3),
   414--427.
   \doi{10.3386/t0344}
   
-Cameron AC & Gelbach JB & Miller DL (2011).
-  \dQuote{Robust Inference With Multiway Clustering},
+Cameron AC, Gelbach JB, Miller DL (2011).
+  \dQuote{Robust Inference with Multiway Clustering},
   \emph{Journal of Business & Ecomomic Statistics}, \bold{29}(2),
   238--249.
   \doi{10.1198/jbes.2010.07136}
   
-Kauermann G & Carroll RJ (2001).
+Kauermann G, Carroll RJ (2001).
   \dQuote{A Note on the Efficiency of Sandwich Covariance Matrix
     Estimation},
   \emph{Journal of the American Statistical Association},
@@ -121,10 +148,10 @@ Ma MS (2014).
   \emph{Mimeo, Availlable at SSRN:}
    URL \url{http://ssrn.com/abstract=2420421}.
 
-McCaffrey DF & Bell RM (2002).
-  \dQuote{Bias Reduction in Standard Errors for Linear Regression with
-    Multi-Stage Samples},
-  \emph{Survey Methodology}, \bold{28}(2), 169--181.
+MacKinnon, JG, White, H (1985). 
+  \dQuote{Some heteroskedasticity-consistent covariance matrix estimators with improved finite sample properties}
+  \emph{Journal of Econometrics}, \bold{29}(3), 305--325.
+  \doi{10.1016/0304-4076(85)90158-7}
   
 Petersen MA (2009).
   \dQuote{Estimating Standard Errors in Finance Panel Data Sets: Comparing Approaches},
@@ -157,11 +184,13 @@ m <- lm(y ~ x, data = PetersenCL)
 
 ## clustered covariances
 ## one-way
-vcovCL(m, cluster = PetersenCL$firm)
+vcovCL(m, cluster = ~ firm)
+vcovCL(m, cluster = PetersenCL$firm) ## same
 ## one-way with HC2
-vcovCL(m, cluster = PetersenCL$firm, type = "HC2")
+vcovCL(m, cluster = ~ firm, type = "HC2")
 ## two-way
-vcovCL(m, cluster = PetersenCL[, c("firm", "year")])
+vcovCL(m, cluster = ~ firm + year)
+vcovCL(m, cluster = PetersenCL[, c("firm", "year")]) ## same
 
 ## comparison with cross-section sandwiches
 ## HC0

@@ -4,16 +4,6 @@ bread <- function(x, ...)
 }
 
 bread.default <- function(x, ...) {
-  nobs0   <- function(x, ...) {
-    nobs1 <- if("stats4" %in% loadedNamespaces()) stats4::nobs else nobs
-    nobs2 <- function(x, ...) NROW(residuals(x, ...))
-    rval <- try(nobs1(x, ...), silent = TRUE)
-    if(inherits(rval, "try-error") | is.null(rval)) rval <- nobs2(x, ...)
-    return(rval)
-  }
-  vcov0   <- if(!is.null(vcov)) vcov else {
-    if("stats4" %in% loadedNamespaces()) stats4::vcov else stats::vcov
-  }
   nobs0(x) * vcov0(x, ...)
 }
 

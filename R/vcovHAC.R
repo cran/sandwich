@@ -25,14 +25,14 @@ vcovHAC.default <- function(x, order.by = NULL, prewhite = FALSE,
 
 meatHAC <- function(x, order.by = NULL, prewhite = FALSE,
   weights = weightsAndrews, adjust = TRUE, diagnostics = FALSE,
-  ar.method = "ols", data = list())
+  ar.method = "ols", data = list(), ...)
 {
   ## ensure that NAs are omitted
   if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
 
   prewhite <- as.integer(prewhite)
 
-  umat <- estfun(x)[, , drop = FALSE]
+  umat <- estfun(x, ...)[, , drop = FALSE]
   if(is.zoo(umat)) umat <- as.matrix(coredata(umat))
   n.orig <- n <- nrow(umat)
   k <- ncol(umat)

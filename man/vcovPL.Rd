@@ -3,7 +3,7 @@
 \alias{meatPL}
 
 
-\title{Clustered Covariance Matrix Estimation for panel data}
+\title{Clustered Covariance Matrix Estimation for Panel Data}
 
 \description{
   Estimation of sandwich covariances a la Newey-West (1987)
@@ -21,11 +21,14 @@ meatPL(x, cluster = NULL, order.by = NULL,
 
 \arguments{
   \item{x}{a fitted model object.}
-  \item{cluster}{a variable indicating the clustering of observations
-    or a \code{list} (or \code{data.frame}) thereof. By default,
-    either \code{attr(x, "cluster")} is used. If that is also \code{NULL}
-    each observation is its own cluster.}
-  \item{order.by}{a variable indicating the aggregation within time periods.}
+  \item{cluster}{a variable indicating the clustering of observations,
+    a \code{list} (or \code{data.frame}) thereof, or a formula specifying
+    which variables from the fitted model should be used (see examples).
+    By default (\code{cluster = NULL}), either \code{attr(x, "cluster")} is used
+    (if any) or otherwise every observation is assumed to be its own cluster.}
+  \item{order.by}{a variable, list/data.frame, or formula indicating the
+    aggregation within time periods. By default \code{attr(x, "order.by")} is used
+    (if any) or otherwise observations within clusters are assumed to be ordered.}
   \item{kernel}{a character specifying the kernel used. All kernels
     described in Andrews (1991) are supported, see \code{\link{kweights}}.}
   \item{lag}{character or numeric, indicating the lag length used.
@@ -66,10 +69,22 @@ meatPL(x, cluster = NULL, order.by = NULL,
   Default lag length is the \code{"NW1987"}. 
   For \code{lag = "NW1987"}, the lag length is chosen from the heuristic
   \eqn{floor[T^{(1/4)}]}. More details on lag length selection in Hoechle (2007). 
-  For \code{lag = "NW1994"},
-  the lag length is taken from the first step of Newey and West's
-  (1994) plug-in procedure.
+  For \code{lag = "NW1994"}, the lag length is taken from the first step
+  of Newey and West's (1994) plug-in procedure.
   
+  The \code{cluster}/\code{order.by} specification can be made in a number of ways:
+  Either both can be a single variable or \code{cluster} can be a 
+  \code{list}/\code{data.frame} of two variables.
+  If \code{\link[stats]{expand.model.frame}} works for the model object \code{x},
+  the \code{cluster} (and potentially additionally \code{order.by}) can also be
+  a \code{formula}. By default (\code{cluster = NULL, order.by = NULL}),
+  \code{attr(x, "cluster")} and \code{attr(x, "order.by")} are checked and
+  used if available. If not, every observation is assumed to be its own cluster,
+  and observations within clusters are assumed to be ordered accordingly.
+  If the number of observations in the model \code{x} is smaller than in the
+  original \code{data} due to \code{NA} processing, then the same \code{NA} processing
+  can be applied to \code{cluster} if necessary (and \code{x$na.action} being
+  available).
 }
 
 \value{
@@ -78,26 +93,30 @@ meatPL(x, cluster = NULL, order.by = NULL,
 
 \references{
 Andrews DWK (1991).
-\dQuote{Heteroscedasticity and Autocorrelation Consistent Covariance
-  Matrix Estimation},
-\emph{Econometrica}, 817--858.
+  \dQuote{Heteroscedasticity and Autocorrelation Consistent Covariance Matrix Estimation},
+  \emph{Econometrica}, 817--858.
+
+Berger S, Graham N, Zeileis A (2017).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  Technical Report 2017-12,
+  \emph{Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.}
+  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12}.
 
 Driscoll JC &  Kraay AC (1998).
-\dQuote{Consistent Covariance Matrix Estimation with Spatially Dependent
-Panel Data},
-\emph{The Review of Economics and Statistics}, \bold{80}(4), 549--560.
+  \dQuote{Consistent Covariance Matrix Estimation with Spatially Dependent Panel Data},
+  \emph{The Review of Economics and Statistics}, \bold{80}(4), 549--560.
 
 Hoechle D (2007).
-\dQuote{Robust Standard Errors for Panel Regressions with Cross-Sectional Dependence},
-\emph{Stata Journal}, \bold{7}(3), 281--312.
+  \dQuote{Robust Standard Errors for Panel Regressions with Cross-Sectional Dependence},
+  \emph{Stata Journal}, \bold{7}(3), 281--312.
 
 Newey WK & West KD (1987).
-\dQuote{Hypothesis Testing with Efficient Method of Moments Estimation},
-\emph{International Economic Review}, 777-787.
+  \dQuote{Hypothesis Testing with Efficient Method of Moments Estimation},
+  \emph{International Economic Review}, 777-787.
 
 Newey WK & West KD (1994).
-\dQuote{Automatic Lag Selection in Covariance Matrix Estimation},
-\emph{The Review of Economic Studies}, \bold{61}(4), 631--653.
+  \dQuote{Automatic Lag Selection in Covariance Matrix Estimation},
+  \emph{The Review of Economic Studies}, \bold{61}(4), 631--653.
   
 White H (1980).
   \dQuote{A Heteroskedasticity-Consistent Covariance Matrix Estimator and a Direct Test for Heteroskedasticity},
@@ -115,7 +134,7 @@ Zeileis A (2006).
   \doi{10.18637/jss.v016.i09}
 }
 
-\seealso{\code{\link{vcovCL}}}
+\seealso{\code{\link{vcovCL}}, \code{\link{vcovPC}}}
 
 \examples{
 ## Petersen's data
@@ -125,15 +144,26 @@ m <- lm(y ~ x, data = PetersenCL)
 ## Driscoll and Kraay standard errors
 ## lag length set to: T - 1 (maximum lag length)
 ## as proposed by Petersen (2009)
-sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "max", adjust = FALSE)))
+sqrt(diag(vcovPL(m, cluster = ~ firm + year, lag = "max", adjust = FALSE)))
 
 ## lag length set to: floor(4 * (T / 100)^(2/9))
 ## rule of thumb proposed by Hoechle (2007) based on Newey & West (1994)
-sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "NW1994")))
+sqrt(diag(vcovPL(m, cluster = ~ firm + year, lag = "NW1994")))
 
 ## lag length set to: floor(T^(1/4))
 ## rule of thumb based on Newey & West (1987)
-sqrt(diag(vcovPL(m, cluster = PetersenCL$firm, lag = "NW1987")))
+sqrt(diag(vcovPL(m, cluster = ~ firm + year, lag = "NW1987")))
+
+## the following specifications of cluster/order.by are equivalent
+vcovPL(m, cluster = ~ firm + year)
+vcovPL(m, cluster = PetersenCL[, c("firm", "year")])
+vcovPL(m, cluster = ~ firm, order.by = ~ year)
+vcovPL(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)
+
+## these are also the same when observations within each
+## cluster are already ordered
+vcovPL(m, cluster = ~ firm)
+vcovPL(m, cluster = PetersenCL$firm)
 }
 
 \keyword{regression}
