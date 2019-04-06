@@ -514,6 +514,7 @@ x -0.2938577  2.0823419
 > 
 > ### ** Examples
 > 
+> suppressWarnings(RNGversion("3.5.0"))
 > set.seed(1)
 > ## iid series (with variance of mean 1/n)
 > ## and Andrews kernel HAC (with prewhitening)
@@ -613,6 +614,7 @@ x           -0.04395562  0.10690628
 > m <- lm(y ~ x, data = PetersenCL)
 > 
 > ## comparison of different standard errors
+> suppressWarnings(RNGversion("3.5.0"))
 > set.seed(1)
 > cbind(
 +   "classical" = sqrt(diag(vcov(m))),

@@ -9,7 +9,7 @@ vcovPC <- function(x, cluster = NULL, order.by = NULL, pairwise = FALSE, sandwic
   ## check (and fix) if sandwich is not positive semi-definite
   if (fix && any((eig <- eigen(rval, symmetric = TRUE))$values < 0)) {
     eig$values <- pmax(eig$values, 0)
-    rval <- crossprod(sqrt(eig$values) * t(eig$vectors))
+    rval[] <- crossprod(sqrt(eig$values) * t(eig$vectors))
   }
   return(rval)
 }

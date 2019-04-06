@@ -549,6 +549,7 @@ After setting the random seed for reproducibility, we draw 250 observations
 from this model:
 
 <<dgp>>=
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(123)
 x <- rnorm(250)
 y <- rnbinom(250, mu = exp(1 + x), size = 1)

@@ -51,6 +51,7 @@ arrows(30, 39, 47.5, 21, lwd = 1.5, length = 0.15, angle = 20)
 ###################################################
 ### code chunk number 3: dgp
 ###################################################
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(123)
 x <- rnorm(250)
 y <- rnbinom(250, mu = exp(1 + x), size = 1)
@@ -84,7 +85,7 @@ coeftest(fm_nbin)
 
 
 ###################################################
-### code chunk number 8: sandwich-OOP.Rnw:626-631
+### code chunk number 8: sandwich-OOP.Rnw:627-632
 ###################################################
 library("AER")
 data("Affairs", package = "AER")
@@ -94,14 +95,14 @@ fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + religiousness + occupatio
 
 
 ###################################################
-### code chunk number 9: sandwich-OOP.Rnw:638-640
+### code chunk number 9: sandwich-OOP.Rnw:639-641
 ###################################################
 coeftest(fm_tobit)
 coeftest(fm_tobit, vcov = sandwich)
 
 
 ###################################################
-### code chunk number 10: sandwich-OOP.Rnw:648-650
+### code chunk number 10: sandwich-OOP.Rnw:649-651
 ###################################################
 coeftest(fm_probit)
 coeftest(fm_probit, vcov = sandwich)

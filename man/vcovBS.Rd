@@ -201,6 +201,7 @@ data("PetersenCL", package = "sandwich")
 m <- lm(y ~ x, data = PetersenCL)
 
 ## comparison of different standard errors
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(1)
 cbind(
   "classical" = sqrt(diag(vcov(m))),

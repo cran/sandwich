@@ -41,6 +41,7 @@ lrvar(x, type = c("Andrews", "Newey-West"), prewhite = TRUE, adjust = TRUE, \dot
 \seealso{\code{\link{kernHAC}}, \code{\link{NeweyWest}}, \code{\link{vcovHAC}}}
 
 \examples{
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(1)
 ## iid series (with variance of mean 1/n)
 ## and Andrews kernel HAC (with prewhitening)

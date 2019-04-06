@@ -1,3 +1,13 @@
+Changes in Version 2.5-1
+
+  o In various vcov*() functions assuring that the variance-covariance matrix is
+    positive-definite (via fix=TRUE) erroneously dropped the dimnames. Now these
+    are properly preserved. (Reported by Joe Ritter.)
+
+  o Added suppressWarnings(RNGversion("3.5.0")) in those places where set.seed()
+    was used to assure exactly reproducible results from R 3.6.0 onwards.
+
+
 Changes in Version 2.5-0
 
   o Enhanced vignette("sandwich-CL", package = "sandwich") by better describing

@@ -12,36 +12,34 @@
 \Plaintitle{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R}
 \Shorttitle{Various Versatile Variances}
 
-\Keywords{clustered data, clustered covariance matrix estimators, object orientation, simulation, \proglang{R}}
-\Plainkeywords{clustered data, clustered covariance matrix estimators, object orientation, simulation, R}
+\Keywords{clustered data, covariance matrix estimator, object orientation, simulation, \proglang{R}}
+\Plainkeywords{clustered data, covariance matrix estimator, object orientation, simulation, R}
 
 \Abstract{
   Clustered covariances or clustered standard errors are very widely used to
   account for correlated or clustered data, especially in economics, political
-  sciences, or other social sciences. They are employed to adjust the inference
+  sciences, and other social sciences. They are employed to adjust the inference
   following estimation of a standard least-squares regression or generalized
   linear model estimated by maximum likelihood. Although many publications just
   refer to ``the'' clustered standard errors, there is a surprisingly wide
   variety of clustered covariances, particularly due to different flavors of
   bias corrections. Furthermore, while the linear regression model is certainly
   the most important application case, the same strategies can be employed in
-  more general models (e.g. for zero-inflated, censored, or limited responses).
-
+  more general models (e.g., for zero-inflated, censored, or limited responses).
+%
   In \proglang{R}, functions for covariances in clustered or panel models have been
   somewhat scattered or available only for certain modeling functions, notably
   the (generalized) linear regression model. In contrast, an object-oriented
   approach to ``robust'' covariance matrix estimation -- applicable beyond
   \code{lm()} and \code{glm()} -- is available in the \pkg{sandwich} package but
-  has been limited to the case of cross-section or time series data. Now,
-  this shortcoming has been corrected in \pkg{sandwich} (starting from
-  version~2.4.0): Based on methods for two generic functions (\code{estfun()} and
-  \code{bread()}), clustered and panel covariances are now provided in
-  \code{vcovCL()}, \code{vcovPL()}, and \code{vcovPC()}. 
-  Moreover, clustered bootstrap covariances, based on \code{update()} for models on bootstrap samples
-  of the data, are provided in \code{vcovBS()}.
-  These are directly
-  applicable to models from many packages, e.g., including \pkg{MASS}, \pkg{pscl}, \pkg{countreg},
-  \pkg{betareg}, among others. Some empirical illustrations are provided
+  has been limited to the case of cross-section or time series data. Starting with
+  \pkg{sandwich}~2.4.0, this shortcoming has been corrected: Based on methods for
+  two generic functions (\code{estfun()} and \code{bread()}), clustered and panel
+  covariances are provided in \code{vcovCL()}, \code{vcovPL()}, and \code{vcovPC()}. 
+  Moreover, clustered bootstrap covariances are provided in \code{vcovBS()},
+  using model \code{update()} on bootstrap samples. These are directly
+  applicable to models from packages including \pkg{MASS}, \pkg{pscl}, \pkg{countreg},
+  and \pkg{betareg}, among many others. Some empirical illustrations are provided
   as well as an assessment of the methods' performance in a simulation study.
 }
 
@@ -52,7 +50,7 @@
   Universit\"at Innsbruck\\
   Universit\"atsstr.~15\\
   6020 Innsbruck, Austria\\
-  E-mail: \email{Susanne.Berger@uibk.ac.at}, \email{Achim.Zeileis@R-project.org}\\
+  E-mail: \email{Susanne.Berger@student.uibk.ac.at}, \email{Achim.Zeileis@R-project.org}\\
   URL: \url{https://www.uibk.ac.at/statistics/personal/berger/},\\
   \phantom{URL: }\url{https://eeecon.uibk.ac.at/~zeileis/}\\
   
@@ -99,8 +97,6 @@ if(file.exists("sim-CL.rda")) {
 }
 @ 
 
-\vspace*{-0.4cm}
-
 \section{Introduction} \label{sec:intro}
 
 Observations with correlations between objects of the same group/cluster are
@@ -132,7 +128,7 @@ package \pkg{sandwich} \citep{hac:Zeileis:2004a,hac:Zeileis:2006}. Using this
 infrastructure, sandwich covariances for cross-section or time series data have
 been available for models beyond \code{lm()} or \code{glm()}, e.g., for packages
 \pkg{MASS} \citep{hac:Venables+Ripley:2002}, \pkg{pscl}/\pkg{countreg}
-\citep{hac:Zeileis+Kleiber+Jackman:2008}, \pkg{betareg}
+\citep{hac:Zeileis+Kleiber+Jackman:2008}, and \pkg{betareg}
 \citep{hac:Cribari-Neto+Zeileis:2010,hac:Gruen+Kosmidis+Zeileis:2012}, among
 many others. However, corresponding functions for clustered or panel data had
 not been available in \pkg{sandwich} but have been somewhat scattered or
@@ -256,7 +252,7 @@ sandwich that rely only on a small set of extractor functions (\code{estfun()}
 and \code{bread()}) for fitted model objects. The function \code{sandwich()}
 computes a plain sandwich estimate \citep{hac:Eicker:1963,hac:Huber:1967,hac:White:1980}
 from a fitted model object, defaulting to what is known as HC0 or HC1 in linear
-regresion models. \code{vcovHC()} is a wrapper to \code{sandwich()} combined
+regression models. \code{vcovHC()} is a wrapper to \code{sandwich()} combined
 with \code{meatHC()} and \code{bread()} to compute general HC covariances
 ranging from HC0 to HC5 \citep[see][and the references therein]{hac:Zeileis:2004a}. \code{vcovHAC()}, based on \code{sandwich()} with
 \code{meatHAC()} and \code{bread()}, computes HAC covariance matrix estimates.
@@ -276,7 +272,8 @@ Covariance estimators in \pkg{car} as well as in \pkg{sandwich} are constructed
 to insert the resulting covariance matrix estimate in different Wald-type
 inference functions, as \code{confint()} from \pkg{stats} \citep{hac:R:2018},
 \code{coeftest()} and \code{waldtest()} from \pkg{lmtest} \citep{hac:Zeileis+Hothorn:2002},
-\code{linearHypothesis()} and \code{deltaMethod()} from \pkg{car} \citep{hac:Fox+Weisberg:2011}.
+\code{Anova()}, \code{Confint()}, \code{S()}, \code{linearHypothesis()}, and \code{deltaMethod()} from \pkg{car} \citep{hac:Fox+Weisberg:2011}.
+
 
 \subsection[R packages for clustered covariances]{\proglang{R} packages for clustered covariances}
 
@@ -293,12 +290,12 @@ includes: \pkg{multiwayvcov} \citep{hac:Graham+Arai+Hagstroemer:2016},
 
 In \pkg{multiwayvcov}, the implementation was object-oriented, in many aspects
 building on \pkg{sandwich} infrastructure. However, certain details assumed
-\code{lm} or \code{glm}-like objects. In \pkg{plm} and \pkg{lfe} several
+`\code{lm}' or `\code{glm}'-like objects. In \pkg{plm} and \pkg{lfe} several
 types of sandwich covariances are available for the packages' \code{plm}
 (panel linear models) and \code{felm} (fixed-effect linear models), respectively.
 The \pkg{geepack} package can estimate independence working models for
-\code{glm}-type models, also supporting clustered covariances for the
-resulting \code{geeglm} objects. Finally, \pkg{clusterSEs} and
+`\code{glm}'-type models, also supporting clustered covariances for the
+resulting `\code{geeglm}' objects. Finally, \pkg{clusterSEs} and
 \pkg{clubSandwich} focus on the case of ordinary or weighted least squares
 regression models.
 
@@ -477,7 +474,7 @@ $I_{n_{g}}$ is an identity matrix of size $n_{g}$, $H_{gg}$ is the block from th
 matrix $H$ that pertains to cluster~$g$.
 In case of a linear model, the hat
 (or projection) matrix is defined as $H = X (X^\top X)^{-1} X^\top$, with model matrix $X$.
-A generalized hat matrix is available for generalized linear models.
+A generalized hat matrix is available for generalized linear models \citep[GLMs, see Equation~12.3 in][]{hac:McCullagh+Nelder:1989}.
 To apply these factors to $\hat M_\mathrm{CL}$ (Equation~\ref{eq:meatCL}), their square
 root has to be applied to each of the $\psi$ factors in the outer product
 \citep[see][Section~VI.B for the linear regression case]{hac:Cameron+Miller:2015}.
@@ -512,8 +509,7 @@ estimators to have just \code{estfun()}
 and \code{model.matrix()} extractors but an extractor for (blocks of) the full hat matrix
 are required as well. Currently, no such extractor method is available in base \proglang{R}
 (as \code{hatvalues()} just extracts $\mathrm{diag} H$) and hence HC2 and HC3 in \code{meatCL()}
-are just available for \code{lm} and \code{glm} objects.
-
+are just available for `\code{lm}' and `\code{glm}' objects.
 
 \subsubsection{Two-way and multi-way clustered covariances}
 Certainly, there can be more than one cluster dimension, as for example observations that are characterized by housholds within states or companies within industries.
@@ -642,7 +638,7 @@ into residuals and regressor matrix.
 \section{Software} \label{sec:software}
 
 As conveyed already in Section~\ref{sec:methods}, the \pkg{sandwich} package has been extended
-along the same lines it was originally established in \citep{hac:Zeileis:2006}. The new clustered
+along the same lines it was originally established in \cite{hac:Zeileis:2006}. The new clustered
 and panel covariances require a new \code{meat*()} function that ideally only extracts the
 \code{estfun()} from a fitted model object. For the full sandwich covariance an accompanying
 \code{vcov*()} function is provided that couples the \code{meat*()} with the \code{bread()} estimate
@@ -652,16 +648,15 @@ The new sandwich covariances \code{vcovCL()} for clustered data and \code{vcovPL
 as well as \code{vcovPC()} for panel-corrected covariances all follow this structure and are
 introduced in more detail below.
 
-Model classes which provide the necessary building blocks include \code{betareg},
-\code{clm}, \code{coxph}, \code{crch}, \code{glm}, \code{hurdle}, \code{lm}, \code{mlm}, \code{mlogit},
-\code{nls}, \code{polr}, \code{rlm}, \code{survreg}, or \code{zeroinfl} from packages 
-\pkg{stats} \citep{hac:R:2018}, 
-\pkg{betareg} \citep{hac:Cribari-Neto+Zeileis:2010,hac:Gruen+Kosmidis+Zeileis:2012},
-\pkg{crch} \citep{hac:Messner+Mayr+Zeileis:2016},
-\pkg{MASS} \citep{hac:Venables+Ripley:2002},
-\pkg{mlogit} \citep{hac:Croissant:2018}, 
-\pkg{ordinal} \citep{hac:Christensen:2018}, and
-\pkg{survival} \citep{hac:Therneau:2018}.
+Model classes which provide the necessary building blocks include
+`\code{lm}', `\code{glm}', `\code{mlm}', and `\code{nls}' from \pkg{stats} \citep{hac:R:2018}, 
+`\code{betareg}' from \pkg{betareg} \citep{hac:Cribari-Neto+Zeileis:2010,hac:Gruen+Kosmidis+Zeileis:2012},
+`\code{clm}' from \pkg{ordinal} \citep{hac:Christensen:2018},
+`\code{coxph}' and `\code{survreg}' from \pkg{survival} \citep{hac:Therneau:2018},
+`\code{crch}' from \pkg{crch} \citep{hac:Messner+Mayr+Zeileis:2016},
+`\code{hurdle}' and `\code{zeroinfl}' from \pkg{pscl}/\pkg{countreg} \citep{hac:Zeileis+Kleiber+Jackman:2008},
+`\code{mlogit}' from \pkg{mlogit} \citep{hac:Croissant:2018}, 
+and `\code{polr}' and `\code{rlm}' from \pkg{MASS} \citep{hac:Venables+Ripley:2002}.
 For all of these an \code{estfun()} method is available along with a \code{bread()} method
 (or the default method works). In case the models are based on a single linear predictor only,
 they also provide \code{model.matrix()} extractors so that the factorization from Equation~\ref{eq:fact}
@@ -694,9 +689,9 @@ The bias correction is composed of two parts that can be switched on and off
 separately: First, the cluster bias correction from Equation~\ref{eq:biasadjc}
 is controlled by \code{cadjust}. Second, the HC bias correction from
 Equations~\ref{eq:biasadj0}--\ref{eq:biasadj3} is specified via \code{type}
-with the default to use \code{"HC1"} for \code{lm} objects and
+with the default to use \code{"HC1"} for `\code{lm}' objects and
 \code{"HC0"} otherwise. Moreover, \code{type = "HC2"} and \code{"HC3"}
-are only available for \code{lm} and \code{glm} objects as they require
+are only available for `\code{lm}' and `\code{glm}' objects as they require
 computation of full blocks of the hat matrix (rather than just the diagonal
 elements as in \code{hatvalues()}). Hence, the hat matrices of (generalized)
 linear models are provided directly in \code{meatCL()} and are not object-oriented
@@ -764,7 +759,7 @@ if the number of lags increases with time periods $T$, but with speed less than 
 \code{"NW1994"} sets the lag length to $\mathrm{floor}[4 \cdot (\frac{T}{100})^{2/9}]$ \citep{hac:Newey+West:1994}.
 
 The \code{adjust} argument allows to make a finite sample adjustment, which
-amounts to multiplication with $n/(n - k)$, where $n$ is the number of
+amounts to multiplication by $n/(n - k)$, where $n$ is the number of
 observations, and $k$ is the number of estimated parameters.
 
 
@@ -801,7 +796,7 @@ numbers of observations.
 As an alternative to the asymptotic approaches to clustered covariances in
 \code{vcovCL()}, \code{vcovPL()}, and \code{vcovPC()}, the function
 \code{vcovBS()} provides a bootstrap solution. Currently, a default method is available as
-well as a dedicated method for \code{lm} objects with more refined bootstrapping
+well as a dedicated method for `\code{lm}' objects with more refined bootstrapping
 options. Both methods take the arguments
 %
 \begin{verbatim}
@@ -849,7 +844,7 @@ Bootstrapping also often improves inference when nonlinear models are applied to
 However, the ``xy'' bootstrap is not the only technique available, and the literature 
 has found a number of alternative bootstrapping approaches -- which make somewhat different 
 assumptions -- to be useful in practice, even for linear models applied to large samples. Hence, the 
-\code{vcovBS()} method for \code{lm} objects provides several additional bootstrapping \code{type}s and computes the 
+\code{vcovBS()} method for `\code{lm}' objects provides several additional bootstrapping \code{type}s and computes the 
 bootstrapped coefficient estimates somewhat more efficiently using \code{lm.fit()} or 
 \code{qr.coef()} rather than \code{update()}. The default \code{type}, however, is also 
 pair resampling (\code{type = "xy"}) as in the default method. Alternative \code{type} 
@@ -958,6 +953,7 @@ with ``standard'' standard errors and basic (cross-section) sandwich standard
 errors. As an additional reference, a simple clustered bootstrap covariance can
 be computed by \code{vcovBS()} (by default with \code{R = 250} bootstrap samples).
 <<innovation-se, echo=TRUE, eval=FALSE>>= 
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(0)
 vc <- list(
   "standard" = vcov(h_innov),
@@ -1002,11 +998,11 @@ p_lm <- lm(y ~ x, data = PetersenCL)
 
 One-way clustered covariances for linear regression models are available in a number of different
 \proglang{R} packages. The implementations differ mainly in two aspects: (1) Whether a simple
-``\code{lm}'' object can be supplied or (re-)estimation of a dedicated model object is necessary.
+`\code{lm}' object can be supplied or (re-)estimation of a dedicated model object is necessary.
 (2) Which kind of bias adjustment is done by default (HC type and/or cluster adjustment).
 
 The function \code{cluster.vcov()} from \pkg{multiwayvcov} (whose implementation strategy
-\code{vcovCL()} follows) can use ``\code{lm}'' objects directly and then applies both the HC1
+\code{vcovCL()} follows) can use `\code{lm}' objects directly and then applies both the HC1
 and cluster adjustment by default. In contrast, \pkg{plm} and \pkg{geepack} both require re-estimation
 of the model and then employ HC0 without cluster adjustment by default. In \pkg{plm}, a pooling
 model needs to be estimated with \code{plm()} and in \pkg{geepack} an independence working model
@@ -1021,7 +1017,7 @@ se(list(
 ))
 @ 
 And the \pkg{plm} and \pkg{geepack} results can be replicated with the following code.
-(Note that \pkg{geepack} does not provide a \code{vcov()} method for ``\code{geeglm}'' objects,
+(Note that \pkg{geepack} does not provide a \code{vcov()} method for `\code{geeglm}' objects,
 hence the necessary code is included below.)
 <<petersen-comparison2>>=
 library("plm")
@@ -1113,8 +1109,8 @@ linear models. For the linear model, there are a number of simulation studies in
 the literature \citep[including][]{hac:Cameron+Gelbach+Miller:2008,
 hac:Arceneaux+Nickerson:2009,hac:Petersen:2009,hac:Cameron+Gelbach+Miller:2011,
 hac:Harden:2011,hac:Thompson:2011,hac:Cameron+Miller:2015,hac:Jin:2015},
-far less for generalized linear models \citep[see for
-example][]{hac:Miglioretti+Heagerty:2007} and, up to our knowledge, no larger
+far fewer for generalized linear models \citep[see for
+example][]{hac:Miglioretti+Heagerty:2007} and, to our knowledge, no larger
 systematic comparisons for models beyond. Therefore, we try to fill this gap
 by starting out with simulations of (generalized) linear models similar to the
 ones mentioned above and then moving on to other types of maximum likelihood
@@ -1128,7 +1124,7 @@ most important parameters to control for this are the cluster correlation $\rho$
 and the number of clusters $G$ as bias decreases with increasing number of clusters
 \citep{hac:Green+Vavreck:2008,hac:Arceneaux+Nickerson:2009,hac:Harden:2011}. More specifically,
 the cluster correlation varies from $0$ to $0.9$ and the number of clusters $G$ ranges from
-$10$ to $50, 100, \dots, 250$.
+$10$ to $250$.
 
 In a first step, only balanced clusters with a low number of observations per cluster ($5$) are
 considered. All models are specified through linear predictors (with up to three regressors)
@@ -1198,7 +1194,7 @@ Beck and Katz panel-corrected covariances (\emph{PC}),
 and clustered covariances with HC0--HC3 adjustment (\emph{CL-0}--\emph{CL-3}).
 As further references, covariances from a clustered bootstrap (\emph{BS}),
 a mixed-effects model with random intercept (\emph{random}), and
-from a GEE with exchangeable correlation structure (\emph{gee})
+a GEE with exchangeable correlation structure (\emph{gee})
 are assessed.
 
 \subsubsection{Outcome measure}
@@ -1237,7 +1233,7 @@ The supplementary \proglang{R} script `\code{sim-CL.R}' comprises the simulation
 data generating process  described above and includes functions \code{dgp()},
 \code{fit()}, and \code{sim()}. While \code{dgp()} specifies the data generating
 process and generates a data frame with (up to) three regressors \code{x1},
-\code{x2}, \code{x3} as well as cluster dimensions \code{id} and \code{round}.
+\code{x2}, \code{x3} as well as cluster dimensions \code{id} and \code{round},
 \code{fit()} is responsible for the model estimation as well as computation of the
 covariance matrix estimate and the empirical coverage. The function \code{sim()}
 sets up all factorial combinations of the specified scenarios and loops over the fits
@@ -1457,19 +1453,26 @@ In most cases, all of the standard errors are underestimated for $G = 10$
 clusters (except clustered standard errors with HC3 bias correction for the
 binomial and Poisson response). As found in previous studies for clustered
 HC0/HC1 covariances \citep[][among
-others]{hac:Arceneaux+Nickerson:2009,hac:Petersen:2009,hac:Harden:2011,hac:Cameron+Miller:2015},
+others]{hac:Arceneaux+Nickerson:2009,hac:Petersen:2009,hac:Harden:2011,hac:Cameron+Miller:2015,hac:Pustejovsky+Tipton:2018},
 the larger the number of clusters $G$, the better the
-coverage and the less standard errors are underestimated. It can be observed
-that in our study about 50--100 clusters are enough for sufficiently accurate
-coverage rates.
+coverage and the less standard errors are underestimated. In our study about 50--100 clusters are enough for sufficiently accurate
+coverage rates using clustered standard errors without a bias correction (CL-0 in the figure), 
+which is consistent with other authors' findings.
 
 Additionally, it can be observed that the higher the number of clusters, the
 less the different types of HC bias correction differ. However, for
 a small number of clusters, the HC3 correction works best, followed by HC2, HC1
 and HC0. This is also consistent with the findings for cross-sectional data,
 e.g., \cite{hac:Long+Ervin:2000} suggest to use HC3 in the linear model for
-small samples with less than 250 observations. Moreover, bootstrap covariances
+small samples with fewer than 250 observations. Moreover, bootstrap covariances
 perform somewhat better than HC0/HC1 for a small number of clusters.
+However, \citet{hac:Pustejovsky+Tipton:2018} have argued that HC3 bias corrections for clustered covariances
+(CL-3 in the figure, sometimes referred to ``CR3'' or ``CR3VE'') tend to over-correct for small $G$, and
+recommend HC2 bias corrections (``CR2'', CL-2 in the figure) and $t$~tests using degrees of freedom calculated similar to
+\citet{hac:Satterthwaite:1946}. While Experiment IV finds that HC3 adjustments 
+slightly over-correct for $G = 10$ in binomial models, overall, our findings are 
+not consistent with the suggestion that HC3 is overly aggressive in correcting small
+$G$ bias in clustered standard errors.
 
 
 \section{Summary}
@@ -1481,7 +1484,7 @@ that were somewhat scattered over several packages, the implementation in \pkg{s
 ``flavors'' of clustered covariances and, most importantly, is applicable to any model object that provides methods
 to extract the \code{estfun()} (estimating functions; observed score matrix) and \code{bread()} (inverse Hessian).
 Therefore, it is possible to apply the new functions \code{vcovCL()}, \code{vcovPL()}, and \code{vcovPC()} to models
-beyond linear regression. A thorough Monte Carlo assesses the performance of these functions in regressions
+beyond linear regression. A thorough Monte Carlo study assesses the performance of these functions in regressions
 beyond the standard linear Gaussian scenario, e.g., for exponential family distributions and beyond and
 for the less frequently used HC2 and HC3 adjustments. This shows that clustered covariances work reasonably well
 in the models investigated but some care is needed when applying panel estimators (\code{vcovPL()} and \code{vcovPC()})
@@ -1506,8 +1509,7 @@ Package versions that have been employed are \pkg{sandwich}
 \pkg{lmtest} \Sexpr{gsub("-", "--", packageDescription("lmtest")$Version)},
 \pkg{multiwayvcov} \Sexpr{gsub("-", "--", packageDescription("multiwayvcov")$Version)},
 \pkg{plm} \Sexpr{gsub("-", "--", packageDescription("plm")$Version)},
-and \pkg{pscl} \Sexpr{gsub("-", "--", packageDescription("pscl")$Version)}
-have been used.
+and \pkg{pscl} \Sexpr{gsub("-", "--", packageDescription("pscl")$Version)}.
 
 \proglang{R} itself and all packages (except \pkg{countreg}) used are available from
 CRAN at \url{https://CRAN.R-project.org/}. 
@@ -1564,8 +1566,9 @@ instead of an exchangeable correlation structure.
 
 Figure~\ref{fig:sim-0607} shows the results from a supplementary simulation
 experiment that is analogous to Experiment~I. The two differences are:
-(1)~The cluster correlation $\rho = 0.25$ is fixed and the number of observations
-per cluster is increased from $5$ up to $50$. (2)~Additionally, an AR(1)
+(1)~The number of observations per cluster is increased from $5$ up to $50$
+and the cluster correlation is fixed at $\rho = 0.25$ (with higher values leading
+to qualitatively the same results). (2)~Additionally, an AR(1)
 correlation structure is considered. Somewhat surprisingly, the standard
 clustered HC0 covariance performs satisfactorily in all scenarios and better
 than the panel estimators (PL and PC). The latter approach the desired coverage

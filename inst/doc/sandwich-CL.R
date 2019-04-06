@@ -48,6 +48,7 @@ coeftest(h_innov, vcov = vcovCL, cluster = ~ company)
 ###################################################
 ### code chunk number 4: innovation-se (eval = FALSE)
 ###################################################
+## suppressWarnings(RNGversion("3.5.0"))
 ## set.seed(0)
 ## vc <- list(
 ##   "standard" = vcov(h_innov),

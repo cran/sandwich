@@ -365,6 +365,7 @@ h_innov <- hurdle(
   cites ~ institutions + log(capital/employment) + log(sales),
   data = InstInnovation, dist = "negbin")
 
+suppressWarnings(RNGversion("3.5.0"))
 set.seed(0)
 vc_innov <- list(
   "standard" = vcov(h_innov),
