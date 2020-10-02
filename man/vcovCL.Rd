@@ -1,6 +1,7 @@
 \name{vcovCL}
 \alias{vcovCL}
 \alias{meatCL}
+\encoding{UTF-8}
 
 \title{Clustered Covariance Matrix Estimation}
 
@@ -61,7 +62,7 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   intersection of both dimensions (\eqn{M_{id \cap time}}):
   \deqn{M = M_{id} + M_{time} - M_{id \cap time}}
   Additionally, each of the three terms can be weighted by the corresponding
-  cluster bias adjustment factor (see below and Equation 20 in Berger et al. 2017).
+  cluster bias adjustment factor (see below and Equation 20 in Zeileis et al. 2020).
   Instead of subtracting \eqn{M_{id \cap time}} as the last
   subtracted matrix, Ma (2014) suggests to subtract the basic HC0
   covariance matrix when only a single observation is in each
@@ -72,7 +73,7 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   
   With the \code{type} argument, HC0 to HC3 types of
   bias adjustment can be employed, following the terminology used by
-  MacKinnon and White (1985) for heteroskedasticity corrections. HC0 applies no small sample bias adjustment.
+  MacKinnon and White (1985) for heteroscedasticity corrections. HC0 applies no small sample bias adjustment.
   HC1 applies a degrees of freedom-based correction, \eqn{(n-1)/(n-k)} where \eqn{n} is the
   number of observations and \eqn{k} is the number of explanatory or predictor variables in the model.
   HC1 is the most commonly used approach, and is the default, though it is less effective
@@ -117,12 +118,6 @@ Bell RM, McCaffrey DF (2002).
   \dQuote{Bias Reduction in Standard Errors for Linear Regression with Multi-Stage Samples},
   \emph{Survey Methodology}, \bold{28}(2), 169--181.
 
-Berger S, Graham N, Zeileis A (2017).
-  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
-  Technical Report 2017-12,
-  \emph{Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.}
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12}.
-
 Cameron AC, Gelbach JB, Miller DL (2008).
   \dQuote{Bootstrap-Based Improvements for Inference with Clustered Errors},
   \emph{The Review of Economics and Statistics}, \bold{90}(3),
@@ -146,10 +141,10 @@ Ma MS (2014).
   \dQuote{Are We Really Doing What We Think We Are Doing? A Note on
     Finite-Sample Estimates of Two-Way Cluster-Robust Standard Errors},
   \emph{Mimeo, Availlable at SSRN:}
-   URL \url{http://ssrn.com/abstract=2420421}.
+   URL \url{https://www.ssrn.com/abstract=2420421}.
 
 MacKinnon, JG, White, H (1985). 
-  \dQuote{Some heteroskedasticity-consistent covariance matrix estimators with improved finite sample properties}
+  \dQuote{Some Heteroskedasticity-Consistent Covariance Matrix Estimators with Improved Finite Sample Properties}
   \emph{Journal of Econometrics}, \bold{29}(3), 305--325.
   \doi{10.1016/0304-4076(85)90158-7}
   
@@ -173,6 +168,11 @@ Zeileis A (2006).
   \dQuote{Object-Oriented Computation of Sandwich Estimators},
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
   \doi{10.18637/jss.v016.i09}
+
+Zeileis A, Köll S, Graham N (2020).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  \emph{Journal of Statistical Software}, \bold{95}(1), 1--36.
+  \doi{10.18637/jss.v095.i01}
 }
 
 \seealso{\code{\link{vcovHC}}}
@@ -204,7 +204,7 @@ all.equal(vcovHC(m, type = "HC3"), vcovCL(m, type = "HC3"))
 data("InstInnovation", package = "sandwich")
 
 ## replication of one-way clustered standard errors for model 3, Table I
-## and model 1, Table II in Berger et al. (2016)
+## and model 1, Table II in Berger et al. (2017), see ?InstInnovation
 
 ## count regression formula
 f1 <- cites ~ institutions + log(capital/employment) + log(sales) + industry + year

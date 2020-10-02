@@ -17,14 +17,15 @@ A data frame containing 51 observations of 2 variables.
 \source{Table 14.1 in Greene (1993)}
 
 \references{
-Cribari-Neto F. (2004), Asymptotic Inference Under Heteroskedasticity
-  of Unknown Form, \emph{Computational Statistics \& Data Analysis},
+Cribari-Neto F. (2004).
+  \dQuote{Asymptotic Inference Under Heteroskedasticity of Unknown Form.}
+  \emph{Computational Statistics \& Data Analysis},
   \bold{45}, 215-233.
 
-Greene W.H. (1993), \emph{Econometric Analysis}, 2nd edition.
+Greene W.H. (1993). \emph{Econometric Analysis}, 2nd edition.
   Macmillan Publishing Company, New York.
 
-US Department of Commerce (1979), \emph{Statistical Abstract of the
+US Department of Commerce (1979). \emph{Statistical Abstract of the
   United States}. US Government Printing Office, Washington, DC.
 }
 

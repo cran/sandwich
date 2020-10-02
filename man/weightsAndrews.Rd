@@ -4,7 +4,7 @@
 \alias{kernHAC}
 \title{Kernel-based HAC Covariance Matrix Estimation}
 \description{
- A set of functions implementing a class of kernel-based heteroskedasticity
+ A set of functions implementing a class of kernel-based heteroscedasticity
  and autocorrelation consistent (HAC) covariance matrix estimators
  as introduced by Andrews (1991).
 }
@@ -100,13 +100,13 @@ which is typically just the covariance matrix.
 
 
 \references{
-  Andrews DWK (1991),
-  Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation.
+  Andrews DWK (1991).
+  \dQuote{Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation.}
   \emph{Econometrica}, \bold{59},
   817--858.
 
-  Newey WK & West KD (1987),
-  A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.
+  Newey WK & West KD (1987).
+  \dQuote{A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.}
   \emph{Econometrica}, \bold{55},
   703--708.
 }

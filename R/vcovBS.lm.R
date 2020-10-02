@@ -16,7 +16,11 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
 
   ## collect 'cluster' variables in a data frame
   if(inherits(cluster, "formula")) {
-    cluster_tmp <- expand.model.frame(x, cluster, na.expand = FALSE)
+    cluster_tmp <- if("Formula" %in% loadedNamespaces()) { ## FIXME to suppress potential warnings due to | in Formula
+      suppressWarnings(expand.model.frame(x, cluster, na.expand = FALSE))
+    } else {
+      expand.model.frame(x, cluster, na.expand = FALSE)
+    }
     cluster <- model.frame(cluster, cluster_tmp, na.action = na.pass)
   } else {
     cluster <- as.data.frame(cluster)
@@ -157,7 +161,11 @@ vcovBS.glm <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix = FAL
 
   ## collect 'cluster' variables in a data frame
   if(inherits(cluster, "formula")) {
-    cluster_tmp <- expand.model.frame(x, cluster, na.expand = FALSE)
+    cluster_tmp <- if("Formula" %in% loadedNamespaces()) { ## FIXME to suppress potential warnings due to | in Formula
+      suppressWarnings(expand.model.frame(x, cluster, na.expand = FALSE))
+    } else {
+      expand.model.frame(x, cluster, na.expand = FALSE)
+    }
     cluster <- model.frame(cluster, cluster_tmp, na.action = na.pass)
   } else {
     cluster <- as.data.frame(cluster)

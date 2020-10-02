@@ -2,9 +2,9 @@
 \alias{vcovHAC}
 \alias{vcovHAC.default}
 \alias{meatHAC}
-\title{Heteroskedasticity and Autocorrelation Consistent (HAC) Covariance Matrix Estimation}
+\title{Heteroscedasticity and Autocorrelation Consistent (HAC) Covariance Matrix Estimation}
 \description{
- Heteroskedasticity and autocorrelation consistent (HAC) estimation
+ Heteroscedasticity and autocorrelation consistent (HAC) estimation
  of the covariance matrix of the coefficient estimates in a (generalized)
  linear regression model.
 }
@@ -86,31 +86,31 @@ with
 
 
 \references{
-  Andrews DWK (1991),
-  Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation.
+  Andrews DWK (1991).
+  \dQuote{Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimation.}
   \emph{Econometrica}, \bold{59}, 817--858.
 
-  Andrews DWK & Monahan JC (1992),
-  An Improved Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimator.
+  Andrews DWK & Monahan JC (1992).
+  \dQuote{An Improved Heteroskedasticity and Autocorrelation Consistent Covariance Matrix Estimator.}
   \emph{Econometrica}, \bold{60}, 953--966.
 
-  Lumley T & Heagerty P (1999),
-  Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.
+  Lumley T & Heagerty P (1999).
+  \dQuote{Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.}
   \emph{Journal of the Royal Statistical Society B}, \bold{61}, 459--477.
 
-  Newey WK & West KD (1987),
-  A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.
+  Newey WK & West KD (1987).
+  \dQuote{A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix.}
   \emph{Econometrica}, \bold{55}, 703--708.
 
-  Zeileis A (2004),
-  Econometric Computing with HC and HAC Covariance Matrix Estimators.
+  Zeileis A (2004).
+  \dQuote{Econometric Computing with HC and HAC Covariance Matrix Estimators.}
   \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
-  URL \url{http://www.jstatsoft.org/v11/i10/}.  
+  \doi{10.18637/jss.v011.i10}  
 
-  Zeileis A (2006),
-  Object-Oriented Computation of Sandwich Estimators.
+  Zeileis A (2006).
+  \dQuote{Object-Oriented Computation of Sandwich Estimators.}
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
-  URL \url{http://www.jstatsoft.org/v16/i09/}.
+  \doi{10.18637/jss.v016.i09}
 }
 
 \seealso{\code{\link{weightsLumley}}, \code{\link{weightsAndrews}},

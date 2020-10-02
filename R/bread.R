@@ -11,15 +11,19 @@ bread.lm <- function(x, ...)
 {
   if(!is.null(x$na.action)) class(x$na.action) <- "omit"
   sx <- summary.lm(x)
-  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
+  return(sx$cov.unscaled * as.vector(sum(sx$df[1L:2L])))
 }
 
 bread.mlm <- function(x, ...)
 {
   if(!is.null(x$na.action)) class(x$na.action) <- "omit"
-  sx <- summary.lm(x)
-  rval <- diag(ncol(residuals(x))) %x% sx$cov.unscaled * as.vector(sum(sx$df[1:2]))
-  colnames(rval) <- rownames(rval) <- colnames(vcov(x))
+  cf <- coef(x)
+  rval <- summary.lm(x)
+  rval <- kronecker(
+    structure(diag(ncol(cf)), .Dimnames = rep.int(list(colnames(cf)), 2L)),
+    structure(rval$cov.unscaled,  .Dimnames = rep.int(list(rownames(cf)), 2L)) * as.vector(sum(rval$df[1L:2L])),
+    make.dimnames = TRUE
+  )
   return(rval)
 }
 
@@ -28,16 +32,16 @@ bread.glm <- function(x, ...)
   if(!is.null(x$na.action)) class(x$na.action) <- "omit"
   sx <- summary(x)
   wres <- as.vector(residuals(x, "working")) * weights(x, "working")
-  dispersion <- if(substr(x$family$family, 1, 17) %in% c("poisson", "binomial", "Negative Binomial")) 1
+  dispersion <- if(substr(x$family$family, 1L, 17L) %in% c("poisson", "binomial", "Negative Binomial")) 1
     else sum(wres^2)/sum(weights(x, "working"))
-  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])) * dispersion)
+  return(sx$cov.unscaled * as.vector(sum(sx$df[1L:2L])) * dispersion)
 }
 
 bread.nls <- function(x, ...)
 {
   if(!is.null(x$na.action)) class(x$na.action) <- "omit"
   sx <- summary(x)
-  return(sx$cov.unscaled * as.vector(sum(sx$df[1:2])))
+  return(sx$cov.unscaled * as.vector(sum(sx$df[1L:2L])))
 }
 
 bread.polr <- function(x, ...)

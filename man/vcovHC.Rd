@@ -3,9 +3,9 @@
 \alias{vcovHC.default}
 \alias{vcovHC.mlm}
 \alias{meatHC}
-\title{Heteroskedasticity-Consistent Covariance Matrix Estimation}
+\title{Heteroscedasticity-Consistent Covariance Matrix Estimation}
 \description{
- Heteroskedasticity-consistent estimation of the covariance matrix of the
+ Heteroscedasticity-consistent estimation of the covariance matrix of the
  coefficient estimates in regression models.
 }
 \usage{
@@ -47,7 +47,7 @@ meatHC(x, type = , omega = NULL, \dots)
   \deqn{\hat \sigma^2 (X^\top X)^{-1}}{sigma^2 (X'X)^{-1}}
 
   All other methods do not assume constant variances and are suitable in case of
-  heteroskedasticity. \code{"HC"} (or equivalently \code{"HC0"}) gives White's
+  heteroscedasticity. \code{"HC"} (or equivalently \code{"HC0"}) gives White's
   estimator, the other estimators are refinements of this. They are all of form
   
   \deqn{(X^\top X)^{-1} X^\top \Omega X (X^\top X)^{-1}}{(X'X)^{-1} X' Omega X (X'X)^{-1}}
@@ -76,37 +76,37 @@ meatHC(x, type = , omega = NULL, \dots)
 }
 
 \references{
-Cribari-Neto F. (2004), Asymptotic Inference under Heteroskedasticity
-of Unknown Form. \emph{Computational Statistics & Data Analysis}
+Cribari-Neto F. (2004). \dQuote{Asymptotic Inference under Heteroskedasticity
+of Unknown Form.} \emph{Computational Statistics & Data Analysis}
 \bold{45}, 215--233.
 
-Cribari-Neto F., Da Silva W.B. (2011), A New Heteroskedasticity-Consistent
-Covariance Matrix Estimator for the Linear Regression Model.
+Cribari-Neto F., Da Silva W.B. (2011). \dQuote{A New Heteroskedasticity-Consistent
+Covariance Matrix Estimator for the Linear Regression Model.}
 \emph{Advances in Statistical Analysis}, \bold{95}(2), 129--146.
 
-Cribari-Neto F., Souza T.C., Vasconcellos, K.L.P. (2007), Inference under
-Heteroskedasticity and Leveraged Data. \emph{Communications in Statistics -- Theory and
+Cribari-Neto F., Souza T.C., Vasconcellos, K.L.P. (2007). \dQuote{Inference under
+Heteroskedasticity and Leveraged Data.} \emph{Communications in Statistics -- Theory and
 Methods}, \bold{36}, 1877--1888. Errata: \bold{37}, 3329--3330, 2008.
 
-Long J. S., Ervin L. H. (2000), Using Heteroscedasticity Consistent Standard
-Errors in the Linear Regression Model. \emph{The American Statistician},
+Long J. S., Ervin L. H. (2000). \dQuote{Using Heteroscedasticity Consistent Standard
+Errors in the Linear Regression Model.} \emph{The American Statistician},
 \bold{54}, 217--224.
 
-MacKinnon J. G., White H. (1985), Some Heteroskedasticity-Consistent
-Covariance Matrix Estimators with Improved Finite Sample Properties.
-\emph{Journal of Econometrics} \bold{29}, 305--325.
+MacKinnon J. G., White H. (1985). \dQuote{Some Heteroskedasticity-Consistent
+Covariance Matrix Estimators with Improved Finite Sample Properties.}
+\emph{Journal of Econometrics}, \bold{29}, 305--325.
 
-White H. (1980), A Heteroskedasticity-Consistent Covariance Matrix and
-a Direct Test for Heteroskedasticity. \emph{Econometrica} \bold{48},
+White H. (1980). \dQuote{A Heteroskedasticity-Consistent Covariance Matrix and
+a Direct Test for Heteroskedasticity.} \emph{Econometrica} \bold{48},
 817--838.
 
-Zeileis A (2004), Econometric Computing with HC and HAC Covariance Matrix
-Estimators. \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
-URL \url{http://www.jstatsoft.org/v11/i10/}.
+Zeileis A (2004). \dQuote{Econometric Computing with HC and HAC Covariance Matrix
+Estimators.} \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
+\doi{10.18637/jss.v011.i10}
 
-Zeileis A (2006), Object-Oriented Computation of Sandwich Estimators.
+Zeileis A (2006). \dQuote{Object-Oriented Computation of Sandwich Estimators.}
 \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
-URL \url{http://www.jstatsoft.org/v16/i09/}.
+\doi{10.18637/jss.v016.i09}
 }
 
 \seealso{\code{\link{lm}}, \code{\link[car]{hccm}},
@@ -114,7 +114,7 @@ URL \url{http://www.jstatsoft.org/v16/i09/}.
 
 \examples{
 ## generate linear regression relationship
-## with homoskedastic variances
+## with homoscedastic variances
 x <- sin(1:100)
 y <- 1 + x + rnorm(100)
 ## model fit and HC3 covariance

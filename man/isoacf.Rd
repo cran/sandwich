@@ -30,14 +30,14 @@ See also Robertson et al. (1988).
 }
 
 \references{
-  Lumley T & Heagerty P (1999),
-  Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.
+  Lumley T & Heagerty P (1999).
+  \dQuote{Weighted Empirical Adaptive Variance Estimators for Correlated Data Regression.}
   \emph{Journal of the Royal Statistical Society B}, \bold{61},
   459--477.
 
-  Robertson T, Wright FT, Dykstra RL (1988),
+  Robertson T, Wright FT, Dykstra RL (1988).
   \emph{Order Restricted Statistical Inference}.
-  New York. Wiley.
+  John Wiley and Sons, New York.
 }
 
 \seealso{\code{\link{weave}}, \code{\link{weightsLumley}}}

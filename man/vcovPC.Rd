@@ -1,6 +1,7 @@
 \name{vcovPC}
 \alias{vcovPC}
 \alias{meatPC}
+\encoding{UTF-8}
 
 \title{Panel-Corrected Covariance Matrix Estimation}
 
@@ -78,19 +79,13 @@ meatPC(x, cluster = NULL, order.by = NULL,
 Bailey D, Katz JN (2011).
   \dQuote{Implementing Panel-Corrected Standard Errors in R: The pcse Package},
   \emph{Journal of Statistical Software, Code Snippets}, \bold{42}(1), 1--11.
-  \url{http://www.jstatsoft.org/v42/c01/}
+  \doi{10.18637/jss.v042.c01}
   
 Beck N, Katz JN (1995).
   \dQuote{What To Do (and Not To Do) with Time-Series-Cross-Section Data in Comparative Politics},
   \emph{American Political Science Review}, \bold{89}(3), 634--647.
-  \url{http://www.jstor.org/stable/2082979}
+  \doi{10.2307/2082979}
   
-Berger S, Graham N, Zeileis A (2017).
-  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
-  Technical Report 2017-12,
-  \emph{Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.}
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12}.
-
 Zeileis A (2004).
   \dQuote{Econometric Computing with HC and HAC Covariance Matrix Estimator},
   \emph{Journal of Statistical Software}, \bold{11}(10), 1--17.
@@ -100,6 +95,11 @@ Zeileis A (2006).
   \dQuote{Object-Oriented Computation of Sandwich Estimators},
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
   \doi{10.18637/jss.v016.i09}
+
+Zeileis A, Köll S, Graham N (2020).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  \emph{Journal of Statistical Software}, \bold{95}(1), 1--36.
+  \doi{10.18637/jss.v095.i01}
 }
 
 \seealso{\code{\link{vcovCL}}, \code{\link{vcovPL}}}

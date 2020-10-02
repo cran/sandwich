@@ -29,7 +29,7 @@ the standard errors clustered by year.
 }
 
 \source{
-\url{http://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm}
+\url{https://www.kellogg.northwestern.edu/faculty/petersen/htm/papers/se/test_data.htm}
 }
 
 \references{

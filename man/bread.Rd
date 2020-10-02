@@ -13,6 +13,7 @@
 \alias{bread.mlogit}
 \alias{bread.polr}
 \alias{bread.clm}
+\encoding{UTF-8}
 
 \title{Bread for Sandwiches}
 
@@ -44,9 +45,15 @@ and simply computes their product.
 \seealso{\code{\link{lm}}, \code{\link{glm}}}
 
 \references{
-  Zeileis A (2006), Object-Oriented Computation of Sandwich Estimators.
+Zeileis A (2006).
+  \dQuote{Object-Oriented Computation of Sandwich Estimators.}
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
-  URL \url{http://www.jstatsoft.org/v16/i09/}.
+  \doi{10.18637/jss.v016.i09}
+
+Zeileis A, Köll S, Graham N (2020).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  \emph{Journal of Statistical Software}, \bold{95}(1), 1--36.
+  \doi{10.18637/jss.v095.i01}
 }
 
 \examples{

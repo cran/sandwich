@@ -39,7 +39,11 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
       order.by <- NULL
     }
     ## get variable(s) from expanded model frame
-    cluster_tmp <- expand.model.frame(x, cluster, na.expand = FALSE)
+    cluster_tmp <- if("Formula" %in% loadedNamespaces()) { ## FIXME to suppress potential warnings due to | in Formula
+      suppressWarnings(expand.model.frame(x, cluster, na.expand = FALSE))
+    } else {
+      expand.model.frame(x, cluster, na.expand = FALSE)
+    }
     cluster <- model.frame(cluster, cluster_tmp, na.action = na.pass)
 
     ## handle omitted or excluded observations

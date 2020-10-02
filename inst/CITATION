@@ -1,4 +1,22 @@
 bibentry("Article",
+         title       = "Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in {R}",
+         author      = c(person(given = "Achim", family = "Zeileis",
+                           email = "Achim.Zeileis@R-project.org",
+			   comment = c(ORCID = "0000-0003-0918-3766")),
+			 person(given = "Susanne", family = "K\\\"oll"), 
+		         person(given = "Nathaniel", family = "Graham",
+                           email = "npgraham1@npgraham1.com")),
+         journal     = "Journal of Statistical Software",
+         year        = "2020",
+	 volume      = "95",
+	 number      = "1",
+	 pages       = "1--36",
+         doi         = "10.18637/jss.v095.i01",
+  
+	 header     = "To cite sandwich in publications use:"
+)
+
+bibentry("Article",
          title       = "Econometric Computing with {HC} and {HAC} Covariance Matrix Estimators",
          author      = person(given = "Achim", family = "Zeileis",
                          email = "Achim.Zeileis@R-project.org",
@@ -10,7 +28,7 @@ bibentry("Article",
 	 pages       = "1--17",
          doi         = "10.18637/jss.v011.i10",
 	 
-	 header     = "To cite sandwich in publications use:"
+         header      = "If sandwich is applied to lm() models, please also cite:"
 )
 
 bibentry("Article",
@@ -26,21 +44,4 @@ bibentry("Article",
          doi         = "10.18637/jss.v016.i09",
 
          header      = "If sandwich is applied to models other than lm(), please also cite:"
-)
-
-bibentry("TechReport",
-         title       = "Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in {R}",
-         author      = c(person(given = "Susanne", family = "Berger"), 
-		         person(given = "Nathaniel", family = "Graham"), 
-		         person(given = "Achim", family = "Zeileis",
-                           email = "Achim.Zeileis@R-project.org",
-			   comment = c(ORCID = "0000-0003-0918-3766"))),
-         institution = "Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universit\\\"at Innsbruck",
-         year        = "2017",
-         type        = "Working Paper",
-         number      = "2017-12",
-         month       = "July",
-         url	     = "http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12",
-  
-         header      = "If clustered covariances are used, please also cite:"
 )

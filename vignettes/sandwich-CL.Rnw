@@ -3,12 +3,12 @@
 \usepackage{amsmath,amssymb,bm,thumbpdf,lmodern,soul}
 %% need no \usepackage{Sweave}
 
-\author{Susanne Berger\\Universit\"at Innsbruck \And 
-        Nathaniel Graham\\Texas A\&M\\International University \And
-        Achim Zeileis\\Universit\"at Innsbruck}
+\author{Achim Zeileis\\Universit\"at Innsbruck \And
+        Susanne K\"oll\\Universit\"at Innsbruck \And 
+        Nathaniel Graham\\Texas A\&M\\International University}
 \title{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in \proglang{R}}
 
-\Plainauthor{Susanne Berger, Nathaniel Graham, Achim Zeileis}
+\Plainauthor{Achim Zeileis, Susanne K\"oll, Nathaniel Graham}
 \Plaintitle{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R}
 \Shorttitle{Various Versatile Variances}
 
@@ -16,6 +16,11 @@
 \Plainkeywords{clustered data, covariance matrix estimator, object orientation, simulation, R}
 
 \Abstract{
+  This introduction to the object-oriented implementation of clustered covariances
+  in the \proglang{R} package \pkg{sandwich} is a (slightly)
+  modified version of \cite{hac:Zeileis+Koell+Graham:2020}, published in the
+  \emph{Journal of Statistical Software}.
+
   Clustered covariances or clustered standard errors are very widely used to
   account for correlated or clustered data, especially in economics, political
   sciences, and other social sciences. They are employed to adjust the inference
@@ -26,7 +31,7 @@
   bias corrections. Furthermore, while the linear regression model is certainly
   the most important application case, the same strategies can be employed in
   more general models (e.g., for zero-inflated, censored, or limited responses).
-%
+
   In \proglang{R}, functions for covariances in clustered or panel models have been
   somewhat scattered or available only for certain modeling functions, notably
   the (generalized) linear regression model. In contrast, an object-oriented
@@ -44,15 +49,14 @@
 }
 
 \Address{
-  Susanne Berger, Achim Zeileis\\
+  Achim Zeileis, Susanne K\"oll\\
   Department of Statistics\\
   Faculty of Economics and Statistics\\
   Universit\"at Innsbruck\\
   Universit\"atsstr.~15\\
   6020 Innsbruck, Austria\\
-  E-mail: \email{Susanne.Berger@student.uibk.ac.at}, \email{Achim.Zeileis@R-project.org}\\
-  URL: \url{https://www.uibk.ac.at/statistics/personal/berger/},\\
-  \phantom{URL: }\url{https://eeecon.uibk.ac.at/~zeileis/}\\
+  E-mail: \email{Achim.Zeileis@R-project.org}\\
+  URL: \url{https://eeecon.uibk.ac.at/~zeileis/}\\
   
   Nathaniel Graham\\
   Division of International Banking and Finance Studies\\
@@ -158,7 +162,7 @@ In the statistics as well as in the econometrics literature a variety of
 strategies are popular for dealing with clustered dependencies in regression models.
 Here we give a a brief overview of clustered covariances methods, some background
 information, as well as a discussion of corresponding software implementations
-in \proglang{R} and \proglang{Stata}.
+in \proglang{R} and \proglang{Stata} \citep{Stata}.
 
 \subsection{Clustered dependencies in regression models}
 
@@ -284,9 +288,9 @@ to either objects from \code{lm()} or dedicated model objects fitting certain
 (generalized) linear models for clustered or panel data. The list of packages
 includes: \pkg{multiwayvcov} \citep{hac:Graham+Arai+Hagstroemer:2016},
 \pkg{plm} \citep{hac:Croissant+Millo:2008}, \pkg{geepack}
-\citep{hac:Halekoh+Hojsgaard+Yan:2002}, \pkg{lfe} \citep{hac:Gaure:2018},
-\pkg{clubSandwich} \citep{hac:Pustejovsky:2018}, and \pkg{clusterSEs}
-\citep{hac:Esarey:2018}, among others.
+\citep{hac:Halekoh+Hojsgaard+Yan:2002}, \pkg{lfe} \citep{hac:Gaure:2013},
+\pkg{clubSandwich} \citep{hac:Pustejovsky+Tipton:2017}, and \pkg{clusterSEs}
+\citep{hac:Esarey+Menger:2019}, among others.
 
 In \pkg{multiwayvcov}, the implementation was object-oriented, in many aspects
 building on \pkg{sandwich} infrastructure. However, certain details assumed
@@ -346,7 +350,7 @@ Let $(y_{i},x_{i})$ for $i = 1, \ldots, n$ be data with some distribution
 controlled by a parameter vector $\theta$ with $k$ dimensions. For a wide
 range of models the (quasi-)maximum likelihood estimator $\hat \theta$ is
 governed by a central limit theorem \citep{hac:White:1994} so that
-$\hat \theta \approx \mathcal{N}(\theta, n^{-1} S(\theta))$. Moreover, the covariance
+$\hat \theta$ is approximately normally distributed with $\mathcal{N}(\theta, n^{-1} S(\theta))$. Moreover, the covariance
 matrix is of sandwich type with a meat matrix $M(\theta)$ between two slices
 of bread $B(\theta)$:
 \begin{eqnarray} \label{eq:sandwich}
@@ -367,16 +371,16 @@ such that an $n \times k$ matrix is obtained \citep{hac:Zeileis:2006}:
 \end{eqnarray}
 The estimate $\hat B$ for the bread is based on second derivatives, i.e., the empirical version of the inverse Hessian
 \begin{equation} \label{eq:Bhat}
-  \hat B \quad = \quad \left( \frac{1}{n} \sum_{i = 1}^n - \frac{\partial \psi(y, x, \hat \theta)}{\partial \theta} \right)^{-1},
+  \hat B \quad = \quad \left( \frac{1}{n} \sum_{i = 1}^n - \left. \frac{\partial \psi(y_i, x_i, \theta)}{\partial \theta} \right|_{\theta = \hat \theta} \right)^{-1},
 \end{equation}
 whereas $\hat M, \hat M_\mathrm{HAC}, \hat M_\mathrm{HC}$ compute outer product, HAC and HC estimators for the meat, respectively, 
 \begin{eqnarray} \label{eq:meat-op}
   \hat M & = & \frac{1}{n} \sum_{i = 1}^n\psi(y_i, x_i, \hat \theta) \psi(y_i, x_i, \hat \theta)^\top \\ \label{eq:meat-hac}
   \hat M_\mathrm{HAC} & = & \frac{1}{n} \sum_{i, j = 1}^n w_{|i-j|} \, \psi(y_i, x_i, \hat \theta) \psi(y_j, x_j, \hat \theta)^\top \\ \label{eq:meat-hc}
   \hat M_\mathrm{HC} & = & \frac{1}{n} X^\top \left( \begin{array}{ccc} 
-  \omega(r(y_1, x_1^\top \theta)) & \cdots & 0 \\ 
+  \omega(r(y_1, x_1^\top \hat \theta)) & \cdots & 0 \\ 
   \vdots & \ddots & \vdots \\
-  0 & \cdots & \omega(r(y_n, x_n^\top \theta))
+  0 & \cdots & \omega(r(y_n, x_n^\top \hat \theta))
   \end{array} \right) X.
 \end{eqnarray}
 The outer product estimator in Equation~\ref{eq:meat-op} corresponds to the basic sandwich estimator \citep{hac:Eicker:1963,hac:Huber:1967,hac:White:1980}.
@@ -465,7 +469,7 @@ cross-section data estimators. HC0 to HC3 bias corrections for cluster $g$ are
 defined as
 \begin{eqnarray} \label{eq:biasadj0}
   \mathrm{HC0:} &  & 1 \\  \label{eq:biasadj1}
-  \mathrm{HC1:} &  & \frac{n}{n - k} \\  \label{eq:biasadj2}
+  \mathrm{HC1:} &  & \frac{n - 1}{n - k} \\  \label{eq:biasadj2}
   \mathrm{HC2:} &  & \frac{G - 1}{G} \cdot (I_{n_{g}} - H_{gg})^{-1} \\  \label{eq:biasadj3}
   \mathrm{HC3:} &  & \frac{G - 1}{G} \cdot (I_{n_{g}} - H_{gg})^{-2}, 
 \end{eqnarray}  
@@ -544,7 +548,7 @@ To reflect that the data are now panel data with a natural time ordering within 
 to an index $(g, t)$ for $g = 1, \dots, G$ \emph{groups} sampled at $t = 1, \ldots, n_g$ points in \emph{time} (with $n = n_1 + \dots + n_G$).
 
 Clustered covariances account for the average within-cluster covariance, where a cluster or group is any set of
-observations with can be identified by a variable to ``cluster on''. In the case of panel data, observations are frequently
+observations which can be identified by a variable to ``cluster on''. In the case of panel data, observations are frequently
 grouped by time and by one or more cross-sectional variables such as individuals or countries that have been observed repeatedly
 over time.
 
@@ -554,13 +558,13 @@ A panel Newey-West estimator can be obtained by setting the cross-sectional as w
 effectively assuming that each cross-sectional group is a separate, autocorrelated time-series. The meat is composed of
 %
 \begin{equation} \label{eq:newey2}
-  \hat M_\mathrm{PL}^{NW} \quad = \quad \frac{1}{n} \sum_{\ell = 0}^{L} w_{\ell} \, \bigg[\sum_{t = 1}^{n_{g}}\sum_{g = 1}^{G} \psi(y_{g,t}, x_{g,t}, \hat \theta) \psi(y_{g,t-\ell}, x_{g,t-\ell}, \hat \theta)^\top\bigg].
+  \hat M_\mathrm{PL}^{NW} \quad = \quad \frac{1}{n} \sum_{\ell = 0}^{L} w_{\ell} \, \bigg[\sum_{t = 1}^{n_{\max}}\sum_{g = 1}^{G} \psi(y_{g,t}, x_{g,t}, \hat \theta) \psi(y_{g,t-\ell}, x_{g,t-\ell}, \hat \theta)^\top\bigg].
 \end{equation}  
 %
 \cite{hac:Newey+West:1987} employ a Bartlett kernel for obtaining the weights as  
 $w_{\ell} = 1 - \frac{\ell}{L + 1}$ at lag $\ell$ up to lag $L$.
 As \cite{hac:Petersen:2009} noticed, the maximal lag length $L$ in a panel data set is
-$n_g - 1$, i.e., the maximum number of \emph{time} periods per \emph{group} minus one.
+$n_{\max} - 1$, i.e., one less than the maximum number of \emph{time} periods per \emph{group} $n_{\max} = \max_g n_g$.
 
 \subsubsection{Driscoll and Kraay}
 
@@ -577,7 +581,7 @@ within each time period $t$. This yields a panel
 sandwich estimator where the meat is computed as
 %
 \begin{equation} \label{eq:driscoll}
-  \hat M_\mathrm{PL} \quad = \quad \frac{1}{n} \sum_{\ell = 0}^L w_\ell \, \bigg[ \sum_{t = 1}^{n_g} \bigg(
+  \hat M_\mathrm{PL} \quad = \quad \frac{1}{n} \sum_{\ell = 0}^L w_\ell \, \bigg[ \sum_{t = 1}^{n_{\max}} \bigg(
     \sum_{g = 1}^{G} \psi(y_{g,t}, x_{g,t}, \hat \theta) \bigg) \bigg(
     \sum_{g = 1}^{G} \psi(y_{g,t-\ell}, x_{g,t-\ell}, \hat \theta) \bigg)^\top \bigg],
 \end{equation}  
@@ -651,11 +655,11 @@ introduced in more detail below.
 Model classes which provide the necessary building blocks include
 `\code{lm}', `\code{glm}', `\code{mlm}', and `\code{nls}' from \pkg{stats} \citep{hac:R:2018}, 
 `\code{betareg}' from \pkg{betareg} \citep{hac:Cribari-Neto+Zeileis:2010,hac:Gruen+Kosmidis+Zeileis:2012},
-`\code{clm}' from \pkg{ordinal} \citep{hac:Christensen:2018},
-`\code{coxph}' and `\code{survreg}' from \pkg{survival} \citep{hac:Therneau:2018},
+`\code{clm}' from \pkg{ordinal} \citep{hac:Christensen:2019},
+`\code{coxph}' and `\code{survreg}' from \pkg{survival} \citep{hac:Therneau:2020},
 `\code{crch}' from \pkg{crch} \citep{hac:Messner+Mayr+Zeileis:2016},
 `\code{hurdle}' and `\code{zeroinfl}' from \pkg{pscl}/\pkg{countreg} \citep{hac:Zeileis+Kleiber+Jackman:2008},
-`\code{mlogit}' from \pkg{mlogit} \citep{hac:Croissant:2018}, 
+`\code{mlogit}' from \pkg{mlogit} \citep{hac:Croissant:2020}, 
 and `\code{polr}' and `\code{rlm}' from \pkg{MASS} \citep{hac:Venables+Ripley:2002}.
 For all of these an \code{estfun()} method is available along with a \code{bread()} method
 (or the default method works). In case the models are based on a single linear predictor only,
@@ -1246,7 +1250,7 @@ and a GEE with an exchangeable correlation structure (\code{m_gee}, using \pkg{g
 \citealp{hac:Halekoh+Hojsgaard+Yan:2002}) are fitted. For the other (non-GLM)
 responses, the functions
 \code{betareg()} (from \pkg{betareg}, \citealp{hac:Cribari-Neto+Zeileis:2010}),
-\code{zerotrunc()} (from \pkg{countreg}, \citealp{hac:Zeileis+Kleiber:2018}),
+\code{zerotrunc()} (from \pkg{countreg}, \citealp{hac:Zeileis+Kleiber:2020}),
 and \code{zeroinfl()} (from \pkg{pscl}/\pkg{countreg}, \citealp{hac:Zeileis+Kleiber+Jackman:2008}) are used.
 
 \subsection{Results}

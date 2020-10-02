@@ -23,10 +23,10 @@ An annual time series from 1963 to 1982 with 7 variables.
 \source{Table 15.1 in Greene (1993)}
 
 \references{
-Greene W.H. (1993), \emph{Econometric Analysis}, 2nd edition.
+Greene W.H. (1993). \emph{Econometric Analysis}, 2nd edition.
   Macmillan Publishing Company, New York.
 
-Executive Office of the President (1984), \emph{Economic Report of the
+Executive Office of the President (1984). \emph{Economic Report of the
   President}. US Government Printing Office, Washington, DC.
 }
 

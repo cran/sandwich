@@ -1,7 +1,7 @@
 \name{vcovPL}
 \alias{vcovPL}
 \alias{meatPL}
-
+\encoding{UTF-8}
 
 \title{Clustered Covariance Matrix Estimation for Panel Data}
 
@@ -96,12 +96,6 @@ Andrews DWK (1991).
   \dQuote{Heteroscedasticity and Autocorrelation Consistent Covariance Matrix Estimation},
   \emph{Econometrica}, 817--858.
 
-Berger S, Graham N, Zeileis A (2017).
-  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
-  Technical Report 2017-12,
-  \emph{Working Papers in Economics and Statistics, Research Platform Empirical and Experimental Economics, Universitaet Innsbruck.}
-  \url{http://EconPapers.RePEc.org/RePEc:inn:wpaper:2017-12}.
-
 Driscoll JC &  Kraay AC (1998).
   \dQuote{Consistent Covariance Matrix Estimation with Spatially Dependent Panel Data},
   \emph{The Review of Economics and Statistics}, \bold{80}(4), 549--560.
@@ -132,6 +126,11 @@ Zeileis A (2006).
   \dQuote{Object-Oriented Computation of Sandwich Estimators},
   \emph{Journal of Statistical Software}, \bold{16}(9), 1--16.
   \doi{10.18637/jss.v016.i09}
+
+Zeileis A, Köll S, Graham N (2020).
+  \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
+  \emph{Journal of Statistical Software}, \bold{95}(1), 1--36.
+  \doi{10.18637/jss.v095.i01}
 }
 
 \seealso{\code{\link{vcovCL}}, \code{\link{vcovPC}}}

@@ -1,6 +1,6 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 4.0.2 (2020-06-22) -- "Taking Off Again"
+Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -690,7 +690,7 @@ x           -2.845344e-05  2.868462e-03
 > data("InstInnovation", package = "sandwich")
 > 
 > ## replication of one-way clustered standard errors for model 3, Table I
-> ## and model 1, Table II in Berger et al. (2016)
+> ## and model 1, Table II in Berger et al. (2017), see ?InstInnovation
 > 
 > ## count regression formula
 > f1 <- cites ~ institutions + log(capital/employment) + log(sales) + industry + year
@@ -745,7 +745,7 @@ detaching ‘package:lmtest’, ‘package:zoo’
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: vcovHAC
-> ### Title: Heteroskedasticity and Autocorrelation Consistent (HAC)
+> ### Title: Heteroscedasticity and Autocorrelation Consistent (HAC)
 > ###   Covariance Matrix Estimation
 > ### Aliases: vcovHAC vcovHAC.default meatHAC
 > ### Keywords: regression ts
@@ -773,14 +773,14 @@ x           2.055475e-05 1.616308e-02
 > flush(stderr()); flush(stdout())
 > 
 > ### Name: vcovHC
-> ### Title: Heteroskedasticity-Consistent Covariance Matrix Estimation
+> ### Title: Heteroscedasticity-Consistent Covariance Matrix Estimation
 > ### Aliases: vcovHC vcovHC.default vcovHC.mlm meatHC
 > ### Keywords: regression ts
 > 
 > ### ** Examples
 > 
 > ## generate linear regression relationship
-> ## with homoskedastic variances
+> ## with homoscedastic variances
 > x <- sin(1:100)
 > y <- 1 + x + rnorm(100)
 > ## model fit and HC3 covariance
@@ -1061,7 +1061,7 @@ x           2.055475e-05 1.616308e-02
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  8.195 0.964 9.165 0 0 
+Time elapsed:  10.34 2.202 10.74 0 0 
 > grDevices::dev.off()
 null device 
           1 
