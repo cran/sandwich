@@ -21,14 +21,18 @@ meatPL(x, cluster = NULL, order.by = NULL,
 
 \arguments{
   \item{x}{a fitted model object.}
-  \item{cluster}{a variable indicating the clustering of observations,
-    a \code{list} (or \code{data.frame}) thereof, or a formula specifying
-    which variables from the fitted model should be used (see examples).
+  \item{cluster}{a single variable indicating the clustering of observations,
+    or a \code{list} (or \code{data.frame}) of one or two variables, or a
+    formula specifying which one ore two variables from the fitted model should
+    be used (see examples). In case two variables are specified, the second variable
+    is assumed to provide the time ordering (instead of using the argument
+    \code{order.by}).
     By default (\code{cluster = NULL}), either \code{attr(x, "cluster")} is used
     (if any) or otherwise every observation is assumed to be its own cluster.}
   \item{order.by}{a variable, list/data.frame, or formula indicating the
     aggregation within time periods. By default \code{attr(x, "order.by")} is used
-    (if any) or otherwise observations within clusters are assumed to be ordered.}
+    (if any) or specified through the second variable in \code{cluster} (see above).
+    If neither is available,  observations within clusters are assumed to be ordered.}
   \item{kernel}{a character specifying the kernel used. All kernels
     described in Andrews (1991) are supported, see \code{\link{kweights}}.}
   \item{lag}{character or numeric, indicating the lag length used.

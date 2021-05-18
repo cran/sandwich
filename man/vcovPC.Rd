@@ -19,14 +19,18 @@ meatPC(x, cluster = NULL, order.by = NULL,
 
 \arguments{
   \item{x}{a fitted model object.}
-  \item{cluster}{a variable indicating the clustering of observations,
-    a \code{list} (or \code{data.frame}) thereof, or a formula specifying
-    which variables from the fitted model should be used (see examples).
+  \item{cluster}{a single variable indicating the clustering of observations,
+    or a \code{list} (or \code{data.frame}) of one or two variables, or a
+    formula specifying which one ore two variables from the fitted model should
+    be used (see examples). In case two variables are specified, the second variable
+    is assumed to provide the time ordering (instead of using the argument
+    \code{order.by}).
     By default (\code{cluster = NULL}), either \code{attr(x, "cluster")} is used
     (if any) or otherwise every observation is assumed to be its own cluster.}
   \item{order.by}{a variable, list/data.frame, or formula indicating the
     aggregation within time periods. By default \code{attr(x, "order.by")} is used
-    (if any) or otherwise observations within clusters are assumed to be ordered.}
+    (if any) or specified through the second variable in \code{cluster} (see above).
+    If neither is available,  observations within clusters are assumed to be ordered.}
   \item{pairwise}{logical. For unbalanced panels. Indicating whether
   the meat should be estimated pair- or casewise.}
   \item{sandwich}{logical. Should the sandwich estimator be computed?
@@ -119,6 +123,7 @@ pu_lm <- lm(y ~ x, data = PU)
 sqrt(diag(vcovPC(pu_lm, cluster = ~ firm + year, pairwise = TRUE)))
 sqrt(diag(vcovPC(pu_lm, cluster = ~ firm + year, pairwise = FALSE)))
 
+\donttest{
 ## the following specifications of cluster/order.by are equivalent
 vcovPC(m, cluster = ~ firm + year)
 vcovPC(m, cluster = PetersenCL[, c("firm", "year")])
@@ -129,6 +134,7 @@ vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)
 ## cluster are already ordered
 vcovPC(m, cluster = ~ firm)
 vcovPC(m, cluster = PetersenCL$firm)
+}
 }
 
 \keyword{regression}

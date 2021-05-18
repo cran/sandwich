@@ -43,6 +43,9 @@ vcovBS.default <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix =
   
   if(NROW(cluster) != n) stop("number of observations in 'cluster' and 'nobs()' do not match")
 
+  ## catch NAs in cluster -> need to be addressed in the model object by the user
+  if(anyNA(cluster)) stop("cannot handle NAs in 'cluster': either refit the model without the NA observations in 'cluster' or impute the NAs")
+
   ## for multi-way clustering: set up interaction patterns
   p <- NCOL(cluster)
   if (p > 1L) {

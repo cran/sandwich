@@ -40,7 +40,7 @@ types of sandwich estimators can be computed.
   Universit\"atsstr.~15\\
   6020 Innsbruck, Austria\\
   E-mail: \email{Achim.Zeileis@R-project.org}\\
-  URL: \url{http://eeecon.uibk.ac.at/~zeileis/}
+  URL: \url{https://www.zeileis.org/}
 }
 
 \begin{document}

@@ -1,6 +1,6 @@
 
-R version 4.0.2 (2020-06-22) -- "Taking Off Again"
-Copyright (C) 2020 The R Foundation for Statistical Computing
+R version 4.0.4 (2021-02-15) -- "Lost Library Book"
+Copyright (C) 2021 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -869,34 +869,6 @@ x           -0.003086646  0.009584083
 (Intercept)           x 
  0.02260277  0.02524119 
 > 
-> ## the following specifications of cluster/order.by are equivalent
-> vcovPC(m, cluster = ~ firm + year)
-              (Intercept)             x
-(Intercept)  4.928685e-04 -4.396037e-05
-x           -4.396037e-05  6.388754e-04
-> vcovPC(m, cluster = PetersenCL[, c("firm", "year")])
-              (Intercept)             x
-(Intercept)  4.928685e-04 -4.396037e-05
-x           -4.396037e-05  6.388754e-04
-> vcovPC(m, cluster = ~ firm, order.by = ~ year)
-              (Intercept)             x
-(Intercept)  4.928685e-04 -4.396037e-05
-x           -4.396037e-05  6.388754e-04
-> vcovPC(m, cluster = PetersenCL$firm, order.by = PetersenCL$year)
-              (Intercept)             x
-(Intercept)  4.928685e-04 -4.396037e-05
-x           -4.396037e-05  6.388754e-04
-> 
-> ## these are also the same when observations within each
-> ## cluster are already ordered
-> vcovPC(m, cluster = ~ firm)
-              (Intercept)             x
-(Intercept)  4.928685e-04 -4.396037e-05
-x           -4.396037e-05  6.388754e-04
-> vcovPC(m, cluster = PetersenCL$firm)
-              (Intercept)             x
-(Intercept)  4.928685e-04 -4.396037e-05
-x           -4.396037e-05  6.388754e-04
 > 
 > 
 > 
@@ -1061,7 +1033,7 @@ x           2.055475e-05 1.616308e-02
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  10.34 2.202 10.74 0 0 
+Time elapsed:  5.098 0.135 5.235 0 0 
 > grDevices::dev.off()
 null device 
           1 

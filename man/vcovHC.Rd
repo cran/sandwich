@@ -38,7 +38,10 @@ meatHC(x, type = , omega = NULL, \dots)
   \code{\link{sandwich}} and \code{\link{bread}}. See Zeileis (2006) for
   more implementation details. The theoretical background, exemplified
   for the linear regression model, is described below and in Zeileis (2004).
-  Analogous formulas are employed for other types of models.
+  Analogous formulas are employed for other types of models, provided that
+  they depend on a single linear predictor and the estimating functions
+  can be represented as a product of \dQuote{working residual} and regressor
+  vector (Zeileis 2006, Equation 7).
 
   When \code{type = "const"} constant variances are assumed and
   and \code{vcovHC} gives the usual estimate of the covariance matrix of

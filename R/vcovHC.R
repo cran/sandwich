@@ -34,8 +34,22 @@ meatHC <- function(x,
   ## hence better rely on
   ef <- estfun(x, ...)
   res <- rowMeans(ef/X, na.rm = TRUE)
+
   ## handle rows with just zeros
-  res[apply(abs(ef) < .Machine$double.eps, 1L, all)] <- 0
+  all0 <- apply(abs(ef) < .Machine$double.eps, 1L, all)
+  res[all0] <- 0
+  ## in case of lm/glm and type = "const" re-obtain the working residuals
+  if(any(all0) && substr(type, 1L, 1L) == "c") {
+    if(inherits(x, "glm")) {
+      res <- as.vector(residuals(x, "working")) * weights(x, "working")
+      if(!(substr(x$family$family, 1L, 17L) %in% c("poisson", "binomial", "Negative Binomial"))) {
+        res <- res * sum(weights(x, "working"), na.rm = TRUE) / sum(res^2, na.rm = TRUE)
+      }
+    } else if(inherits(x, "lm")) {
+      res <- as.vector(residuals(x))
+      if(!is.null(weights(x))) res <- res * weights(x)
+    }
+  }
   
   ## if omega not specified, set up using type
   if(is.null(omega)) {

@@ -81,6 +81,9 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
     if(n != NROW(order.by)) order.by <- order.by[-x$na.action]
   }
 
+  ## catch NAs in cluster/order.by -> need to be addressed in the model object by the user
+  if(anyNA(cluster) || anyNA(order.by)) stop("cannot handle NAs in 'cluster' or 'order.by': either refit the model without the NA observations or impute the NAs")
+
   ## reorder scores and cluster/time variables
   index <- order(order.by)
   ef <- ef[index, , drop = FALSE]

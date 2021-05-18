@@ -1,3 +1,23 @@
+# sandwich 3.0-1
+
+* Extended the "Getting started" page with information on how to use _sandwich_ in
+  combination with the _modelsummary_ package (Arel-Bundock) based on _broom_
+  infrastructure (Robinson, Hayes, Couch). (Based on ideas from Grant McDermott.)
+  <https://sandwich.R-Forge.R-project.org/articles/sandwich.html>
+
+* Catch `NA` observations in `cluster` and/or `order.by` indexes for `vcovCL()`,
+  `vcovBS()`, `vcovPL()`, and `vcovPC()`. Such missing observations cannot be
+  handled in the covariance extractor functions but need to be addressed prior
+  to fitting the model object, either by omitting these observations or by
+  imputing the missing values. (Raised by Alexander Fischer on StackOverflow
+  <https://stackoverflow.com/questions/64849935/clustered-standard-errors-and-missing-values>.)
+
+* In `vcovHC()` if there are `estfun()` rows that are all zero and `type = "const"`,
+  then the working residuals for `lm` and `glm` objects are obtained via
+  `residuals()` rather than `estfun()`. (Prompted by an issue raised by
+  Alex Torgovitsky.)
+
+
 # sandwich 3.0-0
 
 * Release of version 3.0-0 accompanying the publication of the paper
@@ -17,7 +37,7 @@
   n/(n-k). (Reported by Yves Croissant.)
 
 * The package is also accompanied by a `pkgdown` website on R-Forge now:  
-  <http://sandwich.R-Forge.R-project.org/>  
+  <https://sandwich.R-Forge.R-project.org/>  
   This essentially uses the previous content of the package (documentation,
   vignettes, NEWS) and just formatting was enhanced. But a few new features
   were also added:
