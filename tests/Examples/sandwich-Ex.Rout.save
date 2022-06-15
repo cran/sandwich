@@ -1,6 +1,6 @@
 
-R version 4.0.4 (2021-02-15) -- "Lost Library Book"
-Copyright (C) 2021 The R Foundation for Statistical Computing
+R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -237,7 +237,7 @@ RealInt       48.194851 -0.0648546058 17.58798679
 > ## Willam H. Greene, Econometric Analysis, 2nd Ed.
 > ## Chapter 14
 > ## load data set, p. 385, Table 14.1
-> data(PublicSchools)
+> data("PublicSchools", package = "sandwich")
 > 
 > ## omit NA in Wisconsin and scale income
 > ps <- na.omit(PublicSchools)
@@ -269,7 +269,6 @@ F-statistic: 44.68 on 2 and 47 DF,  p-value: 1.345e-11
 > 
 > ## compare standard and HC0 standard errors
 > ## p. 391, Table 14.3
-> library(sandwich)
 > coef(fmq)
 (Intercept)      Income I(Income^2) 
    832.9144  -1834.2029   1587.0423 
@@ -1033,7 +1032,7 @@ x           2.055475e-05 1.616308e-02
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  5.098 0.135 5.235 0 0 
+Time elapsed:  5.364 0.152 5.524 0 0 
 > grDevices::dev.off()
 null device 
           1 

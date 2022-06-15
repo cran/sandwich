@@ -137,7 +137,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   approx <- match.arg(approx)
   prewhite <- as.integer(prewhite)
 
-  umat <- estfun(x)[,, drop = FALSE]
+  umat <- if(inherits(x, "matrix")) x else estfun(x)[,, drop = FALSE]
   if(is.zoo(umat)) umat <- as.matrix(coredata(umat))
   n <- nrow(umat)
   k <- ncol(umat)
@@ -324,7 +324,7 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
       " kernel. Use ", sQuote("bwAndrews"), " instead.", sep = ""))
   prewhite <- as.integer(prewhite)
 
-  umat <- estfun(x)[,, drop = FALSE]
+  umat <- if(inherits(x, "matrix")) x else estfun(x)[,, drop = FALSE]
   if(is.zoo(umat)) umat <- as.matrix(coredata(umat))
   n <- nrow(umat)
   k <- ncol(umat)

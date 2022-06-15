@@ -66,10 +66,10 @@ meatHC(x, type = , omega = NULL, \dots)
   estimating it, the \code{type} argument can be used to specify the 
   HC0 to HC5 estimators. If \code{omega} is used, \code{type} is ignored.
   
-  Long \& Ervin (2000) conduct a simulation study of HC estimators (HC0 to HC3) in
+  Long & Ervin (2000) conduct a simulation study of HC estimators (HC0 to HC3) in
   the linear regression model, recommending to use HC3 which is thus the
-  default in \code{vcovHC}. Cribari-Neto (2004), Cribari-Neto, Souza, \& Vasconcellos (2007),
-  and Cribari-Neto \& Da Silva (2011), respectively, suggest the HC4, HC5, and
+  default in \code{vcovHC}. Cribari-Neto (2004), Cribari-Neto, Souza, & Vasconcellos (2007),
+  and Cribari-Neto & Da Silva (2011), respectively, suggest the HC4, HC5, and
   modified HC4m type estimators. All of them are tailored to take into account
   the effect of leverage points in the design matrix. For more details see the references.
 }

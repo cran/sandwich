@@ -1,42 +1,6 @@
 
 > library("sandwich")
 
-> library("geepack")
-
-> library("lattice")
-
-> library("lmtest")
-Loading required package: zoo
-
-Attaching package: ‘zoo’
-
-The following objects are masked from ‘package:base’:
-
-    as.Date, as.Date.numeric
-
-
-> library("multiwayvcov")
-
-> library("pcse")
-
-Attaching package: ‘pcse’
-
-The following object is masked from ‘package:sandwich’:
-
-    vcovPC
-
-
-> library("plm")
-Loading required package: Formula
-
-> library("pscl")
-Classes and Methods for R developed in the
-Political Science Computational Laboratory
-Department of Political Science
-Stanford University
-Simon Jackman
-hurdle and zeroinfl functions by Achim Zeileis
-
 > panel.xyref <- function(x, y, ...) {
 +     panel.abline(h = 0.95, col = "slategray")
 +     panel.xyplot(x, y, ...)
@@ -52,16 +16,93 @@ hurdle and zeroinfl functions by Achim Zeileis
 +     source("sim-CL.R")
 + }
 
-> data("InstInnovation", package = "sandwich")
+> warn <- FALSE
 
-> library("pscl")
+> if (!require("geepack")) {
++     warn <- TRUE
++     geeglm <- function(formula, data, ...) glm(formula = formula, 
++         data = data)
++     geep .... [TRUNCATED] 
+Loading required package: geepack
+
+> if (!require("lattice")) {
++     warn <- TRUE
++     xyplot <- function(data, ...) plot(data)
++     canonical.theme <- function(...) list(...)
++      .... [TRUNCATED] 
+Loading required package: lattice
+
+> if (!require("lme4")) {
++     lme4_version <- "0.0.0"
++ } else {
++     lme4_version <- gsub("-", "--", packageDescription("lme4")$Version)
++ }
+Loading required package: lme4
+Loading required package: Matrix
+
+> if (!require("lmtest")) {
++     warn <- TRUE
++     coeftest <- function(object, ...) summary(object, ...)$coefficients
++     lmtest_version <- "0.0. ..." ... [TRUNCATED] 
+Loading required package: lmtest
+Loading required package: zoo
+
+Attaching package: ‘zoo’
+
+The following objects are masked from ‘package:base’:
+
+    as.Date, as.Date.numeric
+
+
+> if (!require("multiwayvcov")) {
++     warn <- TRUE
++     cluster.vcov <- function(object, ...) vcov(object)
++     multiwayvcov_version <- "0.0.0"
++  .... [TRUNCATED] 
+Loading required package: multiwayvcov
+
+> if (!require("pcse")) {
++     warn <- TRUE
++     pcse_vcovPC <- function(object, ...) vcov(object)
++     pcse_version <- "0.0.0"
++ } else {
++     pc .... [TRUNCATED] 
+Loading required package: pcse
+
+Attaching package: ‘pcse’
+
+The following object is masked from ‘package:sandwich’:
+
+    vcovPC
+
+
+> if (!require("plm")) {
++     warn <- TRUE
++     plm <- function(formula, data, ...) lm(formula = formula, 
++         data = data)
++     vcovSCC <- f .... [TRUNCATED] 
+Loading required package: plm
+
+> if (!require("pscl")) {
++     warn <- TRUE
++     hurdle <- function(formula, data, ...) glm(formula = formula, 
++         data = data)
++     pscl_ve .... [TRUNCATED] 
+Loading required package: pscl
+Classes and Methods for R developed in the
+Political Science Computational Laboratory
+Department of Political Science
+Stanford University
+Simon Jackman
+hurdle and zeroinfl functions by Achim Zeileis
+
+> warn <- if (warn) {
++     "{\\\\large\\\\bf\\\\color{Red}\n   Not all required packages were available when rendering this version of the vignette!\ ..." ... [TRUNCATED] 
+
+> data("InstInnovation", package = "sandwich")
 
 > h_innov <- hurdle(cites ~ institutions + log(capital/employment) + 
 +     log(sales), data = InstInnovation, dist = "negbin")
-
-> library("sandwich")
-
-> library("lmtest")
 
 > coeftest(h_innov, vcov = vcovCL, cluster = ~company)
 
@@ -95,20 +136,14 @@ zero_log(sales)               0.0164233 0.0165897 0.0277648 0.0295080
 
 > p_lm <- lm(y ~ x, data = PetersenCL)
 
-> library("multiwayvcov")
-
 > se(list(sandwich = vcovCL(p_lm, cluster = ~firm), 
 +     multiwayvcov = cluster.vcov(p_lm, cluster = ~firm)))
             sandwich multiwayvcov
 (Intercept) 0.067013     0.067013
 x           0.050596     0.050596
 
-> library("plm")
-
 > p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling", 
 +     indexes = c("firm", "year"))
-
-> library("geepack")
 
 > vcov.geeglm <- function(object) {
 +     vc <- object$geese$vbeta
@@ -138,11 +173,9 @@ x           0.053561     0.053561
 (Intercept) 0.024357 0.024357
 x           0.028163 0.028163
 
-> library("pcse")
-
 > se(list(sandwich = sandwich::vcovPC(p_lm, cluster = ~firm + 
-+     year), pcse = pcse::vcovPC(p_lm, groupN = PetersenCL$firm, 
-+     groupT = Peters .... [TRUNCATED] 
++     year), pcse = pcse_vcovPC(p_lm, groupN = PetersenCL$firm, 
++     groupT = Peterse .... [TRUNCATED] 
             sandwich     pcse
 (Intercept) 0.022201 0.022201
 x           0.025276 0.025276
@@ -152,8 +185,8 @@ x           0.025276 0.025276
 > pu_lm <- lm(y ~ x, data = PU)
 
 > se(list(sandwichT = sandwich::vcovPC(pu_lm, cluster = ~firm + 
-+     year, pairwise = TRUE), pcseT = pcse::vcovPC(pu_lm, PU$firm, 
-+     PU$year, pa .... [TRUNCATED] 
++     year, pairwise = TRUE), pcseT = pcse_vcovPC(pu_lm, PU$firm, 
++     PU$year, pai .... [TRUNCATED] 
             sandwichT    pcseT sandwichF    pcseF
 (Intercept)  0.022070 0.022070  0.022603 0.022603
 x            0.025338 0.025338  0.025241 0.025241
@@ -292,4 +325,4 @@ x            0.025338 0.025338  0.025241 0.025241
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
-  3.770   0.687   4.453 
+  5.430   0.320   5.786 

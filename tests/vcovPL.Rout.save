@@ -1,6 +1,6 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -43,6 +43,8 @@ institutions -0.001241881  2.128408e-05
 > 
 > 
 > ## vcovPL covariance matrix compared with vcovSCC from plm package
+> if(!require("plm")) q()
+Loading required package: plm
 > pm <- plm::plm(y ~ x, data = PetersenCL, model = "pooling", indexes = c("firm", "year"))
 > 
 > (pl1 <- vcovPL(m, cluster = ~ firm, adjust = FALSE))
@@ -76,4 +78,4 @@ attr(,"cluster")
 > 
 > proc.time()
    user  system elapsed 
-  0.753   0.049   0.789 
+  0.715   0.043   0.752 

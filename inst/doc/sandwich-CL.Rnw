@@ -78,13 +78,6 @@
 
 <<preliminaries,echo=FALSE,results=hide>>=
 library("sandwich")
-library("geepack")
-library("lattice")
-library("lmtest")
-library("multiwayvcov")
-library("pcse")
-library("plm")
-library("pscl")
 
 panel.xyref <- function(x, y, ...) {
   panel.abline(h = 0.95, col = "slategray")
@@ -99,7 +92,79 @@ if(file.exists("sim-CL.rda")) {
 } else {
   source("sim-CL.R")
 }
+
+## FIXME: it would really be better to stop execution if any of the
+## following packages is not available
+warn <- FALSE
+
+if(!require("geepack")) {
+  warn <- TRUE
+  geeglm <- function(formula, data, ...) glm(formula = formula, data = data)
+  geepack_version <- "0.0.0"
+} else {
+  geepack_version <- gsub("-", "--", packageDescription("geepack")$Version)
+}
+if(!require("lattice")) {
+  warn <- TRUE
+  xyplot <- function(data, ...) plot(data)
+  canonical.theme <- function(...) list(...)
+  lattice_version <- "0.0.0"
+} else {
+  lattice_version <- gsub("-", "--", packageDescription("lattice")$Version)
+}
+if(!require("lme4")) {
+  lme4_version <- "0.0.0"
+} else {
+  lme4_version <- gsub("-", "--", packageDescription("lme4")$Version)
+}
+if(!require("lmtest")) {
+  warn <- TRUE
+  coeftest <- function(object, ...) summary(object, ...)$coefficients
+  lmtest_version <- "0.0.0"
+} else {
+  lmtest_version <- gsub("-", "--", packageDescription("lmtest")$Version)
+}
+if(!require("multiwayvcov")) {
+  warn <- TRUE
+  cluster.vcov <- function(object, ...) vcov(object)
+  multiwayvcov_version <- "0.0.0"
+} else {
+  multiwayvcov_version <- gsub("-", "--", packageDescription("multiwayvcov")$Version)
+}
+if(!require("pcse")) {
+  warn <- TRUE
+  pcse_vcovPC <- function(object, ...) vcov(object)
+  pcse_version <- "0.0.0"
+} else {
+  pcse_vcovPC <- pcse::vcovPC
+  pcse_version <- gsub("-", "--", packageDescription("pcse")$Version)
+}
+if(!require("plm")) {
+  warn <- TRUE
+  plm <- function(formula, data, ...) lm(formula = formula, data = data)
+  vcovSCC <- function(object, ...) vcov(object)
+  plm_version <- "0.0.0"
+} else {
+  plm_version <- gsub("-", "--", packageDescription("plm")$Version)
+}
+if(!require("pscl")) {
+  warn <- TRUE
+  hurdle <- function(formula, data, ...) glm(formula = formula, data = data)
+  pscl_version <- "0.0.0"
+} else {
+  pscl_version <- gsub("-", "--", packageDescription("pscl")$Version)
+}
+
+warn <- if(warn) {
+  "{\\\\large\\\\bf\\\\color{Red}
+   Not all required packages were available when rendering this version of the vignette!
+   Some outputs are invalid (replaced by nonsensical placeholders).}"
+} else {
+  ""
+}
 @ 
+
+\Sexpr{warn}
 
 \section{Introduction} \label{sec:intro}
 
@@ -933,22 +998,32 @@ models ongoing innovation, respectively.
 A basic negative binomial hurdle model is fitted with the \code{hurdle} function from the \pkg{pscl}
 package \citep{hac:Zeileis+Kleiber+Jackman:2008} using the
 \cite{hac:Aghion+VanReenen+Zingales:2013} data provided in the \pkg{sandwich} package.
-<<innovation-data>>= 
+%
+<<innovation-data, echo=FALSE, eval=TRUE>>= 
 data("InstInnovation", package = "sandwich")
-library("pscl")
 h_innov <- hurdle(
   cites ~ institutions + log(capital/employment) + log(sales),
   data = InstInnovation, dist = "negbin")
 @
+<<innovation-data-display, echo=TRUE, eval=FALSE>>=
+library("pscl")
+<<innovation-data>>
+@
+%
 The partial Wald tests for all coefficients based on clustered standard errors
 can be obtained by using \code{coeftest()} from \pkg{lmtest} \citep{hac:Zeileis+Hothorn:2002} and setting
 \code{vcov = vcovCL} and providing the company-level clustering (with a total of 803 clusters)
 via \code{cluster = ~ company}.
-<<innovation-coeftest>>=
+%
+<<innovation-coeftest-packages, eval=FALSE>>=
 library("sandwich")
 library("lmtest")
+@
+%
+<<innovation-coeftest>>=
 coeftest(h_innov, vcov = vcovCL, cluster = ~ company)
 @
+%
 This shows that institutional owners are have a small but positive impact in both
 submodels but that only the coefficient in the zero hurdle is significant.
 
@@ -1013,22 +1088,31 @@ model needs to be estimated with \code{plm()} and in \pkg{geepack} an independen
 needs to be fitted with \code{geeglm()}.
 
 The \pkg{multiwayvcov} results can be replicated as follows.
-<<petersen-comparison1>>=
+%
+<<petersen-multiwayvcov, eval=FALSE>>=
 library("multiwayvcov")
+@
+%
+<<petersen-comparison1>>=
 se(list(
   "sandwich" = vcovCL(p_lm, cluster = ~ firm),
   "multiwayvcov" = cluster.vcov(p_lm, cluster = ~ firm)
 ))
 @ 
+%
 And the \pkg{plm} and \pkg{geepack} results can be replicated with the following code.
 (Note that \pkg{geepack} does not provide a \code{vcov()} method for `\code{geeglm}' objects,
 hence the necessary code is included below.)
-<<petersen-comparison2>>=
+%
+<<petersen-plmgee, eval=FALSE>>=
 library("plm")
+library("geepack")
+@
+%
+<<petersen-comparison2>>=
 p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling",
  indexes = c("firm", "year"))
 
-library("geepack")
 vcov.geeglm <- function(object) {
   vc <- object$geese$vbeta
   rownames(vc) <- colnames(vc) <- names(coef(object))
@@ -1078,7 +1162,8 @@ se(list(
 Panel-corrected covariances a la Beck and Katz are implemented in the package \pkg{pcse} -- providing the
 function that is also named \code{vcovPC()} -- which can handle both balanced and unbalanced panels.
 For the balanced Petersen data the two \code{vcovPC()} functions from \pkg{sandwich} and \pkg{pcse} agree.
-<<petersen-comparison4>>=
+%
+<<petersen-comparison4, eval=FALSE>>=
 library("pcse")
 se(list(
   "sandwich" = sandwich::vcovPC(p_lm, cluster = ~ firm + year),
@@ -1086,15 +1171,27 @@ se(list(
     groupT = PetersenCL$year)
 ))
 @
+%
+<<petersen-comparison4-out, echo=FALSE>>=
+se(list(
+  "sandwich" = sandwich::vcovPC(p_lm, cluster = ~ firm + year),
+  "pcse" = pcse_vcovPC(p_lm, groupN = PetersenCL$firm,
+    groupT = PetersenCL$year)
+))
+@
+%
 And also when omitting the last year for the first firm to obtain an unbalanced panel, the \pkg{pcse}
 results can be replicated. Both strategies for balancing the panel internally (pairwise vs.\ casewise)
 are illustrated in the following.
+%
 <<petersen-unbalanced1>>=
 PU <- subset(PetersenCL, !(firm == 1 & year == 10))
 pu_lm <- lm(y ~ x, data = PU)
-@ 
+@
+% 
 and again, panel-corrected standard errors from \pkg{sandwich} are equivalent to those from \pkg{pcse}.
-<<petersen-unbalanced2>>=
+%
+<<petersen-unbalanced2, echo=TRUE, eval=FALSE>>=
 se(list(
   "sandwichT" = sandwich::vcovPC(pu_lm, cluster = ~ firm + year,
     pairwise = TRUE),
@@ -1102,6 +1199,17 @@ se(list(
   "sandwichF" = sandwich::vcovPC(pu_lm, cluster = ~ firm + year,
     pairwise = FALSE),
   "pcseF" = pcse::vcovPC(pu_lm, PU$firm, PU$year, pairwise = FALSE)
+))
+@ 
+%
+<<petersen-unbalanced2-out, echo=FALSE, eval=TRUE>>=
+se(list(
+  "sandwichT" = sandwich::vcovPC(pu_lm, cluster = ~ firm + year,
+    pairwise = TRUE),
+  "pcseT" = pcse_vcovPC(pu_lm, PU$firm, PU$year, pairwise = TRUE),
+  "sandwichF" = sandwich::vcovPC(pu_lm, cluster = ~ firm + year,
+    pairwise = FALSE),
+  "pcseF" = pcse_vcovPC(pu_lm, PU$firm, PU$year, pairwise = FALSE)
 ))
 @ 
 
@@ -1505,15 +1613,14 @@ is provided along with the corresponding results \code{sim-CL.rda}.
 \proglang{R} version \Sexpr{paste(R.Version()[6:7], collapse = ".")} has been used for computations.
 Package versions that have been employed are \pkg{sandwich}
 \Sexpr{gsub("-", "--", packageDescription("sandwich")$Version)},
-\pkg{boot} \Sexpr{gsub("-", "--", packageDescription("boot")$Version)},
 \pkg{countreg} 0.2-0,
-\pkg{geepack} \Sexpr{gsub("-", "--", packageDescription("geepack")$Version)},
-\pkg{lattice} \Sexpr{gsub("-", "--", packageDescription("lattice")$Version)},
-\pkg{lme4} \Sexpr{gsub("-", "--", packageDescription("lme4")$Version)},
-\pkg{lmtest} \Sexpr{gsub("-", "--", packageDescription("lmtest")$Version)},
-\pkg{multiwayvcov} \Sexpr{gsub("-", "--", packageDescription("multiwayvcov")$Version)},
-\pkg{plm} \Sexpr{gsub("-", "--", packageDescription("plm")$Version)},
-and \pkg{pscl} \Sexpr{gsub("-", "--", packageDescription("pscl")$Version)}.
+\pkg{geepack} \Sexpr{geepack_version},
+\pkg{lattice} \Sexpr{lattice_version},
+\pkg{lme4} \Sexpr{lme4_version},
+\pkg{lmtest} \Sexpr{lmtest_version},
+\pkg{multiwayvcov} \Sexpr{multiwayvcov_version},
+\pkg{plm} \Sexpr{plm_version},
+and \pkg{pscl} \Sexpr{pscl_version}.
 
 \proglang{R} itself and all packages (except \pkg{countreg}) used are available from
 CRAN at \url{https://CRAN.R-project.org/}. 

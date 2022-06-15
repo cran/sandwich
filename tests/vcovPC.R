@@ -18,6 +18,7 @@ all.equal(pc1, pc2, tolerance = 1e-5)
 
 
 ## sandwich::vcovPC compared to pcse::vcovPC
+if(!require("pcse")) q()
 (pc3 <- pcse::vcovPC(u_m, PU$firm, PU$year, pairwise = FALSE))
 (pc4 <- sandwich::vcovPC(u_m, cluster = ~ firm + year, pairwise = FALSE))
 (pc5 <- pcse::vcovPC(u_m, PU$firm, PU$year, pairwise = TRUE))

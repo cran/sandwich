@@ -61,10 +61,54 @@ can be integrated into applications.
 <<preliminaries,echo=FALSE,results=hide>>=
 library("zoo")
 library("sandwich")
-library("strucchange")
-library("lmtest")
 options(prompt = "R> ", continue = "+   ")
+
+## FIXME: it would really be better to stop execution if any of the
+## following packages is not available
+warn <- FALSE
+if(require("strucchange")) {
+  data("RealInt", package = "strucchange")
+  strucchange_version <- gsub("-", "--", packageDescription("strucchange")$Version)
+} else {
+  warn <- TRUE
+  strucchange_version <- "0.0--0"
+  RealInt <- ts(sin(1:103), start = 1961, frequency = 4)
+
+  Fstats <- breakpoints <- lm
+  gefp <- function(formula, fit, ...) {
+    rval <- fit(formula)
+    class(rval) <- c("gefp", class(rval))
+    return(rval)
+  }
+  plot.gefp <- function(object, ...) plot(object$residuals)
+  sctest <- function(object, ...) list(p.value = 0.05)
+}
+
+if(!require("lmtest")) {
+  warn <- TRUE
+  coeftest <- function(object, ...) summary(object, ...)$coefficients
+  lmtest_version <- "0.0--0"
+} else {
+  lmtest_version <- gsub("-", "--", packageDescription("lmtest")$Version)
+}
+if(!require("scatterplot3d")) {
+  warn <- TRUE
+  scatterplot3d <- function(object, ...) {
+    plot(object, main = "")
+    list(plane3d = function(...) invisible(NULL))
+  }
+}
+
+warn <- if(warn) {
+  "{\\\\large\\\\bf\\\\color{Red}
+   Not all required packages were available when rendering this version of the vignette!
+   Some outputs are invalid (replaced by nonsensical placeholders).}"
+} else {
+  ""
+}
 @
+
+\Sexpr{warn}
 
 \section{Introduction} \label{sec:intro}
 
@@ -525,7 +569,8 @@ those which produce the figures in the text, are provided (without output) in th
 appendix along with the versions of \proglang{R} and the packages used.
 Before we start with the examples, the \pkg{sandwich} and \pkg{lmtest} package
 have to be loaded:
-<<loadlibs1>>=
+%
+<<loadlibs1, eval=FALSE>>=
 library("sandwich")
 library("lmtest")
 @
@@ -649,7 +694,6 @@ are depicted in Figure~\ref{fig:hac}.
 \begin{figure}[tbh]
 \begin{center}
 <<hac-plot,fig=TRUE,height=5,width=6,echo=FALSE,results=hide>>=
-library("scatterplot3d")
 s3d <- scatterplot3d(Investment[,c(5,7,6)],
   type = "b", angle = 65, scale.y = 1, pch = 16)
 s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
@@ -693,9 +737,9 @@ fitting and assessing fluctuation processes including OLS-based CUSUM processes
 \citep[see][for more details]{hac:Zeileis:2004}.
 
 After loading the package and the data,
-<<loadlibs2>>=
+<<loadlibs2, eval=FALSE>>=
 library("strucchange")
-data("RealInt")
+data("RealInt", package = "strucchange")
 @
 the command
 <<sc-ocus>>=
@@ -741,7 +785,7 @@ intervals is depicted in the right panel of Figure~\ref{fig:sc}.
 par(mfrow = c(1, 2))
 plot(ocus, aggregate = FALSE, main = "")
 plot(RealInt, ylab = "Real interest rate")
-lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
+lines(ts(fitted(bp), start = start(RealInt), frequency = 4), col = 4)
 lines(confint(bp, vcov = kernHAC))
 @
 \caption{\label{fig:sc} OLS-based CUSUM test (left) and fitted model (right) for real interest data.}
@@ -794,8 +838,8 @@ required for the applications in this paper. Furthermore, the packages
 depend on \pkg{zoo}. For the computations in this paper \proglang{R}
 \Sexpr{paste(R.Version()[6:7], collapse = ".")} and \pkg{sandwich}
 \Sexpr{gsub("-", "--", packageDescription("sandwich")$Version)},
-\pkg{lmtest} \Sexpr{gsub("-", "--", packageDescription("lmtest")$Version)},
-\pkg{strucchange} \Sexpr{gsub("-", "--", packageDescription("strucchange")$Version)}
+\pkg{lmtest} \Sexpr{lmtest_version},
+\pkg{strucchange} \Sexpr{strucchange_version}
 and \pkg{zoo} \Sexpr{gsub("-", "--", packageDescription("zoo")$Version)}
 have been used. \proglang{R} itself and all packages used are available from
 CRAN at \url{http://CRAN.R-project.org/}.

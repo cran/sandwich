@@ -16,7 +16,7 @@ vcovPL <- function(x, cluster = NULL, order.by = NULL,
 }
 
 meatPL <- function(x, cluster = NULL, order.by = NULL,
-  kernel = "Bartlett", lag = "NW1987", bw = NULL, adjust = TRUE, ...) ## adjust/cadjust?
+  kernel = "Bartlett", lag = "NW1987", bw = NULL, adjust = TRUE, aggregate = TRUE, ...) ## adjust/cadjust?
 {
   ## extract estimating functions / aka scores
   if (is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
@@ -90,10 +90,19 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
   order.by <- order.by[index]
   cluster <- cluster[index]
 
-  ## aggregate within time periods
-  if(length(unique(order.by)) < n) ef <- apply(ef, 2L, tapply, order.by, sum)
-  nt <- NROW(ef)
-  
+  ## aggregate within time periods?
+  if(aggregate) {
+    if(length(unique(order.by)) < n) ef <- apply(ef, 2L, tapply, order.by, sum)
+    nt <- NROW(ef)
+    nc <- length(unique(cluster))
+  } else {
+    order.by <- as.integer(factor(order.by))
+    nt <- order.by[length(order.by)]
+    cluster <- as.integer(factor(cluster))
+    nc <- cluster[length(cluster)]
+    rownames(ef) <- paste(order.by, cluster, sep = "-")
+  }  
+
   ## lag/bandwidth selection
     if(is.character(lag)) {
         if(lag == "P2009") lag <- "max" 
@@ -114,12 +123,23 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
 
   ## set up kernel weights up to maximal number of lags
   weights <- kweights(0L:(nt - 1L)/bw, kernel = kernel)
+  weights <- weights[1L:max(which(abs(weights) > 0))]
 
   rval <- 0.5 * crossprod(ef) * weights[1L]
     
   if(length(weights) > 1L) {
     for (ii in 2L:length(weights)) {
-      rval <- rval + weights[ii] * crossprod(ef[1L:(nt - ii + 1), , drop = FALSE], ef[ii:nt, , drop = FALSE])
+      rval <- rval + weights[ii] * if(aggregate) {
+        ## Driscoll & Kraay (1998)
+        crossprod(ef[1L:(nt - ii + 1L), , drop = FALSE], ef[ii:nt, , drop = FALSE])
+      } else {
+        ## restricting cross-sectional and cross-serial correlation to zero
+        ## assure to use only clusters where both lags in the crossprod exist
+        ix1 <- paste(rep(1L:(nt - ii + 1L), each = nc), rep(1L:nc, nt - ii + 1L), sep = "-")
+        ix2 <- paste(rep(ii:nt, each = nc), rep(1L:nc, nt - ii + 1L), sep = "-")
+        ok <- (ix1 %in% rownames(ef)) & (ix2 %in% rownames(ef))
+        crossprod(ef[ix1[ok], , drop = FALSE], ef[ix2[ok], , drop = FALSE])
+      }
     }
  }
     
@@ -129,6 +149,3 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
 
   return(rval/n)
 }
-
-
-

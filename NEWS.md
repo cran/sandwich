@@ -1,3 +1,41 @@
+# sandwich 3.0-2
+
+* Added new argument `aggregate = TRUE` to `meatPL()` which is thus inherited by
+  `vcovPL()`. By default, this still yields the Driscoll & Kraay (1998) covariance
+  matrix. When setting `aggregate = FALSE` the cross-sectional and cross-serial
+  correlation is set to zero, yielding the "pure" panel Newey-West covariance
+  matrix.
+
+* Bug fix in `vcovCL(..., type = "HC2")` for `glm` objects or `lm` objects
+  with weights. The code had erroneously assumed that the hat matrices were
+  all symmetric (as in the `lm` case without weights). This is corrected now.
+  (Detected and reported by Bixi Zhang.)
+
+* Issue a warning in `vcovHC()` for HC2/HC3/HC4/HC4m/HC5 if any of the hat values
+  are numerically equal to 1. This leads to numerically unstable covariances,
+  in the most extreme case `NaN` because the associated residuals are equal to
+  0 and divided by 0. (Suggested by Ding Peng and John Fox.)
+
+* Speed improvement in `vcovBS.lm()`: For `"xy"` bootstrap, `.lm.fit()` rather than
+  `lm.fit()` is used which is somewhat more efficient in some situations (suggested
+  by Grant McDermott). For `"residual"` and wild bootstrap, the bootstrap by default
+  still samples coefficients via QR decomposition in each iteration (`qrjoint = FALSE`)
+  but may alternatively sample the dependent variable and then apply the QR
+  decomposition jointly only once (`qrjoint = TRUE`). If the sample size (and the
+  number of coefficients) is large, then `qrjoint = TRUE` may be significantly faster
+  while requiring much more memory (proposed by Alexander Fischer).
+
+* Enable passing score matrix (as computed by `estfun()`) directly to
+  `bwAndrews()` and `bwNeweyWest()`. If this is used, the score matrix should
+  either have a column `(Intercept)` or the `weights` argument should be set
+  appropriately to identify the column pertaining to the intercept (if any).
+
+* The vignettes have been tweaked so that they still "run" without technical errors
+  when suggested packages (listed in the VignetteDepends) are not available. This is
+  achieved by defining replacement functions that do not fail but lead to partially
+  non-sensical output. A warning is added in the vignettes if any of the replacements
+  is used.
+
 # sandwich 3.0-1
 
 * Extended the "Getting started" page with information on how to use _sandwich_ in

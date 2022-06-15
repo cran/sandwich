@@ -52,10 +52,16 @@ types of sandwich estimators can be computed.
 %\VignettePackage{sandwich}
 
 <<preliminaries,echo=FALSE,results=hide>>=
-library("AER")
-library("MASS")
 options(prompt = "R> ", continue = "+   ")
+if(!require("AER")) tobit <- glm
+if(!require("MASS")) glm.nb <- glm
+if(!require("lmtest")) coeftest <- function(object, ...) summary(object)$coefficients
+warn <- if(require("AER") & require("MASS") & require("lmtest")) "" else "{\\\\large\\\\bf\\\\color{Red}
+   Not all required packages were available when rendering this version of the vignette!
+   Some outputs are invalid (replaced by nonsensical placeholders).}"
 @
+
+\Sexpr{warn}
 
 \section{Introduction} \label{sec:intro}
 
@@ -624,13 +630,23 @@ fitted using \code{tobit()} from \pkg{AER}
 \citep[a convenience interface to \code{survreg()} from the \pkg{survival} package by][]{hac:Therneau:2018}
 and \code{glm()}, respectively:
 
-<<>>=
+<<limdep, echo=TRUE, eval=FALSE>>=
 library("AER")
 data("Affairs", package = "AER")
 fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating, data = Affairs)
 fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + religiousness + occupation + rating,
   data = Affairs, family = binomial(link = "probit"))
 @
+
+<<limdep-check, echo=FALSE, eval=TRUE, results=hide>>=
+if(require("AER")) {
+<<limdep>>
+} else {
+data("cars", package = "datasets")
+fm_probit <- fm_tobit <- lm(dist ~ speed, data = cars)
+}
+@
+
 
 Using \code{coeftest()}, we compare the usual summary based on the standard
 errors as computed by \code{vcov()} \citep[which reproduces the results in][]{hac:Greene:2003}

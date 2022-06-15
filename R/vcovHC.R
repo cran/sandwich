@@ -19,15 +19,15 @@ meatHC <- function(x,
   ## ensure that NAs are omitted
   if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
 
-  ## extract X
+  ## extract X and residual degrees of freedom
   X <- model.matrix(x)
   if(any(alias <- is.na(coef(x)))) X <- X[, !alias, drop = FALSE]
   attr(X, "assign") <- NULL
   n <- NROW(X)
-
-  ## get hat values and residual degrees of freedom
-  diaghat <- try(hatvalues(x), silent = TRUE)
   df <- n - NCOL(X)
+
+  ## hat values
+  diaghat <- try(hatvalues(x), silent = TRUE)
   
   ## the following might work, but "intercept" is also claimed for "coxph"
   ## res <- if(attr(terms(x), "intercept") > 0) estfun(x)[,1] else rowMeans(estfun(x)/X, na.rm = TRUE)
@@ -50,7 +50,7 @@ meatHC <- function(x,
       if(!is.null(weights(x))) res <- res * weights(x)
     }
   }
-  
+
   ## if omega not specified, set up using type
   if(is.null(omega)) {
     type <- match.arg(type)
@@ -82,6 +82,17 @@ meatHC <- function(x,
         residuals^2 / sqrt((1 - diaghat)^delta)
       }}
     )
+    
+    ## check hat values (if necessary)
+    if(type %in% c("HC2", "HC3", "HC4", "HC4m", "HC5")) {
+      if(inherits(diaghat, "try-error")) stop(sprintf("hatvalues() could not be extracted successfully but are needed for %s", type))
+      id <- which(diaghat > 1 - sqrt(.Machine$double.eps))
+      if(length(id) > 0L) {
+        id <- if(is.null(rownames(X))) as.character(id) else rownames(X)[id]
+        if(length(id) > 10L) id <- c(id[1L:10L], "...")
+        warning(sprintf("%s covariances become numerically unstable if hat values are close to 1 as for observations %s", type, paste(id, collapse = ", ")))
+      }
+    }
   }
   
   ## process omega
@@ -102,17 +113,17 @@ vcovHC.mlm <- function(x,
   ## ensure that NAs are omitted
   if(is.list(x) && !is.null(x$na.action)) class(x$na.action) <- "omit"
 
-  ## regressors, df, hat values
+  ## regressors and df
   X <- model.matrix(x)
   attr(X, "assign") <- NULL
   if(any(alias <- apply(coef(x), 1, function(z) all(is.na(z))))) X <- X[, !alias, drop = FALSE]
   n <- NROW(X)
-  diaghat <- hatvalues(x)
   df <- n - NCOL(X)
-
-  ## residuals
+  
+  ## hat values and residuals
+  diaghat <- hatvalues(x)
   res <- residuals(x)
- 
+
   ## if omega not specified, set up using type
   if(is.null(omega)) {
     type <- match.arg(type)
@@ -147,6 +158,17 @@ vcovHC.mlm <- function(x,
         residuals^2 / sqrt((1 - diaghat)^delta)
       }}
     )
+
+    ## check hat values (if necessary)
+    if(type %in% c("HC2", "HC3", "HC4", "HC4m", "HC5")) {
+      if(inherits(diaghat, "try-error")) stop(sprintf("hatvalues() could not be extracted successfully but are needed for %s", type))
+      id <- which(diaghat > 1 - sqrt(.Machine$double.eps))
+      if(length(id) > 0L) {
+        id <- if(is.null(rownames(X))) as.character(id) else rownames(X)[id]
+        if(length(id) > 10L) id <- c(id[1L:10L], "...")
+        warning(sprintf("%s cannot be computed due to observations with hatvalue = 1: %s", type, paste(id, collapse = ", ")))
+      }
+    }
   }
   
   ## process omega

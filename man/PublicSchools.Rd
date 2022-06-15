@@ -5,7 +5,7 @@
 Per capita expenditure on public schools and per capita income
 by state in 1979.
 }
-\usage{data(PublicSchools)}
+\usage{data("PublicSchools")}
 \format{
 A data frame containing 51 observations of 2 variables.
  \describe{
@@ -19,7 +19,7 @@ A data frame containing 51 observations of 2 variables.
 \references{
 Cribari-Neto F. (2004).
   \dQuote{Asymptotic Inference Under Heteroskedasticity of Unknown Form.}
-  \emph{Computational Statistics \& Data Analysis},
+  \emph{Computational Statistics & Data Analysis},
   \bold{45}, 215-233.
 
 Greene W.H. (1993). \emph{Econometric Analysis}, 2nd edition.
@@ -33,7 +33,7 @@ US Department of Commerce (1979). \emph{Statistical Abstract of the
 ## Willam H. Greene, Econometric Analysis, 2nd Ed.
 ## Chapter 14
 ## load data set, p. 385, Table 14.1
-data(PublicSchools)
+data("PublicSchools", package = "sandwich")
 
 ## omit NA in Wisconsin and scale income
 ps <- na.omit(PublicSchools)
@@ -45,7 +45,6 @@ summary(fmq)
 
 ## compare standard and HC0 standard errors
 ## p. 391, Table 14.3
-library(sandwich)
 coef(fmq)
 sqrt(diag(vcovHC(fmq, type = "const")))
 sqrt(diag(vcovHC(fmq, type = "HC0")))

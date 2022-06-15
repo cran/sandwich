@@ -3,9 +3,13 @@
 ###################################################
 ### code chunk number 1: preliminaries
 ###################################################
-library("AER")
-library("MASS")
 options(prompt = "R> ", continue = "+   ")
+if(!require("AER")) tobit <- glm
+if(!require("MASS")) glm.nb <- glm
+if(!require("lmtest")) coeftest <- function(object, ...) summary(object)$coefficients
+warn <- if(require("AER") & require("MASS") & require("lmtest")) "" else "{\\\\large\\\\bf\\\\color{Red}
+   Not all required packages were available when rendering this version of the vignette!
+   Some outputs are invalid (replaced by nonsensical placeholders).}"
 
 
 ###################################################
@@ -85,24 +89,39 @@ coeftest(fm_nbin)
 
 
 ###################################################
-### code chunk number 8: sandwich-OOP.Rnw:627-632
+### code chunk number 8: limdep (eval = FALSE)
 ###################################################
+## library("AER")
+## data("Affairs", package = "AER")
+## fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating, data = Affairs)
+## fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + religiousness + occupation + rating,
+##   data = Affairs, family = binomial(link = "probit"))
+
+
+###################################################
+### code chunk number 9: limdep-check
+###################################################
+if(require("AER")) {
 library("AER")
 data("Affairs", package = "AER")
 fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousness + occupation + rating, data = Affairs)
 fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + religiousness + occupation + rating,
   data = Affairs, family = binomial(link = "probit"))
+} else {
+data("cars", package = "datasets")
+fm_probit <- fm_tobit <- lm(dist ~ speed, data = cars)
+}
 
 
 ###################################################
-### code chunk number 9: sandwich-OOP.Rnw:639-641
+### code chunk number 10: sandwich-OOP.Rnw:655-657
 ###################################################
 coeftest(fm_tobit)
 coeftest(fm_tobit, vcov = sandwich)
 
 
 ###################################################
-### code chunk number 10: sandwich-OOP.Rnw:649-651
+### code chunk number 11: sandwich-OOP.Rnw:665-667
 ###################################################
 coeftest(fm_probit)
 coeftest(fm_probit, vcov = sandwich)

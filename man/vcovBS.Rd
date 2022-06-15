@@ -21,7 +21,8 @@ vcovBS(x, \dots)
   fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
 
 \method{vcovBS}{lm}(x, cluster = NULL, R = 250, type = "xy", \dots,
-  fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
+  fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL,
+  qrjoint = FALSE)
 
 \method{vcovBS}{glm}(x, cluster = NULL, R = 250, start = FALSE, \dots,
   fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
@@ -59,6 +60,13 @@ vcovBS(x, \dots)
     \code{\link[parallel]{mclapply}} with the desired number of \code{cores},
     except on Windows where \code{\link[parallel]{parLapply}} with
     \code{makeCluster(cores)} is used.}
+  \item{qrjoint}{logical. For residual-based and wild boostrap (i.e.,
+    \code{type != "xy"}), should the bootstrap sample the dependent variable
+    and then apply the QR decomposition jointly only once? If \code{FALSE},
+    the boostrap applies the QR decomposition separately in each iteration
+    and samples coefficients directly. If the sample size (and the number of
+    coefficients) is large, then \code{qrjoint = TRUE} maybe significantly
+    faster while requiring much more memory.}
 }
 
 \details{

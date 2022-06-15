@@ -3,6 +3,8 @@ data("PetersenCL", package = "sandwich")
 m <- lm(y ~ x, data = PetersenCL)
 b <- glm((y > 0) ~ x, data = PetersenCL, family = binomial(link = "logit"))
 
+options(digits = 4)
+
 ## various versatile variance flavors
 vcovCL(m, cluster = ~ firm, type = "HC0", cadjust = TRUE)
 vcovCL(m, cluster = ~ firm, type = "HC0", cadjust = FALSE)
@@ -24,7 +26,7 @@ vcovCL(m, cluster = ~ firm + year, type = "HC3", cadjust = FALSE)
 
 
 ## comparison with multiwayvcov::cluster.vcov
-
+if(!require("multiwayvcov")) q()
 all.equal(
   vcovCL(m, cluster = ~ firm),
   multiwayvcov::cluster.vcov(m, ~ firm)

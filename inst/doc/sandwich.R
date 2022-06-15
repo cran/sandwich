@@ -5,9 +5,51 @@
 ###################################################
 library("zoo")
 library("sandwich")
-library("strucchange")
-library("lmtest")
 options(prompt = "R> ", continue = "+   ")
+
+## FIXME: it would really be better to stop execution if any of the
+## following packages is not available
+warn <- FALSE
+if(require("strucchange")) {
+  data("RealInt", package = "strucchange")
+  strucchange_version <- gsub("-", "--", packageDescription("strucchange")$Version)
+} else {
+  warn <- TRUE
+  strucchange_version <- "0.0--0"
+  RealInt <- ts(sin(1:103), start = 1961, frequency = 4)
+
+  Fstats <- breakpoints <- lm
+  gefp <- function(formula, fit, ...) {
+    rval <- fit(formula)
+    class(rval) <- c("gefp", class(rval))
+    return(rval)
+  }
+  plot.gefp <- function(object, ...) plot(object$residuals)
+  sctest <- function(object, ...) list(p.value = 0.05)
+}
+
+if(!require("lmtest")) {
+  warn <- TRUE
+  coeftest <- function(object, ...) summary(object, ...)$coefficients
+  lmtest_version <- "0.0--0"
+} else {
+  lmtest_version <- gsub("-", "--", packageDescription("lmtest")$Version)
+}
+if(!require("scatterplot3d")) {
+  warn <- TRUE
+  scatterplot3d <- function(object, ...) {
+    plot(object, main = "")
+    list(plane3d = function(...) invisible(NULL))
+  }
+}
+
+warn <- if(warn) {
+  "{\\\\large\\\\bf\\\\color{Red}
+   Not all required packages were available when rendering this version of the vignette!
+   Some outputs are invalid (replaced by nonsensical placeholders).}"
+} else {
+  ""
+}
 
 
 ###################################################
@@ -37,10 +79,10 @@ arrows(1.32, 0.2, 1.1, kweights(1.1, "Tukey", normalize = TRUE), length = 0.1)
 
 
 ###################################################
-### code chunk number 3: loadlibs1
+### code chunk number 3: loadlibs1 (eval = FALSE)
 ###################################################
-library("sandwich")
-library("lmtest")
+## library("sandwich")
+## library("lmtest")
 
 
 ###################################################
@@ -117,17 +159,16 @@ coeftest(fm.inv, df = Inf, vcov = parzenHAC)
 ###################################################
 ### code chunk number 14: hac-plot
 ###################################################
-library("scatterplot3d")
 s3d <- scatterplot3d(Investment[,c(5,7,6)],
   type = "b", angle = 65, scale.y = 1, pch = 16)
 s3d$plane3d(fm.inv, lty.box = "solid", col = 4)
 
 
 ###################################################
-### code chunk number 15: loadlibs2
+### code chunk number 15: loadlibs2 (eval = FALSE)
 ###################################################
-library("strucchange")
-data("RealInt")
+## library("strucchange")
+## data("RealInt", package = "strucchange")
 
 
 ###################################################
@@ -149,18 +190,18 @@ confint(bp, vcov = kernHAC)
 par(mfrow = c(1, 2))
 plot(ocus, aggregate = FALSE, main = "")
 plot(RealInt, ylab = "Real interest rate")
-lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
+lines(ts(fitted(bp), start = start(RealInt), frequency = 4), col = 4)
 lines(confint(bp, vcov = kernHAC))
 
 
 ###################################################
-### code chunk number 19: sandwich.Rnw:786-787
+### code chunk number 19: sandwich.Rnw:830-831
 ###################################################
 options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 20: sandwich.Rnw:805-807 (eval = FALSE)
+### code chunk number 20: sandwich.Rnw:849-851 (eval = FALSE)
 ###################################################
 ## library("sandwich")
 ## library("lmtest")
@@ -168,7 +209,7 @@ options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 21: sandwich.Rnw:814-815 (eval = FALSE)
+### code chunk number 21: sandwich.Rnw:858-859 (eval = FALSE)
 ###################################################
 ## data("PublicSchools")
 ## ps <- na.omit(PublicSchools)
@@ -176,13 +217,13 @@ options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 22: sandwich.Rnw:819-820 (eval = FALSE)
+### code chunk number 22: sandwich.Rnw:863-864 (eval = FALSE)
 ###################################################
 ## fm.ps <- lm(Expenditure ~ Income + I(Income^2), data = ps)
 
 
 ###################################################
-### code chunk number 23: sandwich.Rnw:824-829 (eval = FALSE)
+### code chunk number 23: sandwich.Rnw:868-873 (eval = FALSE)
 ###################################################
 ## sqrt(diag(vcov(fm.ps)))
 ## sqrt(diag(vcovHC(fm.ps, type = "const")))
@@ -192,39 +233,39 @@ options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 24: sandwich.Rnw:833-835 (eval = FALSE)
+### code chunk number 24: sandwich.Rnw:877-879 (eval = FALSE)
 ###################################################
 ## coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC0"))
 ## coeftest(fm.ps, df = Inf, vcov = vcovHC(fm.ps, type = "HC4"))
 
 
 ###################################################
-### code chunk number 25: sandwich.Rnw:855-856 (eval = FALSE)
+### code chunk number 25: sandwich.Rnw:899-900 (eval = FALSE)
 ###################################################
 ## data("Investment")
 
 
 ###################################################
-### code chunk number 26: sandwich.Rnw:860-861 (eval = FALSE)
+### code chunk number 26: sandwich.Rnw:904-905 (eval = FALSE)
 ###################################################
 ## fm.inv <- lm(RealInv ~ RealGNP + RealInt, data = Investment)
 
 
 ###################################################
-### code chunk number 27: sandwich.Rnw:879-881 (eval = FALSE)
+### code chunk number 27: sandwich.Rnw:923-925 (eval = FALSE)
 ###################################################
 ## plot(Investment[, "RealInv"], type = "b", pch = 19, ylab = "Real investment")
 ## lines(ts(fitted(fm.inv), start = 1964), col = 4)
 
 
 ###################################################
-### code chunk number 28: sandwich.Rnw:897-898 (eval = FALSE)
+### code chunk number 28: sandwich.Rnw:941-942 (eval = FALSE)
 ###################################################
 ## data("RealInt")
 
 
 ###################################################
-### code chunk number 29: sandwich.Rnw:902-905 (eval = FALSE)
+### code chunk number 29: sandwich.Rnw:946-949 (eval = FALSE)
 ###################################################
 ## ocus <- gefp(RealInt ~ 1, fit = lm, vcov = kernHAC)
 ## plot(ocus, aggregate = FALSE)
@@ -232,7 +273,7 @@ options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 30: sandwich.Rnw:909-912 (eval = FALSE)
+### code chunk number 30: sandwich.Rnw:953-956 (eval = FALSE)
 ###################################################
 ## fs <- Fstats(RealInt ~ 1, vcov = kernHAC)
 ## plot(fs)
@@ -240,7 +281,7 @@ options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 31: sandwich.Rnw:917-919 (eval = FALSE)
+### code chunk number 31: sandwich.Rnw:961-963 (eval = FALSE)
 ###################################################
 ## bp <- breakpoints(RealInt ~ 1)
 ## confint(bp, vcov = kernHAC)
@@ -248,7 +289,7 @@ options(prompt = "  ")
 
 
 ###################################################
-### code chunk number 32: sandwich.Rnw:923-926 (eval = FALSE)
+### code chunk number 32: sandwich.Rnw:967-970 (eval = FALSE)
 ###################################################
 ## plot(RealInt, ylab = "Real interest rate")
 ## lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)

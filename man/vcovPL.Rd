@@ -16,7 +16,7 @@ vcovPL(x, cluster = NULL, order.by = NULL,
 
 meatPL(x, cluster = NULL, order.by = NULL,
   kernel = "Bartlett", lag = "NW1987", bw = NULL,
-  adjust = TRUE, \dots)
+  adjust = TRUE, aggregate = TRUE, \dots)
 }
 
 \arguments{
@@ -49,6 +49,9 @@ meatPL(x, cluster = NULL, order.by = NULL,
   \item{adjust}{logical. Should a finite sample adjustment be made? This
     amounts to multiplication with \eqn{n/(n - k)} where \eqn{n} is the
     number of observations and \eqn{k} is the number of estimated parameters.}
+  \item{aggregate}{logical. Should the \code{estfun} be aggregated within each
+    time period (yielding Driscoll and Kraay 1998) or not (restricting cross-sectional
+    and cross-serial correlation to zero, yielding panel Newey-West)?}
   \item{\dots}{arguments passed to the \code{metaPL} or \code{estfun} function,
     respectively.}
 }
@@ -62,11 +65,11 @@ meatPL(x, cluster = NULL, order.by = NULL,
   cross-sectional dimension), the Driscoll and Kraay (1998)
   standard errors are robust to general forms of cross-sectional and
   serial correlation (Hoechle (2007)).
-  The Newey-West (1978) covariance matrix restricts the Driscoll and
+  The Newey-West (1987) covariance matrix restricts the Driscoll and
   Kraay (1998) covariance matrix to no cross-sectional correlation.
   
   The function \code{meatPL} is the work horse for estimating
-  the meat of Newey-West (1978) and Driscoll and Kraay (1998)
+  the meat of Newey-West (1987) and Driscoll and Kraay (1998)
   covariance matrix estimators. \code{vcovPL} is a wrapper calling
   \code{\link{sandwich}} and \code{\link{bread}} (Zeileis 2006).
 

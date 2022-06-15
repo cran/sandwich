@@ -1,6 +1,6 @@
 
-R version 3.5.1 (2018-07-02) -- "Feather Spray"
-Copyright (C) 2018 The R Foundation for Statistical Computing
+R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
+Copyright (C) 2022 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -49,6 +49,15 @@ x           -8.787789e-05  6.371175e-04
 > 
 > 
 > ## sandwich::vcovPC compared to pcse::vcovPC
+> if(!require("pcse")) q()
+Loading required package: pcse
+
+Attaching package: 'pcse'
+
+The following object is masked from 'package:sandwich':
+
+    vcovPC
+
 > (pc3 <- pcse::vcovPC(u_m, PU$firm, PU$year, pairwise = FALSE))
               X.Intercept.             x
 X.Intercept.  5.108853e-04 -8.787789e-05
@@ -73,4 +82,4 @@ x           -4.566605e-05  6.419998e-04
 > 
 > proc.time()
    user  system elapsed 
-  2.726   0.995   3.707 
+  2.528   0.336   2.858 

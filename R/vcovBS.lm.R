@@ -1,4 +1,4 @@
-vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
+vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL, qrjoint = FALSE)
 {
   ## set up return value with correct dimension and names
   cf <- coef(x)
@@ -98,8 +98,7 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
   }
 
   ## bootstrap for each cluster dimension
-  for (i in 1L:length(cl))
-  {
+  for (i in 1L:length(cl)) {
     ## cluster structure
     cli <- if(type %in% c("xy", "residual")) {
       split(seq_along(cluster[[i]]), cluster[[i]])
@@ -116,21 +115,23 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
     bootfit <- switch(type,
       "xy" = function(j, ...) {
         j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
-        lm.fit(xfit[j, , drop = FALSE], y[j], ...)$coefficients
+        .lm.fit(xfit[j, , drop = FALSE], y[j], ...)$coefficients
       },
       "residual" = function(j, ...) {
         j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
-	qr.coef(xfit$qr, xfit$fit + xfit$res[j])
+        yboot <- xfit$fit + xfit$res[j]
+	if(qrjoint) yboot else qr.coef(xfit$qr, yboot)
       },
       function(j, ...) {
         j <- wild(nlevels(cli))
-	qr.coef(xfit$qr, xfit$fit + xfit$res * j[cli])
+        yboot <- xfit$fit + xfit$res * j[cli]
+	if(qrjoint) yboot else qr.coef(xfit$qr, yboot)
       }
     )
     
     ## actually refit
     cf <- applyfun(1L:R, bootfit, ...)
-    cf <- do.call("rbind", cf)
+    cf <- if(qrjoint && type != "xy") t(qr.coef(xfit$qr, do.call("cbind", cf))) else do.call("rbind", cf)
 
     ## aggregate across cluster variables
     rval <- rval + sign[i] * cov(cf, use = use)

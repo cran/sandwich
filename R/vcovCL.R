@@ -113,15 +113,6 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
       ## working residuals
       res <- rowMeans(ef/X, na.rm = TRUE)
       res[apply(abs(ef) < .Machine$double.eps, 1L, all)] <- 0
-
-      ## matrix square root
-      matpower <- function(X, p) {
-        if((ncol(X) == 1L) && (nrow(X) == 1L)) return(X^p)
-        Xeig <- eigen(X, symmetric = TRUE)
-        if(any(Xeig$values < 0)) stop("matrix is not positive semidefinite")
-        sqomega <- diag(Xeig$values^p)
-        return(Xeig$vectors %*% sqomega %*% t(Xeig$vectors))
-      }
     }
   }
   
@@ -156,7 +147,7 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
 	    X[ij, , drop = FALSE] %*% XX1 %*% t(X[ij, , drop = FALSE]) %*% diag(w[ij], nrow = length(ij), ncol = length(ij))
 	  }
           Hij <- if(type == "HC2") {
-	    matpower(diag(length(ij)) - Hij, -0.5)
+	    matrixpower(diag(length(ij)) - Hij, -0.5)
 	  } else {
 	    solve(diag(length(ij)) - Hij)
 	  }
@@ -181,4 +172,33 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
   if(type == "HC1") rval <- (n - 1L)/(n - k) * rval
 
   return(rval)
+}
+
+## matrix power (for square root and inverse square root)
+matrixpower <- function(X, p, symmetric = NULL, tol = .Machine$double.eps^(1/1.3)) {
+  if((ncol(X) == 1L) && (nrow(X) == 1L)) return(X^p)
+  if(is.null(symmetric)) symmetric <- isSymmetric(X)
+  Xeig <- eigen(X, symmetric = symmetric)
+  if(is.complex(Xeig$values)) {
+    if(any(abs(Im(Xeig$values)) > tol)) warning("complex eigen values of X")
+    Xeig$values <- Re(Xeig$values)
+    Xeig$vectors <- Re(Xeig$vectors)
+  }
+  Xeig$values[Xeig$values < tol] <- 0
+  # if(any(Xeig$values < 0)) stop("matrix is not positive semidefinite")
+  if(symmetric) {
+    Xeig$vectors %*% ((Xeig$values^p) * t(Xeig$vectors))
+  } else {
+    Xeig$vectors %*% ((Xeig$values^p) * matrixinverse(Xeig$vectors))
+  }
+}
+
+matrixinverse <- function(X, tol = .Machine$double.eps^(1/1.3)) {
+  if((ncol(X) == 1L) && (nrow(X) == 1L)) return(1/X)
+  inv <- try(solve(X), silent = TRUE)
+  if(!inherits(inv, "try-error")) return(inv)
+  Xsvd <- svd(X)
+  ok <- Xsvd$d > max(tol * Xsvd$d[1L], 0)
+  inv <- Xsvd$v[, ok, drop = FALSE] %*% ((1/Xsvd$d[ok]) * t(Xsvd$u[, ok, drop = FALSE]))
+  return(inv)
 }

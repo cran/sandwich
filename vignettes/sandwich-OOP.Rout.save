@@ -1,22 +1,29 @@
 
-> library("AER")
+> options(prompt = "R> ", continue = "+   ")
+
+> if (!require("AER")) tobit <- glm
+Loading required package: AER
 Loading required package: car
+Loading required package: carData
 Loading required package: lmtest
 Loading required package: zoo
 
-Attaching package: 'zoo'
+Attaching package: ‘zoo’
 
-The following objects are masked from 'package:base':
+The following objects are masked from ‘package:base’:
 
     as.Date, as.Date.numeric
 
 Loading required package: sandwich
 Loading required package: survival
-Loading required package: splines
 
-> library("MASS")
+> if (!require("MASS")) glm.nb <- glm
+Loading required package: MASS
 
-> options(prompt = "R> ", continue = "+   ")
+> if (!require("lmtest")) coeftest <- function(object, 
++     ...) summary(object)$coefficients
+
+> warn <- if (require("AER") & require("MASS") & require("lmtest")) "" else "{\\\\large\\\\bf\\\\color{Red}\n   Not all required packages were availab ..." ... [TRUNCATED] 
 
 > par(mar = rep(0, 4))
 
@@ -98,7 +105,7 @@ z test of coefficients:
 x            0.996072   0.053534 18.6062  < 2e-16 ***
 I(x^2)      -0.049124   0.023146 -2.1223  0.03381 *  
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 > coeftest(fm_pois, vcov = sandwich)
@@ -110,7 +117,7 @@ z test of coefficients:
 x            0.996072   0.105217  9.4668   <2e-16 ***
 I(x^2)      -0.049124   0.036284 -1.3539   0.1758    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 > fm_qpois <- glm(y ~ x + I(x^2), family = quasipoisson)
@@ -124,7 +131,7 @@ z test of coefficients:
 x            0.996072   0.117063  8.5088   <2e-16 ***
 I(x^2)      -0.049124   0.050613 -0.9706   0.3318    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 > fm_nbin <- glm.nb(y ~ x + I(x^2))
@@ -138,18 +145,13 @@ z test of coefficients:
 x            0.999616   0.094894 10.5340   <2e-16 ***
 I(x^2)      -0.052652   0.064883 -0.8115   0.4171    
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
-> library("AER")
-
-> data("Affairs", package = "AER")
-
-> fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousness + 
-+     occupation + rating, data = Affairs)
-
-> fm_probit <- glm(I(affairs > 0) ~ age + yearsmarried + 
-+     religiousness + occupation + rating, data = Affairs, family = binomial(link = "probit" .... [TRUNCATED] 
+> if (require("AER")) {
++     library("AER")
++     data("Affairs", package = "AER")
++     fm_tobit <- tobit(affairs ~ age + yearsmarried + religiousne .... [TRUNCATED] 
 
 > coeftest(fm_tobit)
 
@@ -164,7 +166,7 @@ occupation     0.326053   0.254425  1.2815  0.200007
 rating        -2.284973   0.407828 -5.6028 2.109e-08 ***
 Log(scale)     2.109859   0.067098 31.4444 < 2.2e-16 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 > coeftest(fm_tobit, vcov = sandwich)
@@ -180,7 +182,7 @@ occupation     0.326053   0.245978  1.3255  0.184993
 rating        -2.284973   0.393479 -5.8071 6.356e-09 ***
 Log(scale)     2.109859   0.054837 38.4754 < 2.2e-16 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 > coeftest(fm_probit)
@@ -195,7 +197,7 @@ religiousness -0.183646   0.051715 -3.5511 0.0003836 ***
 occupation     0.037513   0.032845  1.1421 0.2533995    
 rating        -0.272983   0.052574 -5.1923 2.077e-07 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
 > coeftest(fm_probit, vcov = sandwich)
@@ -210,10 +212,10 @@ religiousness -0.183646   0.053047 -3.4620 0.0005363 ***
 occupation     0.037513   0.032922  1.1395 0.2545089    
 rating        -0.272983   0.053327 -5.1190 3.071e-07 ***
 ---
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
-  1.412   0.040   1.451 
+  1.088   0.063   1.149 
