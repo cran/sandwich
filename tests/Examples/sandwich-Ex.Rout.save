@@ -1,6 +1,6 @@
 
-R version 4.2.0 (2022-04-22) -- "Vigorous Calisthenics"
-Copyright (C) 2022 The R Foundation for Statistical Computing
+R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
+Copyright (C) 2023 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
@@ -381,35 +381,33 @@ x -0.2938577  2.0823419
 > ### ** Examples
 > 
 > ## linear regression
-> x <- sin(1:10)
-> y <- rnorm(10)
-> fm <- lm(y ~ x)
+> x <- 1:9
+> y <- sin(1:9/5)
+> m <- lm(y ~ x)
 > 
 > ## estimating function: (y - x'beta) * x
-> estfun(fm)
-   (Intercept)           x
-1  -0.68507480 -0.57647056
-2   0.13214846  0.12016225
-3  -0.96783127 -0.13658036
-4   1.36873882 -1.03586495
-5   0.08173006 -0.07837294
-6  -0.99685418  0.27853651
-7   0.40942540  0.26898700
-8   0.69524135  0.68784276
-9   0.47205088  0.19454089
-10 -0.50957471  0.27721940
-> residuals(fm) * cbind(1, x)
+> estfun(m)
+  (Intercept)           x
+1 -0.13577304 -0.13577304
+2 -0.04481531 -0.08963062
+3  0.03061755  0.09185265
+4  0.08353989  0.33415956
+5  0.10786351  0.53931755
+6  0.09864034  0.59184202
+7  0.05225971  0.36581794
+8 -0.03340770 -0.26726157
+9 -0.15892494 -1.43032449
+> residuals(m) * cbind(1, x)
                             x
- [1,] -0.68507480 -0.57647056
- [2,]  0.13214846  0.12016225
- [3,] -0.96783127 -0.13658036
- [4,]  1.36873882 -1.03586495
- [5,]  0.08173006 -0.07837294
- [6,] -0.99685418  0.27853651
- [7,]  0.40942540  0.26898700
- [8,]  0.69524135  0.68784276
- [9,]  0.47205088  0.19454089
-[10,] -0.50957471  0.27721940
+ [1,] -0.13577304 -0.13577304
+ [2,] -0.04481531 -0.08963062
+ [3,]  0.03061755  0.09185265
+ [4,]  0.08353989  0.33415956
+ [5,]  0.10786351  0.53931755
+ [6,]  0.09864034  0.59184202
+ [7,]  0.05225971  0.36581794
+ [8,] -0.03340770 -0.26726157
+ [9,] -0.15892494 -1.43032449
 > 
 > 
 > 
@@ -426,6 +424,7 @@ x -0.2938577  2.0823419
 > 
 > ### ** Examples
 > 
+> set.seed(1)
 > x <- filter(rnorm(100), 0.9, "recursive")
 > isoacf(x)
   [1]  1.00000000  0.75620784  0.52668286  0.31877074  0.17874234  0.10451987
@@ -618,17 +617,26 @@ x           -0.04395562  0.10690628
 > cbind(
 +   "classical" = sqrt(diag(vcov(m))),
 +   "HC-cluster" = sqrt(diag(vcovCL(m, cluster = ~ firm))),
-+   "BS-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm)))
++   "BS-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm))),
++   "FW-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm, type = "fractional")))
 + )
-             classical HC-cluster BS-cluster
-(Intercept) 0.02835932 0.06701270 0.07067533
-x           0.02858329 0.05059573 0.04878784
+             classical HC-cluster BS-cluster FW-cluster
+(Intercept) 0.02835932 0.06701270 0.07067533 0.06596187
+x           0.02858329 0.05059573 0.04878784 0.04965168
 > 
 > ## two-way wild cluster bootstrap with Mammen distribution
 > vcovBS(m, cluster = ~ firm + year, type = "wild-mammen")
             (Intercept)           x
-(Intercept) 0.003535619 0.000488708
-x           0.000488708 0.002589785
+(Intercept) 0.004135069 0.000364327
+x           0.000364327 0.002659964
+> 
+> ## jackknife estimator coincides with HC3 (aka CV3)
+> all.equal(
++   vcovBS(m, cluster = ~ firm, type = "jackknife"),
++   vcovCL(m, cluster = ~ firm, type = "HC3", cadjust = FALSE),
++   tolerance = 1e-7
++ )
+[1] TRUE
 > 
 > 
 > 
@@ -803,6 +811,49 @@ x           2.055475e-05 1.616308e-02
                           x
   8.124921e-03 2.055475e-05
 x 2.055475e-05 1.616308e-02
+> 
+> 
+> 
+> cleanEx()
+> nameEx("vcovJK")
+> ### * vcovJK
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: vcovJK
+> ### Title: (Clustered) Jackknife Covariance Matrix Estimation
+> ### Aliases: vcovJK vcovJK.default
+> ### Keywords: regression bootstrap
+> 
+> ### ** Examples
+> 
+> ## cross-section data
+> data("PublicSchools", package = "sandwich")
+> m1 <- lm(Expenditure ~ poly(Income, 2), data = PublicSchools)
+> vcovJK(m1, center = "estimate")
+                 (Intercept) poly(Income, 2)1 poly(Income, 2)2
+(Intercept)         97.84092         1055.131         1370.855
+poly(Income, 2)1  1055.13101        25053.095        31336.158
+poly(Income, 2)2  1370.85525        31336.158        46955.800
+> vcovHC(m1, type = "HC3") * (nobs(m1) - 1)/nobs(m1)
+                 (Intercept) poly(Income, 2)1 poly(Income, 2)2
+(Intercept)         97.84092         1055.131         1370.855
+poly(Income, 2)1  1055.13101        25053.095        31336.158
+poly(Income, 2)2  1370.85525        31336.158        46955.800
+> 
+> ## clustered data
+> data("PetersenCL", package = "sandwich")
+> m2 <- lm(y ~ x, data = PetersenCL)
+> 
+> ## jackknife estimator coincides with HC3 (aka CV3)
+> vcovJK(m2, cluster = ~ firm, center = "estimate")
+              (Intercept)             x
+(Intercept)  4.499186e-03 -6.714627e-05
+x           -6.714627e-05  2.577098e-03
+> vcovCL(m2, cluster = ~ firm, type = "HC3", cadjust = FALSE)
+              (Intercept)             x
+(Intercept)  4.499186e-03 -6.714627e-05
+x           -6.714627e-05  2.577098e-03
 > 
 > 
 > 
@@ -1032,7 +1083,7 @@ x           2.055475e-05 1.616308e-02
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  5.364 0.152 5.524 0 0 
+Time elapsed:  6.801 0.156 6.968 0 0 
 > grDevices::dev.off()
 null device 
           1 

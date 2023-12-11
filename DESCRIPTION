@@ -1,11 +1,10 @@
 Package: sandwich
-Version: 3.0-2
-Date: 2022-06-13
+Version: 3.1-0
+Date: 2023-12-10
 Title: Robust Covariance Matrix Estimators
-Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org",
-                    comment = c(ORCID = "0000-0003-0918-3766")),
-             person(given = "Thomas", family = "Lumley", role = "aut", email = "t.lumley@auckland.ac.nz"),
-	     person(given = "Nathaniel", family = "Graham", role = "ctb", email = "npgraham1@gmail.com"),
+Authors@R: c(person(given = "Achim", family = "Zeileis", role = c("aut", "cre"), email = "Achim.Zeileis@R-project.org", comment = c(ORCID = "0000-0003-0918-3766")),
+             person(given = "Thomas", family = "Lumley", role = "aut", email = "t.lumley@auckland.ac.nz", comment = c(ORCID = "0000-0003-4255-5437")),
+	     person(given = "Nathaniel", family = "Graham", role = "ctb", email = "npgraham1@gmail.com", comment = c(ORCID = "0009-0002-1215-5256")),
 	     person(given = "Susanne", family = "Koell", role = "ctb"))
 Description: Object-oriented software for model-robust covariance matrix estimators. Starting out from the basic 
              robust Eicker-Huber-White sandwich covariance methods include: heteroscedasticity-consistent (HC)
@@ -25,11 +24,11 @@ License: GPL-2 | GPL-3
 URL: https://sandwich.R-Forge.R-project.org/
 BugReports: https://sandwich.R-Forge.R-project.org/contact.html
 NeedsCompilation: no
-Packaged: 2022-06-14 00:56:06 UTC; zeileis
+Packaged: 2023-12-11 08:49:01 UTC; zeileis
 Author: Achim Zeileis [aut, cre] (<https://orcid.org/0000-0003-0918-3766>),
-  Thomas Lumley [aut],
-  Nathaniel Graham [ctb],
+  Thomas Lumley [aut] (<https://orcid.org/0000-0003-4255-5437>),
+  Nathaniel Graham [ctb] (<https://orcid.org/0009-0002-1215-5256>),
   Susanne Koell [ctb]
 Maintainer: Achim Zeileis <Achim.Zeileis@R-project.org>
 Repository: CRAN
-Date/Publication: 2022-06-15 07:10:05 UTC
+Date/Publication: 2023-12-11 13:50:02 UTC

@@ -60,7 +60,7 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   (\eqn{M_{id}, M_{time}}) minus the
   clustered sandwich estimator, with clusters formed out of the
   intersection of both dimensions (\eqn{M_{id \cap time}}):
-  \deqn{M = M_{id} + M_{time} - M_{id \cap time}}
+  \deqn{M = M_{id} + M_{time} - M_{id \cap time}}.
   Additionally, each of the three terms can be weighted by the corresponding
   cluster bias adjustment factor (see below and Equation 20 in Zeileis et al. 2020).
   Instead of subtracting \eqn{M_{id \cap time}} as the last
@@ -76,7 +76,8 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   MacKinnon and White (1985) for heteroscedasticity corrections. HC0 applies no small sample bias adjustment.
   HC1 applies a degrees of freedom-based correction, \eqn{(n-1)/(n-k)} where \eqn{n} is the
   number of observations and \eqn{k} is the number of explanatory or predictor variables in the model.
-  HC1 is the most commonly used approach, and is the default, though it is less effective
+  HC1 is the most commonly used approach for linear models, and HC0 otherwise. Hence these
+  are the defaults in \code{vcovCL}. However, HC0 and HC1 are less effective
   than HC2 and HC3 when the number of clusters is relatively small (Cameron et al. 2008).
   HC2 and HC3 types of bias adjustment are geared towards the linear
   model, but they are also applicable for GLMs (see Bell and McCaffrey
@@ -85,6 +86,14 @@ meatCL(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALSE, \dots)
   of a hat matrix (or a weighted version therof for GLMs) and hence
   these two types are currently only implemented for \code{\link{lm}}
   and \code{\link{glm}} objects.
+  
+  An alternative to the clustered HC3 estimator is the clustered jackknife estimator
+  which is available in \code{\link{vcovBS}} with \code{type = "jackknife"}. In linear
+  models the HC3 and the jackknife estimator coincide (MacKinnon et al. 2022) with the
+  latter still being computationally feasible if the number of observations per cluster
+  is large. In nonlinear models (including non-Gaussian GLMs) the jackknife and the HC3
+  estimator do not coincide but the jackknife might still be a useful alternative when
+  the HC3 cannot be computed.
   
   The \code{cadjust} argument allows to
   switch the cluster bias adjustment factor \eqn{G/(G-1)} on and
@@ -143,7 +152,12 @@ Ma MS (2014).
   \emph{Mimeo, Availlable at SSRN:}
    URL \url{https://www.ssrn.com/abstract=2420421}.
 
-MacKinnon, JG, White, H (1985). 
+MacKinnon JG, Nielsen MØ, Webb MD (2022). 
+  \dQuote{Cluster-Robust Inference: A Guide to Empirical Practice}, 
+  \emph{Journal of Econometrics}, Forthcoming.
+  \doi{10.1016/j.jeconom.2022.04.001}
+
+MacKinnon JG, White H (1985). 
   \dQuote{Some Heteroskedasticity-Consistent Covariance Matrix Estimators with Improved Finite Sample Properties}
   \emph{Journal of Econometrics}, \bold{29}(3), 305--325.
   \doi{10.1016/0304-4076(85)90158-7}
@@ -175,7 +189,7 @@ Zeileis A, Köll S, Graham N (2020).
   \doi{10.18637/jss.v095.i01}
 }
 
-\seealso{\code{\link{vcovHC}}}
+\seealso{\code{\link{vcovHC}}, \code{\link{vcovBS}}}
 
 \examples{
 ## Petersen's data

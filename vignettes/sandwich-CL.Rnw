@@ -298,7 +298,7 @@ However, as this also requires non-standard (non-normal) inference it cannot be 
 standard tests in the same modular way as implemented in \pkg{sandwich} and is
 not pursued further here.
 
-In a recent paper, \cite{hac:Abadie+Athey+Imbens+Wooldridge:2017} survey
+In a recent paper, \cite{hac:Abadie+Athey+Imbens+Wooldridge:2022} survey
 state-of-the-art methods for clustered covariances with special focus on
 treatment effects in economic experiments with possibly multiple cluster
 dimensions. They emphasize that, in terms of effect on the covariance
@@ -1111,7 +1111,7 @@ library("geepack")
 %
 <<petersen-comparison2>>=
 p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling",
- indexes = c("firm", "year"))
+ index = c("firm", "year"))
 
 vcov.geeglm <- function(object) {
   vc <- object$geese$vbeta
@@ -1253,7 +1253,7 @@ Following \cite{hac:Harden:2011} the linear predictor considered for the simulat
 of three regressors that are either \emph{correlated} with the clustering, \emph{clustered},
 or \emph{uncorrelated}. The correlation of the first type of regressor is controlled by
 separate parameter $\rho_x$.
-Thus, in the terminology of  \cite{hac:Abadie+Athey+Imbens+Wooldridge:2017},
+Thus, in the terminology of  \cite{hac:Abadie+Athey+Imbens+Wooldridge:2022},
 the parameter $\rho$ above controls the correlation in the sampling process while the parameter
 $\rho_x$ controls the extent of the clustering in the ``treatment'' assignment.
 

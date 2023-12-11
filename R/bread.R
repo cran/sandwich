@@ -66,7 +66,7 @@ bread.gam <- function(x, ...)
   
 bread.coxph <- function(x, ...)
 {
-  rval <- x$var * x$n
+  rval <- x$n * if(is.null(x$naive.var)) x$var else x$naive.var
   dimnames(rval) <- list(names(coef(x)), names(coef(x)))
   return(rval)
 }

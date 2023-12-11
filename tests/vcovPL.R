@@ -15,7 +15,7 @@ vcovPL(n, cluster = ~ industry, adjust = FALSE)
 
 ## vcovPL covariance matrix compared with vcovSCC from plm package
 if(!require("plm")) q()
-pm <- plm::plm(y ~ x, data = PetersenCL, model = "pooling", indexes = c("firm", "year"))
+pm <- plm::plm(y ~ x, data = PetersenCL, model = "pooling", index = c("firm", "year"))
 
 (pl1 <- vcovPL(m, cluster = ~ firm, adjust = FALSE))
 (pl2 <- plm::vcovSCC(pm))

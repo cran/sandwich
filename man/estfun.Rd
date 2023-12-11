@@ -56,13 +56,13 @@ Zeileis A, Köll S, Graham N (2020).
 
 \examples{
 ## linear regression
-x <- sin(1:10)
-y <- rnorm(10)
-fm <- lm(y ~ x)
+x <- 1:9
+y <- sin(1:9/5)
+m <- lm(y ~ x)
 
 ## estimating function: (y - x'beta) * x
-estfun(fm)
-residuals(fm) * cbind(1, x)
+estfun(m)
+residuals(m) * cbind(1, x)
 }
 
 \keyword{regression}

@@ -176,7 +176,7 @@ se(list(
 ### code chunk number 12: petersen-comparison2
 ###################################################
 p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling",
- indexes = c("firm", "year"))
+ index = c("firm", "year"))
 
 vcov.geeglm <- function(object) {
   vc <- object$geese$vbeta

@@ -43,6 +43,7 @@ See also Robertson et al. (1988).
 \seealso{\code{\link{weave}}, \code{\link{weightsLumley}}}
 
 \examples{
+set.seed(1)
 x <- filter(rnorm(100), 0.9, "recursive")
 isoacf(x)
 acf(x, plot = FALSE)$acf

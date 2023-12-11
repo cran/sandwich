@@ -6,8 +6,8 @@
 Model-robust standard error estimators for cross-sectional, time series,
 clustered, panel, and longitudinal data. Modular object-oriented
 implementation with support for many model objects, including: `lm`,
-`glm`, `survreg`, `coxph`, `mlogit`, `polr`, `hurdle`, `zeroinfl`, and
-beyond.
+`glm`, `fixest`, `survreg`, `coxph`, `mlogit`, `polr`, `hurdle`, `zeroinfl`,
+and beyond.
 
 **Sandwich covariances for general parametric models:**
 
@@ -23,7 +23,6 @@ m <- lm(y ~ x, data = PetersenCL)
 coeftest(m, vcov = sandwich)
 ```
 
-    ## 
     ## t test of coefficients:
     ## 
     ##             Estimate Std. Error t value Pr(>|t|)    
@@ -36,7 +35,6 @@ coeftest(m, vcov = sandwich)
 coeftest(m, vcov = vcovCL, cluster = ~ firm)
 ```
 
-    ## 
     ## t test of coefficients:
     ## 
     ##             Estimate Std. Error t value Pr(>|t|)    

@@ -35,11 +35,12 @@ export(
   "vcovPC",
   "meatPC",
 
-## clustered bootstrap estimator
+## clustered bootstrap (and jackknife) estimator
   "vcovBS",
   "vcovBS.default",
   "vcovBS.lm",
   ".vcovBSenv",
+  "vcovJK",
 
 ## weights/bandwidths for HAC estimators  
   "weightsLumley",
@@ -94,3 +95,4 @@ S3method("vcovHAC", "default")
 S3method("vcovBS", "default")
 S3method("vcovBS", "lm")
 S3method("vcovBS", "glm")
+S3method("vcovJK", "default")

@@ -4,14 +4,13 @@ vcovBS <- function(x, ...) {
   UseMethod("vcovBS")
 }
 
-vcovBS.default <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
+vcovBS.default <- function(x, cluster = NULL, R = 250, start = FALSE, type = "xy", ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL, center = "mean")
 {
   ## set up return value with correct dimension and names
-  cf <- coef(x)
-  k <- length(cf)
+  cf0 <- coef(x)
+  k <- length(cf0)
   n <- nobs0(x)
-  rval <- matrix(0, nrow = k, ncol = k, dimnames = list(names(cf), names(cf)))
-  cf <- matrix(rep.int(NA_real_, k * R), ncol = k, dimnames = list(NULL, names(cf)))
+  rval <- matrix(0, nrow = k, ncol = k, dimnames = list(names(cf0), names(cf0)))
 
   ## try to figure out environment for update()
   env <- try(environment(terms(x)))
@@ -79,31 +78,66 @@ vcovBS.default <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix =
   ## use starting values?
   assign(".vcovBSstart", if(isTRUE(start)) coef(x) else NULL, envir = .vcovBSenv)
 
+  ## xy bootstrap vs. jackknife
+  type <- match.arg(tolower(type), c("xy", "jackknife", "fractional"))
+
   ## bootstrap for each cluster dimension
-  for (i in 1L:length(cl))
-  {
+  for (i in 1L:length(cl)) {
     ## cluster structure
-    cli <- split(seq_along(cluster[[i]]), cluster[[i]])
+    cli <- if(type != "fractional") {
+      split(seq_along(cluster[[i]]), cluster[[i]])    
+    } else {
+      factor(cluster[[i]], levels = unique(cluster[[i]]))
+    }
 
     ## bootstrap fitting function via update()
     bootfit <- function(j, ...) {
-        j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
-        assign(".vcovBSsubset", j, envir = .vcovBSenv)
+        clj <- switch(type,
+          "xy" = {
+            unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
+          },
+          "jackknife" = {
+            unlist(cli[-j])
+          },
+          "fractional" = {
+            fw <- rexp(nlevels(cli))
+            fw <- fw[cli]/mean(fw)
+            mw <- weights(x)
+            j <- if(is.null(mw)) fw else mw * fw
+          })
+        assign(".vcovBSsubset", clj, envir = .vcovBSenv)
         up <- if(is.null(.vcovBSenv$.vcovBSstart)) {
-          update(x, subset = .vcovBSenv$.vcovBSsubset, ..., evaluate = FALSE)
+          if(type != "fractional") {
+            update(x, subset = .vcovBSenv$.vcovBSsubset, ..., evaluate = FALSE)
+          } else {
+            update(x, weights = .vcovBSenv$.vcovBSsubset, ..., evaluate = FALSE)
+          }
         } else {
-          update(x, subset = .vcovBSenv$.vcovBSsubset, start = .vcovBSenv$.vcovBSstart, ..., evaluate = FALSE)      
+          if(type != "fractional") {
+            update(x, subset = .vcovBSenv$.vcovBSsubset, start = .vcovBSenv$.vcovBSstart, ..., evaluate = FALSE)      
+          } else {
+            update(x, weights = .vcovBSenv$.vcovBSsubset, start = .vcovBSenv$.vcovBSstart, ..., evaluate = FALSE)                
+          }
         }
         up <- eval(up, envir = env, enclos = parent.frame())
         coef(up)
     }
     
+    ## for jackknife the number of replications is always the number of "observations" (cluster units)
+    if(type == "jackknife") R <- length(cli)
+    
     ## actually refit
     cf <- applyfun(1L:R, bootfit, ...)
-    cf <- do.call("rbind", cf)
 
     ## aggregate across cluster variables
-    rval <- rval + sign[i] * cov(cf, use = use)
+    if(type == "jackknife") {
+      cf <- do.call("cbind", cf)
+      center <- match.arg(center, c("mean", "estimate"))
+      rval <- rval + sign[i] * (R - 1L)/R * tcrossprod(cf - if(center == "mean") rowMeans(cf) else cf0)
+    } else {
+      cf <- do.call("rbind", cf)
+      rval <- rval + sign[i] * cov(cf, use = use)
+    }
   }
   ## clean up starting values again
   remove(".vcovBSstart", envir = .vcovBSenv)

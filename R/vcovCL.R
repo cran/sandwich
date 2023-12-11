@@ -84,9 +84,13 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
     ## See also Cameron, Gelbach and Miller (2011, page 241)
   #if(FALSE) g[] <- gmin
 
+  ## type of model
+  is_lm <- function(object) class(object)[1L] == "lm" #FIXME# (class(object)[1L] == "lm") || (identical(class(object), "fixest") && object$method == "feols")
+  is_glm <- function(object) class(object)[1L] == "glm"
+
   ## type of bias correction
   if(is.null(type)) {
-    type <- if(class(x)[1L] == "lm") "HC1" else "HC0"
+    type <- if(is_lm(x)) "HC1" else "HC0"
   }
   type <- match.arg(type, c("HC", "HC0", "HC1", "HC2", "HC3"))
   if(type == "HC") type <- "HC0"
@@ -97,7 +101,7 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
     if(any(g == n)) h <- hatvalues(x)
 
     if(!all(g == n)) {
-      if(!(class(x)[1L] %in% c("lm", "glm"))) warning("clustered HC2/HC3 are only applicable to (generalized) linear regression models")
+      if(!(is_lm(x) || is_glm(x))) warning("clustered HC2/HC3 are only applicable to (generalized) linear regression models")
 
       ## regressor matrix
       X <- model.matrix(x)

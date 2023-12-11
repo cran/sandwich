@@ -1,11 +1,10 @@
-vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL, qrjoint = FALSE)
+vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL, qrjoint = FALSE, center = "mean")
 {
   ## set up return value with correct dimension and names
-  cf <- coef(x)
-  k <- length(cf)
+  cf0 <- coef(x)
+  k <- length(cf0)
   n <- nobs(x)
-  rval <- matrix(0, nrow = k, ncol = k, dimnames = list(names(cf), names(cf)))
-  cf <- matrix(rep.int(NA_real_, k * R), ncol = k, dimnames = list(NULL, names(cf)))
+  rval <- matrix(0, nrow = k, ncol = k, dimnames = list(names(cf0), names(cf0)))
 
   ## cluster can either be supplied explicitly or
   ## be an attribute of the model...FIXME: other specifications?
@@ -59,7 +58,7 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
     wild <- function(n) NULL
   }
   type <- match.arg(gsub("wild-", "", tolower(type), fixed = TRUE),
-    c("xy", "residual", "wild", "webb", "rademacher", "mammen", "norm", "user"))
+    c("xy", "jackknife", "fractional", "residual", "wild", "webb", "rademacher", "mammen", "norm", "user"))
   if(type == "wild") type <- "rademacher"
   
   ## set up wild bootstrap function
@@ -72,7 +71,7 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
     wild
   )
 
-  ## model information: original response and design matrix or the corresponding fitted/residuals/QR
+  ## model information: original response, weights, and design matrix or the corresponding fitted/residuals/QR
   y <- if(!is.null(x$y)) {
     x$y
   } else if(!is.null(x$model)) {
@@ -80,7 +79,9 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
   } else {
     model.response(model.frame(x))
   }
-  xfit <- if(type == "xy") model.matrix(x) else list(fit = x$fitted.values, res = x$residuals, qr = x$qr)
+  wts <- if(is.null(x$weights)) rep.int(1, n) else x$weights
+  off <- if(is.null(x$offset))  rep.int(0, n) else x$offset
+  xfit <- if(type %in% c("xy", "jackknife", "fractional")) model.matrix(x) else list(fit = x$fitted.values, res = x$residuals, qr = x$qr)
 
   ## apply infrastructure for refitting models
   if(is.null(applyfun)) {
@@ -100,7 +101,7 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
   ## bootstrap for each cluster dimension
   for (i in 1L:length(cl)) {
     ## cluster structure
-    cli <- if(type %in% c("xy", "residual")) {
+    cli <- if(type %in% c("xy", "jackknife", "residual")) {
       split(seq_along(cluster[[i]]), cluster[[i]])
     } else {
       factor(cluster[[i]], levels = unique(cluster[[i]]))
@@ -115,26 +116,46 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
     bootfit <- switch(type,
       "xy" = function(j, ...) {
         j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
-        .lm.fit(xfit[j, , drop = FALSE], y[j], ...)$coefficients
+        .lm.fit(xfit[j, , drop = FALSE] * sqrt(wts[j]), (y[j] - off[j]) * sqrt(wts[j]), ...)$coefficients
+      },
+      "jackknife" = function(j, ...) {
+        j <- unlist(cli[-j])
+        .lm.fit(xfit[j, , drop = FALSE] * sqrt(wts[j]), (y[j] - off[j]) * sqrt(wts[j]), ...)$coefficients
+      },
+      "fractional" = function(j, ...) {
+        fw <- rexp(nlevels(cli))
+        fw <- fw[cli]/mean(fw)
+        .lm.fit(xfit * sqrt(wts * fw), (y - off) * sqrt(wts * fw), ...)$coefficients
       },
       "residual" = function(j, ...) {
         j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
         yboot <- xfit$fit + xfit$res[j]
+        yboot <- (yboot - off) * sqrt(wts)
 	if(qrjoint) yboot else qr.coef(xfit$qr, yboot)
       },
       function(j, ...) {
         j <- wild(nlevels(cli))
         yboot <- xfit$fit + xfit$res * j[cli]
+        yboot <- (yboot - off) * sqrt(wts)
 	if(qrjoint) yboot else qr.coef(xfit$qr, yboot)
       }
     )
+
+    ## for jackknife the number of replications is always the number of "observations" (cluster units)
+    if(type == "jackknife") R <- length(cli)
     
     ## actually refit
     cf <- applyfun(1L:R, bootfit, ...)
-    cf <- if(qrjoint && type != "xy") t(qr.coef(xfit$qr, do.call("cbind", cf))) else do.call("rbind", cf)
 
     ## aggregate across cluster variables
-    rval <- rval + sign[i] * cov(cf, use = use)
+    if(type == "jackknife") {
+      cf <- do.call("cbind", cf)
+      center <- match.arg(center, c("mean", "estimate"))
+      rval <- rval + sign[i] * (R - 1L)/R * tcrossprod(cf - if(center == "mean") rowMeans(cf) else cf0)
+    } else {
+      cf <- if(qrjoint && type != "xy") t(qr.coef(xfit$qr, do.call("cbind", cf))) else do.call("rbind", cf)
+      rval <- rval + sign[i] * cov(cf, use = use)
+    }
   }
 
   ## check (and fix) if sandwich is not positive semi-definite
@@ -145,16 +166,15 @@ vcovBS.lm <- function(x, cluster = NULL, R = 250, type = "xy", ..., fix = FALSE,
   return(rval)
 }
 
-vcovBS.glm <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
+vcovBS.glm <- function(x, cluster = NULL, R = 250, start = FALSE, type = "xy", ..., fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL, center = "mean")
 {
   ## set up return value with correct dimension and names
-  cf <- coef(x)
-  if(identical(start, TRUE))  start <- cf
+  cf0 <- coef(x)
+  if(identical(start, TRUE))  start <- cf0
   if(identical(start, FALSE)) start <- NULL
-  k <- length(cf)
+  k <- length(cf0)
   n <- nobs(x)
-  rval <- matrix(0, nrow = k, ncol = k, dimnames = list(names(cf), names(cf)))
-  cf <- matrix(rep.int(NA_real_, k * R), ncol = k, dimnames = list(NULL, names(cf)))
+  rval <- matrix(0, nrow = k, ncol = k, dimnames = list(names(cf0), names(cf0)))
 
   ## cluster can either be supplied explicitly or
   ## be an attribute of the model...FIXME: other specifications?
@@ -200,7 +220,7 @@ vcovBS.glm <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix = FAL
     sign <- 1
   }
 
-  ## model information: original response and design matrix or the corresponding fitted/residuals/QR
+  ## model information: original response, design matrix, fitting method
   y <- if(!is.null(x$y)) {
     x$y
   } else if(!is.null(x$model)) {
@@ -209,6 +229,7 @@ vcovBS.glm <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix = FAL
     model.response(model.frame(x))
   }
   xfit <- model.matrix(x)
+  method <- x$method
 
   ## apply infrastructure for refitting models
   if(is.null(applyfun)) {
@@ -225,24 +246,54 @@ vcovBS.glm <- function(x, cluster = NULL, R = 250, start = FALSE, ..., fix = FAL
     }
   }
 
+  ## xy bootstrap vs. jackknife
+  type <- match.arg(tolower(type), c("xy", "jackknife", "fractional"))
+
   ## bootstrap for each cluster dimension
   for (i in 1L:length(cl))
   {
     ## cluster structure
-    cli <- split(seq_along(cluster[[i]]), cluster[[i]])
+    cli <- if(type != "fractional") {
+      split(seq_along(cluster[[i]]), cluster[[i]])
+    } else {
+      factor(cluster[[i]], levels = unique(cluster[[i]]))
+    }
 
     ## bootstrap fitting function
     bootfit <- function(j, ...) {
-      j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
-      glm.fit(xfit[j, , drop = FALSE], y[j], family = x$family, start = start, ...)$coefficients
+      if(type == "xy") {
+        j <- unlist(cli[sample(names(cli), length(cli), replace = TRUE)])
+        wts <- 1
+      } else if(type == "jackknife") {
+        j <- unlist(cli[-j])
+        wts <- 1
+      } else if(type == "fractional") {
+        j <- 1L:n
+        wts <- rexp(nlevels(cli))
+        wts <- wts[cli]/mean(wts)
+      }
+      eval(
+        call(if(is.function(method)) "method" else method, 
+          x = xfit[j, , drop = FALSE], y = y[j], weights = x$prior.weights[j] * wts, offset = x$offset[j],
+          family = x$family, start = start, control = x$control, intercept = attr(x$terms, "intercept") > 0)
+      )$coefficients
     }
+
+    ## for jackknife the number of replications is always the number of "observations" (cluster units)
+    if(type == "jackknife") R <- length(cli)
     
     ## actually refit
     cf <- applyfun(1L:R, bootfit, ...)
-    cf <- do.call("rbind", cf)
 
     ## aggregate across cluster variables
-    rval <- rval + sign[i] * cov(cf, use = use)
+    if(type == "jackknife") {
+      cf <- do.call("cbind", cf)
+      center <- match.arg(center, c("mean", "estimate"))
+      rval <- rval + sign[i] * (R - 1L)/R * tcrossprod(cf - if(center == "mean") rowMeans(cf) else cf0)
+    } else {
+      cf <- do.call("rbind", cf)
+      rval <- rval + sign[i] * cov(cf, use = use)
+    }
   }
 
   ## check (and fix) if sandwich is not positive semi-definite

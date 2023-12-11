@@ -143,7 +143,7 @@ zero_log(sales)               0.0164233 0.0165897 0.0277648 0.0295080
 x           0.050596     0.050596
 
 > p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling", 
-+     indexes = c("firm", "year"))
++     index = c("firm", "year"))
 
 > vcov.geeglm <- function(object) {
 +     vc <- object$geese$vbeta

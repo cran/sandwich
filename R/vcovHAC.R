@@ -177,7 +177,7 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   if(length(weights) < 2) weights <- 1
 
   if(prewhite > 0) {
-    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method)
+    var.fit <- try(ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method))
     if(inherits(var.fit, "try-error")) stop(sprintf("VAR(%i) prewhitening of estimating functions failed", prewhite))
     umat <- as.matrix(na.omit(var.fit$resid))
     n <- n - prewhite ##??
@@ -185,13 +185,19 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
 
   if(approx == "AR(1)") {
     fitAR1 <- function(x) {
-      rval <-  ar(x, order.max = 1, aic = FALSE, method = "ols")
+      rval <-  tryCatch(ar(x, order.max = 1, aic = FALSE, method = "ols"),
+        error = function(e) return(list(ar = NA_real_, var.pred = NA_real_)))
       rval <- c(rval$ar, sqrt(rval$var.pred))
       names(rval) <- c("rho", "sigma")
       return(rval)
     }
 
     ar.coef <- apply(umat, 2, fitAR1)
+    if(any(!is.finite(ar.coef))) {
+      ok <- apply(is.finite(ar.coef), 2L, all)
+      stop(paste("Cannot compute bandwidth because AR(1) approximation failed for estimating functions of:",
+        paste(colnames(ar.coef)[!ok], collapse = ", ")))
+    }
 
     denum <- sum(weights * (ar.coef["sigma",]/(1-ar.coef["rho",]))^4)
     alpha2 <- sum(weights * 4 * ar.coef["rho",]^2 * ar.coef["sigma",]^4/(1-ar.coef["rho",])^8) / denum
@@ -200,13 +206,19 @@ bwAndrews <- function(x, order.by = NULL, kernel = c("Quadratic Spectral", "Trun
   } else {
 
     fitARMA11 <- function(x) {
-      rval <-  arima(x, order = c(1, 0, 1), include.mean = FALSE)
+      rval <-  tryCatch(arima(x, order = c(1, 0, 1), include.mean = FALSE),
+        error = function(e) return(list(coef = c(NA_real_, NA_real_), var.pred = NA_real_)))
       rval <- c(rval$coef, sqrt(rval$sigma2))
       names(rval) <- c("rho", "psi", "sigma")
       return(rval)
     }
 
     arma.coef <- apply(umat, 2, fitARMA11)
+    if(any(!is.finite(arma.coef))) {
+      ok <- apply(is.finite(arma.coef), 2L, all)
+      stop(paste("Cannot compute bandwidth because ARMA(1,1) approximation failed for estimating functions of:",
+        paste(colnames(arma.coef)[!ok], collapse = ", ")))
+    }
 
     denum <- sum(weights * ((1 + arma.coef["psi",]) * arma.coef["sigma",]/(1-arma.coef["rho",]))^4)
     alpha2 <- sum(weights * 4 * ((1 + arma.coef["rho",] * arma.coef["psi",]) * (
@@ -371,7 +383,7 @@ bwNeweyWest <- function(x, order.by = NULL, kernel = c("Bartlett", "Parzen",
   m <- floor(ifelse(prewhite > 0, 3, 4) * (n/100)^mrate)
 
   if(prewhite > 0) {
-    var.fit <- ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method)
+    var.fit <- try(ar(umat, order.max = prewhite, demean = FALSE, aic = FALSE, method = ar.method))
     if(inherits(var.fit, "try-error")) stop(sprintf("VAR(%i) prewhitening of estimating functions failed", prewhite))
     umat <- as.matrix(na.omit(var.fit$resid))
     n <- n - prewhite

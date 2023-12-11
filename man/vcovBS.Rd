@@ -17,15 +17,17 @@
 \usage{
 vcovBS(x, \dots)
 
-\method{vcovBS}{default}(x, cluster = NULL, R = 250, start = FALSE, \dots,
-  fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
+\method{vcovBS}{default}(x, cluster = NULL, R = 250, start = FALSE, type = "xy", \dots,
+  fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL,
+  center = "mean")
 
 \method{vcovBS}{lm}(x, cluster = NULL, R = 250, type = "xy", \dots,
   fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL,
-  qrjoint = FALSE)
+  qrjoint = FALSE, center = "mean")
 
-\method{vcovBS}{glm}(x, cluster = NULL, R = 250, start = FALSE, \dots,
-  fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL)
+\method{vcovBS}{glm}(x, cluster = NULL, R = 250, start = FALSE, type = "xy", \dots,
+  fix = FALSE, use = "pairwise.complete.obs", applyfun = NULL, cores = NULL,
+  center = "mean")
 }
 
 \arguments{
@@ -39,13 +41,15 @@ vcovBS(x, \dots)
   \item{start}{logical. Should \code{coef(x)} be passed as \code{start}
     to the \code{update(x, subset = ...)} call? In case the model \code{x}
     is computed by some numeric iteration, this may speed up the bootstrapping.}
-  \item{type}{character or function. The character string specifies the type of
-    bootstrap to use: One of \code{"xy"}, \code{"residual"}, \code{"wild"}
+  \item{type}{character (or function). The character string specifies the type of
+    bootstrap to use: In the default and \code{glm} method the three types
+    \code{"xy"}, \code{"fractional"}, and \code{"jackknife"} are available.
+    In the \code{lm} method there are additionally \code{"residual"}, \code{"wild"}
     (or equivalently: \code{"wild-rademacher"} or \code{"rademacher"}),
     \code{"mammen"} (or \code{"wild-mammen"}), \code{"norm"}
     (or \code{"wild-norm"}), \code{"webb"} (or \code{"wild-webb"}).
-    Alternatively, \code{type} can be a \code{function(n)} for drawing
-    wild bootstrap factors.}
+    Finally, for the \code{lm} method \code{type} can be a \code{function(n)}
+    for drawing wild bootstrap factors.}
   \item{\dots}{arguments passed to methods. For the default method, this is
     passed to \code{update}, and for the \code{lm} method to \code{lm.fit}.}
   \item{fix}{logical. Should the covariance matrix be fixed to be
@@ -60,6 +64,10 @@ vcovBS(x, \dots)
     \code{\link[parallel]{mclapply}} with the desired number of \code{cores},
     except on Windows where \code{\link[parallel]{parLapply}} with
     \code{makeCluster(cores)} is used.}
+  \item{center}{character. For \code{type = "jackknife"} the coefficients from
+    all jacknife samples (each dropping one observational unit/cluster) can be
+    centered by their \code{"mean"} (default) or by the original full-sample
+    \code{"estimate"}.}
   \item{qrjoint}{logical. For residual-based and wild boostrap (i.e.,
     \code{type != "xy"}), should the bootstrap sample the dependent variable
     and then apply the QR decomposition jointly only once? If \code{FALSE},
@@ -73,7 +81,7 @@ vcovBS(x, \dots)
   Clustered sandwich estimators are used to adjust inference when errors
   are correlated within (but not between) clusters. See the documentation for \code{\link{vcovCL}} 
   for specifics about covariance clustering. This function allows
-  for clustering in arbitrary many cluster dimensions (e.g., firm, time, industry), given all
+  for clustering in arbitrarily many cluster dimensions (e.g., firm, time, industry), given all
   dimensions have enough clusters (for more details, see Cameron et al. 2011).
   Unlike \code{vcovCL}, \code{vcovBS} uses a bootstrap rather than an asymptotic solution.
 
@@ -100,7 +108,7 @@ vcovBS(x, \dots)
   and converges to the asymptotic solution used in \code{vcovCL}
   as \code{R}, \eqn{n}, and \eqn{g} become large (\eqn{n} and \eqn{g} are the number of
   observations and the number of clusters, respectively; see Efron 1979, or Mammen 1992, for a 
-  discussion of bootstrap asymptotics). For small \eqn{g}--particularly under 30 groups--the
+  discussion of bootstrap asymptotics). For small \eqn{g} -- particularly under 30 groups -- the
   bootstrap will converge to a slightly different value than the asymptotic method, due to
   the limited number of distinct bootstrap replications possible (see Webb 2014 for a discussion
   of this phenomonon). The bootstrap will not necessarily converge to an asymptotic estimate
@@ -110,7 +118,7 @@ vcovBS(x, \dots)
   practitioner when the asymptotic solution is unavailable (this can happen when using
   estimators that have no \code{estfun} function, for example). The residual bootstrap,
   by contrast, is rarely of practical interest, because while it provides consistent
-  inference for for clustered standard errors, it is not robust to heteroscedasticity.
+  inference for clustered standard errors, it is not robust to heteroscedasticity.
   More generally, bootstrapping is useful when the bootstrap makes different assumptions than the asymptotic
   estimator, in particular when the number of clusters is small and large \eqn{n} or
   \eqn{g} assumptions are unreasonable. Bootstrapping is also often effective for nonlinear models,
@@ -118,9 +126,30 @@ vcovBS(x, \dots)
   See Cameron and Miller (2015) for further discussion of bootstrap techniques in practical applications,
   and Zeileis et al. (2020) show simulations comparing \code{vcovBS} to \code{vcovCL} in several
   settings.
+  
+  The jackknife approach is of particular interest in practice because it can be shown to be
+  exactly equivalent to the HC3 (without cluster adjustment, also known as CV3)
+  covariance matrix estimator in linear models (see MacKinnon,
+  Nielsen, Webb 2022). If the number of observations per cluster is large it may become
+  impossible to compute this estimator via \code{\link{vcovCL}} while using the jackknife
+  approach will still be feasible. In nonlinear models (including non-Gaussian GLMs) the
+  jackknife and the HC3 estimator do not coincide but the jackknife might still be a useful
+  alternative when the HC3 cannot be computed. A convenience interface \code{\link{vcovJK}}
+  is provided whose default method simply calls \code{vcovBS(..., type = "jackknife")}.
 
-  The \code{\link[stats]{glm}} method works essentially like the default method but call
-  \code{\link[stats]{glm.fit}} instead of code{update}.
+  The fractional-random-weight bootstrap (see Xu et al. 2020), first introduced by
+  Rubin (1981) as Bayesian bootstrap, is an alternative to the xy bootstrap when it is
+  computationally challenging or even impractical to reestimate the model on subsets, e.g.,
+  when "successes" in binary responses are rare or when the number of parameters is close
+  to the sample size. In these situations excluding some observations completely is the
+  source of the problems, i.e., giving some observations zero weight while others receive
+  integer weights of one ore more. The fractional bootstrap mitigates this by giving
+  every observation a positive fractional weight, drawn from a Dirichlet distribution.
+  These may become close to zero but never exclude an observation completly, thus stabilizing
+  the computation of the reweighted models.
+
+  The \code{\link[stats]{glm}} method works essentially like the default method but calls
+  \code{\link[stats]{glm.fit}} instead of \code{update}.
   
   The \code{\link[stats]{lm}} method provides additional bootstrapping \code{type}s
   and computes the bootstrapped coefficient estimates somewhat more efficiently using
@@ -180,20 +209,35 @@ Efron B (1979).
   \emph{The Annals of Statistics}, \bold{7}(1), 1--26.
   \doi{10.1214/aos/1176344552}
   
-Mammen, E (1992). 
+MacKinnon JG, Nielsen MØ, Webb MD (2022). 
+  \dQuote{Cluster-Robust Inference: A Guide to Empirical Practice}, 
+  \emph{Journal of Econometrics}, Forthcoming.
+  \doi{10.1016/j.jeconom.2022.04.001}
+  
+Mammen E (1992). 
   \dQuote{When Does Bootstrap Work?: Asymptotic Results and Simulations}, 
   \emph{Lecture Notes in Statistics}, \bold{77}.
   Springer Science & Business Media.
   
-Mammen, E (1993). 
+Mammen E (1993). 
   \dQuote{Bootstrap and Wild Bootstrap for High Dimensional Linear Models}, 
   \emph{The Annals of Statistics}, \bold{21}(1), 255--285.
   \doi{10.1214/aos/1176349025}
+
+Rubin DB (1981).
+  \dQuote{The Bayesian Bootstrap},
+  \emph{The Annals of Statistics}, \bold{9}(1), 130--134.
+  \doi{10.1214/aos/1176345338}
   
-Webb, MD (2014).
+Webb MD (2014).
   \dQuote{Reworking Wild Bootstrap Based Inference for Clustered Errors},
   Working Paper 1315, \emph{Queen's Economics Department.}
   \url{https://www.econ.queensu.ca/sites/econ.queensu.ca/files/qed_wp_1315.pdf}.
+
+Xu L, Gotwalt C, Hong Y, King CB, Meeker WQ (2020).
+  \dQuote{Applications of the Fractional-Random-Weight Bootstrap},
+  \emph{The American Statistician}, \bold{74}(4), 345--358.
+  \doi{10.1080/00031305.2020.1731599}
 
 Zeileis A, Köll S, Graham N (2020).
   \dQuote{Various Versatile Variances: An Object-Oriented Implementation of Clustered Covariances in R.}
@@ -201,7 +245,7 @@ Zeileis A, Köll S, Graham N (2020).
   \doi{10.18637/jss.v095.i01}
 }
 
-\seealso{\code{\link{vcovCL}}}
+\seealso{\code{\link{vcovCL}}, \code{\link{vcovJK}}}
 
 \examples{
 ## Petersen's data
@@ -214,11 +258,19 @@ set.seed(1)
 cbind(
   "classical" = sqrt(diag(vcov(m))),
   "HC-cluster" = sqrt(diag(vcovCL(m, cluster = ~ firm))),
-  "BS-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm)))
+  "BS-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm))),
+  "FW-cluster" = sqrt(diag(vcovBS(m, cluster = ~ firm, type = "fractional")))
 )
 
 ## two-way wild cluster bootstrap with Mammen distribution
 vcovBS(m, cluster = ~ firm + year, type = "wild-mammen")
+
+## jackknife estimator coincides with HC3 (aka CV3)
+all.equal(
+  vcovBS(m, cluster = ~ firm, type = "jackknife"),
+  vcovCL(m, cluster = ~ firm, type = "HC3", cadjust = FALSE),
+  tolerance = 1e-7
+)
 }
 
 \keyword{regression}
