@@ -83,14 +83,20 @@ meatHC <- function(x,
       }}
     )
     
-    ## check hat values (if necessary)
-    if(type %in% c("HC2", "HC3", "HC4", "HC4m", "HC5")) {
-      if(inherits(diaghat, "try-error")) stop(sprintf("hatvalues() could not be extracted successfully but are needed for %s", type))
-      id <- which(diaghat > 1 - sqrt(.Machine$double.eps))
-      if(length(id) > 0L) {
-        id <- if(is.null(rownames(X))) as.character(id) else rownames(X)[id]
-        if(length(id) > 10L) id <- c(id[1L:10L], "...")
-        warning(sprintf("%s covariances become numerically unstable if hat values are close to 1 as for observations %s", type, paste(id, collapse = ", ")))
+    ## check hat values
+    if(type != "const") {
+      if(type %in% c("HC0", "HC1")) {
+        idx <- if(inherits(diaghat, "try-error")) abs(res)/sqrt(mean(res^2)) < .Machine$double.eps^0.75 else diaghat > 1 - sqrt(.Machine$double.eps)
+        msg <- "%s covariances become (close to) singular if hat values are (close to) 1 as for observation(s) %s"
+      } else {
+        if(inherits(diaghat, "try-error")) stop(sprintf("hatvalues() could not be extracted successfully but are needed for %s", type))
+        idx <- diaghat > 1 - sqrt(.Machine$double.eps)
+        msg <- "%s covariances are numerically unstable for hat values close to 1 (and undefined if exactly 1) as for observation(s) %s"
+      }
+      if(any(idx)) {
+        idx <- if(is.null(rownames(X))) as.character(which(idx)) else rownames(X)[idx]
+        if(length(idx) > 10L) idx <- c(idx[1L:10L], "...")
+        warning(sprintf(msg, type, paste(idx, collapse = ", ")))
       }
     }
   }

@@ -1,7 +1,7 @@
 
-R version 4.3.1 (2023-06-16) -- "Beagle Scouts"
-Copyright (C) 2023 The R Foundation for Statistical Computing
-Platform: x86_64-pc-linux-gnu (64-bit)
+R version 4.4.1 (2024-06-14) -- "Race for Your Life"
+Copyright (C) 2024 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu
 
 R is free software and comes with ABSOLUTELY NO WARRANTY.
 You are welcome to redistribute it under certain conditions.
@@ -1083,7 +1083,7 @@ x           2.055475e-05 1.616308e-02
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  6.801 0.156 6.968 0 0 
+Time elapsed:  6.065 0.316 6.395 0 0 
 > grDevices::dev.off()
 null device 
           1 

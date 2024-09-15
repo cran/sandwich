@@ -89,12 +89,12 @@ Loading required package: plm
 +         data = data)
 +     pscl_ve .... [TRUNCATED] 
 Loading required package: pscl
-Classes and Methods for R developed in the
+Classes and Methods for R originally developed in the
 Political Science Computational Laboratory
 Department of Political Science
-Stanford University
-Simon Jackman
-hurdle and zeroinfl functions by Achim Zeileis
+Stanford University (2002-2015),
+by and under the direction of Simon Jackman.
+hurdle and zeroinfl functions by Achim Zeileis.
 
 > warn <- if (warn) {
 +     "{\\\\large\\\\bf\\\\color{Red}\n   Not all required packages were available when rendering this version of the vignette!\ ..." ... [TRUNCATED] 
@@ -325,4 +325,4 @@ x            0.025338 0.025338  0.025241 0.025241
  *** Run successfully completed ***
 > proc.time()
    user  system elapsed 
-  5.430   0.320   5.786 
+  5.060   0.452   5.509 

@@ -55,7 +55,7 @@ bread.clm <- function(x, ...)
 }
 
 bread.survreg <- function(x, ...)
-  length(x$linear.predictors) * x$var
+  length(x$linear.predictors) * if(is.null(x$naive.var)) x$var else x$naive.var
 
 bread.gam <- function(x, ...)
 {

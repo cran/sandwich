@@ -149,8 +149,8 @@ Kauermann G, Carroll RJ (2001).
 Ma MS (2014).
   \dQuote{Are We Really Doing What We Think We Are Doing? A Note on
     Finite-Sample Estimates of Two-Way Cluster-Robust Standard Errors},
-  \emph{Mimeo, Availlable at SSRN:}
-   URL \url{https://www.ssrn.com/abstract=2420421}.
+  \emph{Mimeo, Availlable at SSRN.}
+   \doi{10.2139/ssrn.2420421}
 
 MacKinnon JG, Nielsen MØ, Webb MD (2022). 
   \dQuote{Cluster-Robust Inference: A Guide to Empirical Practice}, 

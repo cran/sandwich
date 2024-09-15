@@ -60,10 +60,10 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
 
   ## Newey-West type standard errors if neither cluster nor order.by is specified
   if(is.null(cluster) && is.null(order.by)) cluster <- rep(1, n)
-        
+
   ## resort to cross-section if no clusters are supplied
   if(is.null(cluster)) cluster <- 1L:n
-    
+
   ## longitudinal time variable
   if(is.null(order.by)) order.by <- attr(x, "order.by")
   if(is.null(order.by)) {
@@ -92,7 +92,14 @@ meatPL <- function(x, cluster = NULL, order.by = NULL,
 
   ## aggregate within time periods?
   if(aggregate) {
-    if(length(unique(order.by)) < n) ef <- apply(ef, 2L, tapply, order.by, sum)
+    nt <- length(unique(order.by))
+    if(nt < n) {
+      ef <- if(nt == 1L) {
+        matrix(colSums(ef), nrow = 1L, dimnames = list(NULL, colnames(ef)))
+      } else {
+        apply(ef, 2L, tapply, order.by, sum)
+      }
+    }
     nt <- NROW(ef)
     nc <- length(unique(cluster))
   } else {

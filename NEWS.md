@@ -1,3 +1,17 @@
+# sandwich 3.1-1
+
+* In `meatPL()` the case of cross-section data (i.e., all elements of `order.by`
+  being equal) is handled consistently even if `aggregate = TRUE` (reported by
+  Christof Schoetz).
+
+* Fix `bread()` method for `survreg()` objects in case the latter already used a
+  "robust" sandwich variance. In that case `$naive.var` rather than `$var` has
+  to be used for the bread (reported by Daniel Klinenberg).
+
+* Improve warnings in `vcovHC()` for hat values numerically equal to 1. (Suggested by
+  Sanford Weisberg and John Fox.)
+
+
 # sandwich 3.1-0
 
 * Added jackknife estimator in all `vcovBS()` methods (suggested by Joe Ritter).

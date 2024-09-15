@@ -85,7 +85,7 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
   #if(FALSE) g[] <- gmin
 
   ## type of model
-  is_lm <- function(object) class(object)[1L] == "lm" #FIXME# (class(object)[1L] == "lm") || (identical(class(object), "fixest") && object$method == "feols")
+  is_lm <- function(object) class(object)[1L] == "lm"
   is_glm <- function(object) class(object)[1L] == "glm"
 
   ## type of bias correction
@@ -132,7 +132,7 @@ meatCL <- function(x, cluster = NULL, type = NULL, cadjust = TRUE, multi0 = FALS
                if(type == "HC1") (n - k)/(n - 1L) else 1
            } else {
                if(cadjust) g[i]/(g[i] - 1L) else 1
-           }  
+           }
       
     ## HC2/HC3
     if(type %in% c("HC2", "HC3")) {
