@@ -117,13 +117,21 @@ h_innov <- hurdle(
 
 
 ###################################################
-### code chunk number 5: innovation-coeftest
+### code chunk number 5: innovation-coeftest0 (eval = FALSE)
 ###################################################
+## coeftest(h_innov, vcov = vcovCL, cluster = ~ company)
+
+
+###################################################
+### code chunk number 6: innovation-coeftest
+###################################################
+suppressWarnings(
 coeftest(h_innov, vcov = vcovCL, cluster = ~ company)
+)
 
 
 ###################################################
-### code chunk number 6: innovation-se (eval = FALSE)
+### code chunk number 7: innovation-se (eval = FALSE)
 ###################################################
 ## suppressWarnings(RNGversion("3.5.0"))
 ## set.seed(0)
@@ -138,26 +146,26 @@ coeftest(h_innov, vcov = vcovCL, cluster = ~ company)
 
 
 ###################################################
-### code chunk number 7: innovation-se2
+### code chunk number 8: innovation-se2
 ###################################################
 se(vc_innov)
 
 
 ###################################################
-### code chunk number 8: petersen-model
+### code chunk number 9: petersen-model
 ###################################################
 data("PetersenCL", package = "sandwich")
 p_lm <- lm(y ~ x, data = PetersenCL)
 
 
 ###################################################
-### code chunk number 9: petersen-multiwayvcov (eval = FALSE)
+### code chunk number 10: petersen-multiwayvcov (eval = FALSE)
 ###################################################
 ## library("multiwayvcov")
 
 
 ###################################################
-### code chunk number 10: petersen-comparison1
+### code chunk number 11: petersen-comparison1
 ###################################################
 se(list(
   "sandwich" = vcovCL(p_lm, cluster = ~ firm),
@@ -166,14 +174,14 @@ se(list(
 
 
 ###################################################
-### code chunk number 11: petersen-plmgee (eval = FALSE)
+### code chunk number 12: petersen-plmgee (eval = FALSE)
 ###################################################
 ## library("plm")
 ## library("geepack")
 
 
 ###################################################
-### code chunk number 12: petersen-comparison2
+### code chunk number 13: petersen-comparison2
 ###################################################
 p_plm <- plm(y ~ x, data = PetersenCL, model = "pooling",
  index = c("firm", "year"))
@@ -194,7 +202,7 @@ se(list(
 
 
 ###################################################
-### code chunk number 13: petersen-twocl
+### code chunk number 14: petersen-twocl
 ###################################################
 se(list(
   "sandwich" = vcovCL(p_lm, cluster = ~ firm + year, multi0 = TRUE),
@@ -203,7 +211,7 @@ se(list(
 
 
 ###################################################
-### code chunk number 14: petersen-comparison3
+### code chunk number 15: petersen-comparison3
 ###################################################
 se(list(
   "sandwich" = vcovPL(p_lm, cluster = ~ firm + year, adjust = FALSE),
@@ -212,7 +220,7 @@ se(list(
 
 
 ###################################################
-### code chunk number 15: petersen-comparison4 (eval = FALSE)
+### code chunk number 16: petersen-comparison4 (eval = FALSE)
 ###################################################
 ## library("pcse")
 ## se(list(
@@ -223,7 +231,7 @@ se(list(
 
 
 ###################################################
-### code chunk number 16: petersen-comparison4-out
+### code chunk number 17: petersen-comparison4-out
 ###################################################
 se(list(
   "sandwich" = sandwich::vcovPC(p_lm, cluster = ~ firm + year),
@@ -233,14 +241,14 @@ se(list(
 
 
 ###################################################
-### code chunk number 17: petersen-unbalanced1
+### code chunk number 18: petersen-unbalanced1
 ###################################################
 PU <- subset(PetersenCL, !(firm == 1 & year == 10))
 pu_lm <- lm(y ~ x, data = PU)
 
 
 ###################################################
-### code chunk number 18: petersen-unbalanced2 (eval = FALSE)
+### code chunk number 19: petersen-unbalanced2 (eval = FALSE)
 ###################################################
 ## se(list(
 ##   "sandwichT" = sandwich::vcovPC(pu_lm, cluster = ~ firm + year,
@@ -253,7 +261,7 @@ pu_lm <- lm(y ~ x, data = PU)
 
 
 ###################################################
-### code chunk number 19: petersen-unbalanced2-out
+### code chunk number 20: petersen-unbalanced2-out
 ###################################################
 se(list(
   "sandwichT" = sandwich::vcovPC(pu_lm, cluster = ~ firm + year,
@@ -266,7 +274,7 @@ se(list(
 
 
 ###################################################
-### code chunk number 20: sim-01-figure
+### code chunk number 21: sim-01-figure
 ###################################################
 my.settings <- canonical.theme(color = TRUE)
 my.settings[["strip.background"]]$col <- "gray"
@@ -286,7 +294,7 @@ xyplot(coverage ~ rho | par, groups = ~ factor(vcov),
 
 
 ###################################################
-### code chunk number 21: sim-02-figure
+### code chunk number 22: sim-02-figure
 ###################################################
 my.settings <- canonical.theme(color = TRUE)
 my.settings[["strip.background"]]$col <- "gray"
@@ -307,7 +315,7 @@ xyplot(coverage ~ rho | dist, groups = ~ factor(vcov),
 
 
 ###################################################
-### code chunk number 22: sim-03-figure
+### code chunk number 23: sim-03-figure
 ###################################################
 s33 <- na.omit(s33)
 my.settings <- canonical.theme(color = TRUE)
@@ -327,7 +335,7 @@ xyplot(coverage ~ rho | dist, groups = ~ factor(vcov),
 
 
 ###################################################
-### code chunk number 23: sim-04-figure
+### code chunk number 24: sim-04-figure
 ###################################################
 my.settings <- canonical.theme(color = TRUE)
 my.settings[["strip.background"]]$col <- "gray"
@@ -346,7 +354,7 @@ xyplot(coverage ~ nid | dist, groups = ~ factor(vcov, levels = c(paste0("CL-", 0
 
 
 ###################################################
-### code chunk number 24: sim-0607-figure
+### code chunk number 25: sim-0607-figure
 ###################################################
 my.settings <- canonical.theme(color = TRUE)
 my.settings[["strip.background"]]$col <- "gray"
@@ -364,7 +372,7 @@ xyplot(coverage ~ nround | factor(par) + factor(copula), groups = ~ factor(vcov)
 
 
 ###################################################
-### code chunk number 25: sim-08-figure
+### code chunk number 26: sim-08-figure
 ###################################################
 my.settings <- canonical.theme(color = TRUE)
 my.settings[["strip.background"]]$col <- "gray"
@@ -379,5 +387,3 @@ xyplot(coverage ~ nround | factor(par) + factor(dist), groups = ~ factor(vcov),
   auto.key = list(columns = 2),
   par.strip.text = list(col = "black"), par.settings = my.settings,
   panel = panel.xyref)
-
-

@@ -104,7 +104,8 @@ hurdle and zeroinfl functions by Achim Zeileis.
 > h_innov <- hurdle(cites ~ institutions + log(capital/employment) + 
 +     log(sales), data = InstInnovation, dist = "negbin")
 
-> coeftest(h_innov, vcov = vcovCL, cluster = ~company)
+> suppressWarnings(coeftest(h_innov, vcov = vcovCL, 
++     cluster = ~company))
 
 t test of coefficients:
 

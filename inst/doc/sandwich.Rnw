@@ -163,7 +163,7 @@ not the most popular environment for econometric computing but which is finding 
 attention among econometricians \citep{hac:Cribari-Neto+Zarkos:1999,hac:Racine+Hyndman:2002}.
 Both \proglang{R} itself and the \pkg{sandwich} package (as well as all other packages 
 used in this paper) are available at no cost under the terms of the general public licence
-(GPL) from the comprehensive \proglang{R} archive network (CRAN, \url{http://CRAN.R-project.org/}).
+(GPL) from the comprehensive \proglang{R} archive network (CRAN, \url{https://CRAN.R-project.org/}).
 \proglang{R} has no built-in support for HC and HAC estimation and at the time we
 started writing \pkg{sandwich} there was only one package that implements HC (but not HAC)
 estimators \citep[the \pkg{car} package][]{hac:Fox:2002} but which does not allow for as much 
@@ -842,7 +842,7 @@ depend on \pkg{zoo}. For the computations in this paper \proglang{R}
 \pkg{strucchange} \Sexpr{strucchange_version}
 and \pkg{zoo} \Sexpr{gsub("-", "--", packageDescription("zoo")$Version)}
 have been used. \proglang{R} itself and all packages used are available from
-CRAN at \url{http://CRAN.R-project.org/}.
+CRAN at \url{https://CRAN.R-project.org/}.
 
 To make the packages available for the examples the following commands are 
 necessary:

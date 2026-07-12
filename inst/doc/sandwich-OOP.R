@@ -125,5 +125,3 @@ coeftest(fm_tobit, vcov = sandwich)
 ###################################################
 coeftest(fm_probit)
 coeftest(fm_probit, vcov = sandwich)
-
-

@@ -88,6 +88,7 @@ meatPC <- function(x, cluster = NULL, order.by = NULL, pairwise = FALSE, kroneck
   attr(X, "assign") <- NULL
     
   ## working residuals
+  if (!all(dim(X) == dim(ef))) stop("cannot match dimension of model.matrix and estfun to obtain working residuals")
   res <- rowMeans(ef/X, na.rm = TRUE)
   res[apply(abs(ef) < .Machine$double.eps, 1L, all)] <- 0
 

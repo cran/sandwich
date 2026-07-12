@@ -294,5 +294,3 @@ options(prompt = "  ")
 ## plot(RealInt, ylab = "Real interest rate")
 ## lines(ts(fitted(bp), start = start(RealInt), freq = 4), col = 4)
 ## lines(confint(bp, vcov = kernHAC))
-
-

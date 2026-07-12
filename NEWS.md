@@ -1,3 +1,17 @@
+# sandwich 3.1-2
+
+* Added `estfun()` method for `multinom()` objects (from `nnet`) so that `sandwich()`,
+  `vcovCL()` etc. are also supported.
+
+* Added informative error message in `meatHC()` and `meatPC()` if dimension of
+  `model.matrix` and `estfun` cannot be matched and thus working residuals cannot
+  be obtained.
+
+* Updated `structure()` calls to use `dimnames = ...` instead of `.Dimnames = ...`.
+
+* Fix BibTeX problems in vignettes (reported by Sebastian Meyer).
+
+
 # sandwich 3.1-1
 
 * In `meatPL()` the case of cross-section data (i.e., all elements of `order.by`

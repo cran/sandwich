@@ -1020,8 +1020,13 @@ library("sandwich")
 library("lmtest")
 @
 %
-<<innovation-coeftest>>=
+<<innovation-coeftest0, echo=TRUE, eval=FALSE>>=
 coeftest(h_innov, vcov = vcovCL, cluster = ~ company)
+@
+<<innovation-coeftest, echo=FALSE, eval=TRUE>>=
+suppressWarnings(
+<<innovation-coeftest0>>
+)
 @
 %
 This shows that institutional owners are have a small but positive impact in both

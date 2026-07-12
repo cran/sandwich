@@ -33,6 +33,7 @@ meatHC <- function(x,
   ## res <- if(attr(terms(x), "intercept") > 0) estfun(x)[,1] else rowMeans(estfun(x)/X, na.rm = TRUE)
   ## hence better rely on
   ef <- estfun(x, ...)
+  if (!all(dim(X) == dim(ef))) stop("cannot match dimension of model.matrix and estfun to obtain working residuals")
   res <- rowMeans(ef/X, na.rm = TRUE)
 
   ## handle rows with just zeros

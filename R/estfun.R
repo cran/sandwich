@@ -307,7 +307,23 @@ estfun.zeroinfl <- function(x, ...) {
   return(rval)
 }
 
-estfun.mlogit <- function(x, ...)
-{
+estfun.mlogit <- function(x, ...) {
   x$gradient
+}
+
+estfun.multinom <- function(x, ...) {
+  xmat <- model.matrix(x)
+  m <- length(x$lev)
+  n <- nrow(xmat)
+  k <- ncol(xmat)
+  wts <- model.weights(model.frame(x))
+  if(is.null(wts)) wts <- rep.int(1, n)
+  res <- residuals(x)
+  if(m == 2L) res <- cbind(-res, res)
+  rval <- matrix(0, nrow = n, ncol = (m - 1L) * k, dimnames = list(
+    rownames(xmat),
+    as.vector(t(outer(x$lev[-1L], x$vcoefnames, paste, sep = ":")))
+  ))
+  for(i in 2L:m) rval[, (i - 2L) * k + 1L:k] <- wts * res[, i] * xmat
+  return(rval)
 }

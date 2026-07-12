@@ -87,6 +87,7 @@ S3method("estfun", "polr")
 S3method("estfun", "hurdle")
 S3method("estfun", "zeroinfl")
 S3method("estfun", "mlogit")
+S3method("estfun", "multinom")
 
 ## methods for vcov*
 S3method("vcovHC", "default")
