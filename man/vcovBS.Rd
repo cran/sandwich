@@ -232,7 +232,7 @@ Rubin DB (1981).
 Webb MD (2014).
   \dQuote{Reworking Wild Bootstrap Based Inference for Clustered Errors},
   Working Paper 1315, \emph{Queen's Economics Department.}
-  \url{https://www.econ.queensu.ca/sites/econ.queensu.ca/files/qed_wp_1315.pdf}.
+  \url{https://www.econ.queensu.ca/research/working-papers/1315}.
 
 Xu L, Gotwalt C, Hong Y, King CB, Meeker WQ (2020).
   \dQuote{Applications of the Fractional-Random-Weight Bootstrap},

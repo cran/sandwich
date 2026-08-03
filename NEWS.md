@@ -1,3 +1,12 @@
+# sandwich 3.1-3
+
+* Code repository changed from R-Forge to Codeberg at:
+  <https://codeberg.org/zeileis/sandwich/>
+
+* The pkgdown website is now hosted at:
+  <https://zeileis.codeberg.page/sandwich/>
+
+
 # sandwich 3.1-2
 
 * Added `estfun()` method for `multinom()` objects (from `nnet`) so that `sandwich()`,

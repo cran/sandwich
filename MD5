@@ -1,6 +1,6 @@
-4e455b91a3a2f1cff6f8ddd93011e5bd *DESCRIPTION
+bf2ed211a7055b344d69685eb2b745dd *DESCRIPTION
 d61e7c29e628964556495a25e387a0f5 *NAMESPACE
-8e83e03e7f3b799190572e39cede14a8 *NEWS.md
+4005f005b4189590422cdfdcfd9ea59e *NEWS.md
 543121433c6a8d15d8eda056abe57c32 *R/auxiliary.R
 4db28cf6f91305183ceaa07810f893a1 *R/bread.R
 19a8701bd91e5bef4a81a58069ac0d3a *R/estfun.R
@@ -24,13 +24,13 @@ b2df7ddd1bbd460891c35dbe557eaeb2 *data/Investment.rda
 7d1b2d2907e2273691a5da013975cde0 *inst/CITATION
 514b4d16c571bfda86f6bf74c50c0eeb *inst/doc/sandwich-CL.R
 bc18ce88590c038ff1b8b863a9b7f176 *inst/doc/sandwich-CL.Rnw
-eae89463f5e021fceea6e86d83b7e877 *inst/doc/sandwich-CL.pdf
+6e454508f1decc61402cd90c5f3c8189 *inst/doc/sandwich-CL.pdf
 0261f26973a250262f6fae8e6f8007b8 *inst/doc/sandwich-OOP.R
 bb3754045633419f8088fb8b11faf1b4 *inst/doc/sandwich-OOP.Rnw
-bfc2d6f15a943f08464c1e4b498254e2 *inst/doc/sandwich-OOP.pdf
+4c1facf8f93ba9bcca19169aa329cf0f *inst/doc/sandwich-OOP.pdf
 5c7f61bbd79450d85c969168d1687d30 *inst/doc/sandwich.R
 cae045919e052f6186716b6f95cafc63 *inst/doc/sandwich.Rnw
-55e1b8fc2e09e63b3235007da99e246a *inst/doc/sandwich.pdf
+b976ac85cd5a0987efb75639569a485c *inst/doc/sandwich.pdf
 587642f487edf96fefa95949460e00e6 *inst/doc/sim-CL.R
 b4015c0cd0f68c34f3c3039caeed7b60 *inst/doc/sim-CL.rda
 ac3839b163cfbf45638f1a1aceac369c *man/InstInnovation.Rd
@@ -46,7 +46,7 @@ f6b178313cf1b754b5e464293de4fddc *man/estfun.Rd
 4f3f16b30084252769937192e929f86a *man/lrvar.Rd
 49aa1137c3a431fec4162c558cc01abb *man/meat.Rd
 94e1558b5a993e96c00bd7aacfe19840 *man/sandwich.Rd
-03c21ed654c372a2b3c5f5fd52b3351c *man/vcovBS.Rd
+10cfb26a62e09ce297a1b0472ee25c7a *man/vcovBS.Rd
 c2c5b1548ec6bf05ac3fe07dcb9d9ee1 *man/vcovCL.Rd
 b2ddffbbcb8c6390f54f01ffccc4afa6 *man/vcovHAC.Rd
 58e18f6b75329e6795653b64114b340c *man/vcovHC.Rd
